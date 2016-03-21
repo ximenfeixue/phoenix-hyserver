@@ -43,6 +43,10 @@
 			<id>localhost plugins</id>
 			<url>http://192.168.101.89:8081/nexus/content/groups/public/</url>
 		</pluginRepository>
+		<pluginRepository>
+			<id>Codehaus repository</id>
+			<url>http://repository.codehaus.org/</url>
+		</pluginRepository>
 	</pluginRepositories>
 
 	<build>

@@ -546,10 +546,13 @@
 		<resources>
 			<resource>
 				<directory>src/main/resources</directory>
+				<excludes>
+					<exclude>doc</exclude>
+				</excludes>
 				<filtering>true</filtering>
 			</resource>
 		</resources>
-		<testResources>
+		<!-- <testResources>
 			<testResource>
 				<filtering>true</filtering>
 				<directory>src/test/resources</directory>
@@ -561,7 +564,7 @@
 					<include>**/*.xml</include>
 				</includes>
 			</testResource>
-		</testResources>
+		</testResources> -->
 		<pluginManagement>
 			<plugins>
 				<plugin>
@@ -610,7 +613,7 @@
 			</plugin>
 
 			<!-- test插件, 增大内存且仅测试名称为*Test的类 -->
-			<plugin>
+			<!-- <plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
 				<version>2.10</version>
@@ -625,7 +628,7 @@
 					<argLine>-Xmx1024m -XX:PermSize=256m -XX:MaxPermSize=256m</argLine>
 					<useSystemClassLoader>true</useSystemClassLoader>
 				</configuration>
-			</plugin>
+			</plugin> -->
 
 			<!-- cobertura插件 -->
 			<plugin>
@@ -723,9 +726,10 @@
 				</configuration> </plugin> -->
 
 			<!-- dependency插件 -->
-			<plugin>
+			<!-- <plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-dependency-plugin</artifactId>
+				<version>2.2.1</version>
 				<executions>
 					<execution>
 						<id>install</id>
@@ -735,7 +739,7 @@
 						</goals>
 					</execution>
 				</executions>
-			</plugin>
+			</plugin> -->
 
 			<!-- assembly插件 -->
 			<plugin>
@@ -823,18 +827,18 @@
 			<properties>
 				<!-- 数据库连接地址和数据库名 -->
 				<jdbc.url>
-					jdbc:mysql://192.168.101.42:3306/im?createDatabaseIfNotExist=true&amp;amp;useUnicode=true&amp;amp;characterEncoding=utf8
+					jdbc:mysql://192.168.101.131:3306/im?createDatabaseIfNotExist=true&amp;amp;useUnicode=true&amp;amp;characterEncoding=utf8
 				</jdbc.url>
 				<!-- 数据库访问帐号 -->
-				<jdbc.username>dev_im</jdbc.username>
-				<jdbc.password>unwo3bLI</jdbc.password>
+				<jdbc.username>zhangwei</jdbc.username>
+				<jdbc.password>zhangwei</jdbc.password>
 				<!-- 用户数据库连接地址和数据库名 -->
 				<user.jdbc.url>
-					jdbc:mysql://192.168.101.42:3306/phoenix_user?createDatabaseIfNotExist=true&amp;amp;useUnicode=true&amp;amp;characterEncoding=utf8
+					jdbc:mysql://192.168.101.131:3306/phoenix_user?createDatabaseIfNotExist=true&amp;amp;useUnicode=true&amp;amp;characterEncoding=utf8
 				</user.jdbc.url>
 				<!-- 用户数据库访问帐号 -->
-				<user.jdbc.username>dev</user.jdbc.username>
-				<user.jdbc.password>dev</user.jdbc.password>
+				<user.jdbc.username>zhangwei</user.jdbc.username>
+				<user.jdbc.password>zhangwei</user.jdbc.password>
 				<!-- phoenix-ui项目的发布地址，只要替换ip和端口即可 -->
 				<!-- nfs地址 -->
 				<user.cache.expiredTime>86400</user.cache.expiredTime>
@@ -858,7 +862,7 @@
 				<!-- redis端口 -->
 				<redis.port>6379</redis.port>
 				<!-- mongo地址 -->
-				<mongodb.address>192.168.101.131:27017</mongodb.address>
+				<mongodb.address>192.168.101.90:27017</mongodb.address>
 				<!-- mongo中数据库 -->
 				<mongodb.database>ywxt</mongodb.database>
 				<!-- 数据库连接地址和数据库名 -->
@@ -972,16 +976,23 @@
 		<profile>
 			<id>qa</id>
 			<activation>
-				<activeByDefault>false</activeByDefault>
+				<activeByDefault>true</activeByDefault>
 			</activation>
 			<properties>
 				<!-- 数据库连接地址和数据库名 -->
 				<jdbc.url>
-					jdbc:mysql://192.168.101.131:3306/im?createDatabaseIfNotExist=true&amp;amp;useUnicode=true&amp;amp;characterEncoding=utf8
+					jdbc:mysql://192.168.101.42:3306/im?createDatabaseIfNotExist=true&amp;amp;useUnicode=true&amp;amp;characterEncoding=utf8
 				</jdbc.url>
 				<!-- 数据库访问帐号 -->
-				<jdbc.username>zhangwei</jdbc.username>
-				<jdbc.password>zhangwei</jdbc.password>
+				<jdbc.username>dev_im</jdbc.username>
+				<jdbc.password>unwo3bLI</jdbc.password>
+				<!-- 用户数据库连接地址和数据库名 -->
+				<user.jdbc.url>
+					jdbc:mysql://192.168.101.42:3306/phoenix_user?createDatabaseIfNotExist=true&amp;amp;useUnicode=true&amp;amp;characterEncoding=utf8
+				</user.jdbc.url>
+				<!-- 用户数据库访问帐号 -->
+				<user.jdbc.username>dev</user.jdbc.username>
+				<user.jdbc.password>dev</user.jdbc.password>
 				<!-- phoenix-ui项目的发布地址，只要替换ip和端口即可 -->
 				<!-- nfs地址 -->
 				<user.cache.expiredTime>86400</user.cache.expiredTime>
@@ -1001,11 +1012,11 @@
 				<!-- memcache地址 -->
 				<user.cache.address>192.168.101.90:11211</user.cache.address>
 				<!-- redis地址 -->
-				<redis.host>192.168.101..90</redis.host>
+				<redis.host>192.168.101.90</redis.host>
 				<!-- redis端口 -->
 				<redis.port>6379</redis.port>
 				<!-- mongo地址 -->
-				<mongodb.address>192.168.101..90:27017</mongodb.address>
+				<mongodb.address>192.168.120.133:27017</mongodb.address>
 				<!-- mongo中数据库 -->
 				<mongodb.database>ywxt</mongodb.database>
 				<!-- 数据库连接地址和数据库名 -->
@@ -1015,11 +1026,11 @@
 				<!-- phoenix-ui项目的发布地址，只要替换ip和端口即可 -->
 				<log4j.level>debug</log4j.level>
 				<!-- 日志存储路径，多个项目可以用同一个路径，在该路径下每个项目会自动创建以项目名称命名的子文件夹 -->
-				<log4j.path>E:/Workspace/log</log4j.path>
+				<log4j.path>/webserver/tomcat/phoenix-freechat/logs</log4j.path>
 				<qatest.schema.skip>false</qatest.schema.skip>
 				<dubbo.application.name>phoenix-web</dubbo.application.name>
 				<dubbo.protocol.name>dubbo</dubbo.protocol.name>
-				<dubbo.registry.address>zookeeper://192.168.101.90:2181?client=zkclient</dubbo.registry.address>
+				<dubbo.registry.address>zookeeper://192.168.101.15:2181?client=zkclient</dubbo.registry.address>
 
 				<nfs.home>/webserver/upload/</nfs.home>
 				<!-- nginx上传的地址 -->
@@ -1037,7 +1048,7 @@
 				<gintongservice.url>http://192.168.101.90:5555/</gintongservice.url>
 				<!-- 本地项目地址 -->
 				<!-- <gintongIm.url>http://192.168.150.79:3333/ImServer/</gintongIm.url> -->
-				<gintongIm.url>http://localhost:3333/</gintongIm.url>
+				<gintongIm.url>http://192.168.101.203:8080/</gintongIm.url>
 				<bigData.url>http://192.168.101.9:8090/</bigData.url>
 			</properties>
 		</profile>
