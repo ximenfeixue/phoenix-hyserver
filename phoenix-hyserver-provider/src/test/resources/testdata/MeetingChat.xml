@@ -1,0 +1,28 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- DBUnit flatXml DataFile -->
+<dataset>
+
+
+	  <meeting_chat 
+			id='824' 
+			meeting_id='688' 
+			sender_Type='156' 
+			topic_id='052' 
+			chat_content='ChatContent297' 
+			chat_type='931' 
+			message_Id='MessageId086' 
+			member_id='848' 
+			jtfile_url='JtfileUrl646' 
+			jtfile_suffix_name='JtfileSuffixName575' 
+			jtfile_type='JtfileType834' 
+			jtfile_name='JtfileName125' 
+			jtfile_size='089' 
+			jtFile_Module_Type='409' 
+			jtfile_task_id='JtfileTaskId548' 
+			publish_time='PublishTime396' 
+			jtFile_Reserved1='JtFileReserved1817' 
+			jtFile_Reserved2='JtFileReserved2082' 
+			jtFile_Reserved3='JtFileReserved3927' 
+	  />	
+  
+</dataset>

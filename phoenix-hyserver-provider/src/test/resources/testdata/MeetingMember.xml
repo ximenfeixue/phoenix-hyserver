@@ -1,0 +1,18 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- DBUnit flatXml DataFile -->
+<dataset>
+
+
+	  <meeting_member 
+			id='504' 
+			member_id='319' 
+			meeting_id='088' 
+			member_type='971' 
+			member_name='MemberName810' 
+			member_photo='MemberPhoto378' 
+			member_meet_status='870' 
+			attend_meet_status='202' 
+			attend_meet_type='902' 
+	  />	
+  
+</dataset>

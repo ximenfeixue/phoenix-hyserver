@@ -1,0 +1,331 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+"http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+<mapper namespace="MeetingMember">
+	<resultMap id="meetingMemberMap" type="com.ginkgocap.ywxt.model.meeting.MeetingMember">
+        <result property="id" column="id"/>
+        <result property="memberId" column="member_id"/>
+        <result property="meetingId" column="meeting_id"/>
+        <result property="memberType" column="member_type"/>
+        <result property="memberName" column="member_name"/>
+        <result property="memberPhoto" column="member_photo"/>
+        <result property="memberMeetStatus" column="member_meet_status"/>
+        <result property="excuteMeetSign" column="excute_meet_sign"/>
+        <result property="attendMeetStatus" column="attend_meet_status"/>
+        <result property="attendMeetType" column="attend_meet_type"/>
+        <result property="isSign" column="is_sign"/>
+        <result property="signDistance" column="sign_distance"/>
+        <result property="attendMeetTime" column="attend_meet_time"/>
+        <result property="isShowInvitation" column="is_show_invitation"/>
+        <result property="isDelete" column="is_delete"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+	</resultMap>
+	
+	<sql id="columns">
+	   <![CDATA[
+		id,member_id AS memberId,meeting_id AS meetingId,member_type AS memberType,
+		member_name AS memberName,member_photo AS memberPhoto,member_meet_status AS memberMeetStatus,
+		excute_meet_sign AS excuteMeetSign ,attend_meet_status AS attendMeetStatus,
+		sign_distance AS signDistance,attend_meet_type AS attendMeetType,is_sign AS isSign,
+		attend_meet_time AS attendMeetTime,is_show_invitation AS isShowInvitation, is_delete AS isDelete,
+		create_time AS createTime,update_time AS updateTime
+	    ]]>
+	</sql>
+	
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id">
+    <![CDATA[
+        INSERT INTO tb_meeting_member (
+        	id,
+        	member_id,
+        	meeting_id,
+        	member_type,
+        	member_name,
+        	member_photo,
+        	member_meet_status,
+        	excute_meet_sign,
+        	attend_meet_status,
+        	sign_distance,
+        	is_sign,
+        	attend_meet_type,
+        	attend_meet_time,
+        	is_show_invitation,
+        	is_delete,
+        	create_time,
+        	update_time
+        ) VALUES (
+        	#{id},
+        	#{memberId},
+        	#{meetingId},
+        	#{memberType},
+        	#{memberName},
+        	#{memberPhoto},
+        	#{memberMeetStatus},
+        	#{excuteMeetSign},
+        	#{attendMeetStatus},
+        	#{signDistance},
+        	#{isSign},
+        	#{attendMeetType},
+        	#{attendMeetTime},
+        	#{isShowInvitation},
+        	#{isDelete},
+        	NOW(),
+        	NOW()
+        )
+    ]]>
+	</insert>
+    
+	<update id="update" >
+    <![CDATA[
+        UPDATE tb_meeting_member 
+        SET member_id = #{memberId},
+	        meeting_id = #{meetingId},
+	        member_type = #{memberType},
+	        member_name = #{memberName},
+	        member_photo = #{memberPhoto},
+	        member_meet_status = #{memberMeetStatus},
+	        excute_meet_sign = #{excuteMeetSign},
+	        attend_meet_status = #{attendMeetStatus},
+	        sign_distance = #{signDistance},
+	        is_sign = #{isSign},
+	        attend_meet_type = #{attendMeetType},
+	        attend_meet_time = #{attendMeetTime},
+	        is_show_invitation = #{isShowInvitation},
+	        is_delete = #{isDelete},
+	        update_time = NOW()
+        WHERE id = #{id} 
+    ]]>
+	</update>
+
+    <update id="delete">
+    <![CDATA[
+        UPDATE tb_meeting_member 
+        SET is_delete = 1 
+        WHERE id = #{id}
+        	AND is_delete = 0 
+    ]]>
+    </update>
+    <update id="deleteByMeetingId">
+    <![CDATA[
+        UPDATE tb_meeting_member 
+        SET is_delete = 1 
+        WHERE meeting_id = #{meetingId}
+        	AND is_delete = 0
+    ]]>
+    </update>
+    <update id="deleteByMeetingIdAndMeetingtype" parameterType="Map">
+        UPDATE tb_meeting_member
+        SET is_delete = 1
+        WHERE meeting_id = #{meetingId}
+        	AND is_delete = 0 
+        <if test="memberType!=-1">
+        	AND member_type = #{memberType}
+        </if>
+    </update>
+    
+    <select id="getById" resultType="meetingMember">
+		SELECT <include refid="columns" />
+	    <![CDATA[
+		    FROM tb_meeting_member 
+	        WHERE id = #{id} 
+	    ]]>
+	</select>
+	
+	<select id="getByIdList" resultType="meetingMember">
+		SELECT <include refid="columns" />
+		FROM tb_meeting_member 
+		WHERE id IN
+		<foreach collection="idList" item="item" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</select>
+
+    <select id="getByMemberId" resultType="meetingMember" parameterType="java.lang.Long">
+	    SELECT <include refid="columns"/>
+	    <![CDATA[
+	        FROM tb_meeting_member 
+	        WHERE member_id = #{memberId}
+				AND is_delete = 0
+	    ]]>
+    </select>
+    
+    <select id="getByMeetingId" resultType="meetingMember" parameterType="java.lang.Long">
+		SELECT <include refid="columns"/>
+	    FROM tb_meeting_member 
+		WHERE meeting_id = #{meetingId}
+			AND is_delete = 0
+    </select>
+    
+    <select id="getVisitantByMeetingId" resultType="meetingMember" parameterType="java.lang.Long">
+	    SELECT <include refid="columns"/>
+	    <![CDATA[
+	        FROM tb_meeting_member 
+	        WHERE meeting_id = #{meetingId}
+	        	AND member_type = 0
+				AND is_delete = 0
+	    ]]>
+    </select>
+    
+    <select id="getByMemberType" resultType="meetingMember" parameterType="java.lang.Integer">
+	    SELECT <include refid="columns"/>
+	    <![CDATA[
+	        FROM tb_meeting_member 
+			WHERE member_type = #{memberType}
+				AND is_delete = 0
+	    ]]>
+    </select>
+    
+    <select id="getByMemberName" resultType="meetingMember" parameterType="java.lang.String">
+	    SELECT <include refid="columns"/>
+	    <![CDATA[
+	        FROM tb_meeting_member 
+	        WHERE member_name = #{memberName}
+				AND is_delete = 0
+	    ]]>
+    </select>
+    
+    <select id="getByMemberPhoto" resultType="meetingMember" parameterType="java.lang.String">
+		SELECT <include refid="columns"/>
+		<![CDATA[
+			FROM tb_meeting_member 
+			WHERE member_photo = #{memberPhoto}
+				AND is_delete = 0
+		]]>
+    </select>
+    
+    <select id="getByMemberMeetStatus" resultType="meetingMember" parameterType="java.lang.Integer">
+		SELECT <include refid="columns"/>
+		<![CDATA[
+			FROM tb_meeting_member 
+			WHERE member_meet_status = #{memberMeetStatus}
+				AND is_delete = 0
+	    ]]>
+    </select>
+    
+    <select id="getByAttendMeetStatus" resultType="meetingMember" parameterType="java.lang.Integer">
+	    SELECT <include refid="columns"/>
+	    <![CDATA[
+	        FROM tb_meeting_member 
+			WHERE attend_meet_status = #{attendMeetStatus}
+				AND is_delete = 0
+	    ]]>
+    </select>
+    
+    <select id="getByAttendMeetType" resultType="meetingMember" parameterType="java.lang.Integer">
+	    SELECT <include refid="columns"/>
+	    <![CDATA[
+	        FROM tb_meeting_member 
+	        WHERE attend_meet_type = #{attendMeetType}
+				AND is_delete = 0
+	    ]]>
+    </select>
+    
+    <select id="getByMeetingIdAndMemberId" resultType="meetingMember" parameterType="Map">
+	    SELECT <include refid="columns"/>
+	    <![CDATA[
+	        FROM tb_meeting_member 
+			WHERE meeting_id = #{meetingId}
+				AND member_id = #{memberId}
+				AND is_delete = 0
+	    ]]>
+    </select>
+    <select id="getSignUpMemberCount" resultType="java.lang.Integer" parameterType="java.lang.Long">
+	    SELECT count(*)
+	    <![CDATA[
+	        FROM tb_meeting_member 
+			WHERE meeting_id = #{meetingId} 
+				AND attend_meet_type = 1 
+				AND attend_meet_status = 4 
+				AND excute_meet_sign = 1 
+				AND is_delete = 0
+		]]>
+    </select>
+	<select id="getAttendMeetingCount" resultType="java.lang.Integer" parameterType="java.lang.Long">
+		SELECT COUNT(DISTINCT mm.member_id) FROM tb_meeting_member mm 
+		WHERE mm.meeting_id = #{meetingId} 
+			AND mm.is_delete = 0
+			AND mm.member_meet_status<![CDATA[<>]]>2 
+			AND 
+			(
+				(mm.attend_meet_type=0 AND mm.attend_meet_status=1)
+				OR (mm.attend_meet_type=1 AND mm.attend_meet_status=4 AND mm.excute_meet_sign=1)
+			)
+    </select>
+    <select id="getAttendMeetingsCount" resultType="meetingMember" parameterType="java.util.List">
+		SELECT DISTINCT mm.meeting_id AS meetingId,
+			mm.member_id AS memberId
+		FROM tb_meeting_member mm 
+		WHERE mm.is_delete = 0
+			AND mm.member_meet_status <![CDATA[<>]]> 2 
+			AND 
+			(
+				(mm.attend_meet_type=0 AND mm.attend_meet_status=1)
+				OR (mm.attend_meet_type=1 AND mm.attend_meet_status=4 AND mm.excute_meet_sign=1)
+			)
+			AND meeting_id IN
+			<foreach collection="list" item="item" open="(" separator="," close=")">
+				#{item}
+			</foreach>
+    </select>
+     <select id="getAndSignInCount" resultType="java.lang.Integer" parameterType="java.lang.Long">
+	    SELECT count(*)
+	    	FROM tb_meeting_member where meeting_id = #{meetingId} and is_sign=1 AND member_meet_status<![CDATA[<>]]>2 
+				AND 
+				 (
+					 (attend_meet_type =0 AND attend_meet_status=1)
+					  OR
+					 (attend_meet_type=1 AND attend_meet_status=4 AND excute_meet_sign=1)
+				 )	    
+    </select>
+    <select id="getAttendMemberByMeetingId" resultType="meetingMember" parameterType="java.lang.Long">
+	    SELECT <include refid="columns"/>
+	    FROM tb_meeting_member
+	    WHERE meeting_id = #{meetingId} 
+	    	AND is_delete = 0 
+	    	AND member_type = 2
+	    UNION ALL 
+	    SELECT <include refid="columns"/>
+	    FROM tb_meeting_member 
+	    	WHERE meeting_id = #{meetingId} 
+	    	AND is_delete = 0 
+	    	AND member_type <![CDATA[<>]]> 2
+	    	AND attend_meet_type = 0 
+	    	AND attend_meet_status = 1
+	    UNION ALL 
+	    SELECT <include refid="columns"/>
+	    FROM tb_meeting_member 
+	    WHERE meeting_id = #{meetingId} 
+	    	AND is_delete = 0 
+	    	AND member_type <![CDATA[<>]]> 2
+	    	AND attend_meet_type = 1 
+	    	AND attend_meet_status = 4 
+	    	AND excute_meet_sign = 1
+    </select>
+    
+    <update id="deleteMemberByMeetingId">
+		UPDATE tb_meeting_member 
+		SET is_delete = 1,
+	        update_time = NOW()
+		WHERE meeting_id = #{meetingId}
+			AND is_delete = 0
+		<if test="extendIdList != null">
+			AND id NOT IN
+			<foreach collection="extendIdList" item="item" open="(" separator="," close=")">
+	    	    #{item}
+	    	</foreach>
+		</if>
+    </update>
+    
+    <update id="deleteAttendMeetingBatch" parameterType="java.util.List">
+        UPDATE tb_meeting_member 
+        SET is_delete = 1,
+        	member_meet_status = 0,
+	        update_time = NOW()
+        WHERE id IN
+			<foreach collection="list" item="item" open="(" separator="," close=")">
+	    		#{item}
+	    	</foreach> 
+	</update>
+</mapper>

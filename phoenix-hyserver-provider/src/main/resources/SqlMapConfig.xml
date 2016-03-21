@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+	<settings>
+		<setting name="cacheEnabled" value="true" />
+		<setting name="lazyLoadingEnabled" value="true" />
+		<setting name="aggressiveLazyLoading" value="false" />
+		<setting name="multipleResultSetsEnabled" value="true" />
+		<setting name="useColumnLabel" value="true" />
+		<setting name="autoMappingBehavior" value="FULL" />
+	</settings>
+	<typeAliases>
+		 <!-- <typeAlias alias="fileIndex" type="com.ginkgocap.ywxt.model.meeting.FileIndex" /> --> 
+    	  <typeAlias alias="topicChat" type="com.ginkgocap.ywxt.model.meeting.TopicChat" />
+          <typeAlias alias="meetingData" type="com.ginkgocap.ywxt.model.meeting.MeetingData" />
+          <typeAlias alias="meeting" type="com.ginkgocap.ywxt.model.meeting.Meeting" />
+          <typeAlias alias="meetingMember" type="com.ginkgocap.ywxt.model.meeting.MeetingMember" />
+          <typeAlias alias="meetingNoteDetail" type="com.ginkgocap.ywxt.model.meeting.MeetingNoteDetail" />
+          <typeAlias alias="meetingNote" type="com.ginkgocap.ywxt.model.meeting.MeetingNote" />
+          <typeAlias alias="meetingPeople" type="com.ginkgocap.ywxt.model.meeting.MeetingPeople" />
+          <typeAlias alias="meetingPic" type="com.ginkgocap.ywxt.model.meeting.MeetingPic" />
+          <typeAlias alias="meetingTime" type="com.ginkgocap.ywxt.model.meeting.MeetingTime" />
+          <typeAlias alias="meetingTopic" type="com.ginkgocap.ywxt.model.meeting.MeetingTopic" />
+          <typeAlias alias="meetingMemberList" type="com.ginkgocap.ywxt.vo.query.meeting.MeetingMemberListQuery" />
+          <typeAlias alias="meetingQuery" type="com.ginkgocap.ywxt.vo.query.meeting.MeetingQuery" />
+          <typeAlias alias="meetingPeopleQuery" type="com.ginkgocap.ywxt.vo.query.meeting.MeetingPeopleQuery" />
+          <typeAlias alias="meetingDataQuery" type="com.ginkgocap.ywxt.vo.query.meeting.MeetingDataQuery" />
+          <typeAlias alias="meetingNoteQuery" type="com.ginkgocap.ywxt.vo.query.meeting.MeetingNoteQuery" />
+          <typeAlias alias="meetingNoteDetailQuery" type="com.ginkgocap.ywxt.vo.query.meeting.MeetingNoteDetailQuery" />
+          <typeAlias alias="social" type="com.ginkgocap.ywxt.vo.query.social.Social" />
+          <typeAlias alias="imMucmessage"  type="com.ginkgocap.ywxt.model.meeting.ImMucmessage"/>
+          <typeAlias alias="meetingNoticeRelation" type="com.ginkgocap.ywxt.vo.query.meeting.MeetingNoticeRelation" />
+          <typeAlias alias="meetingSignLabelDataQuery" type="com.ginkgocap.ywxt.vo.query.meeting.MeetingSignLabelDataQuery" />
+          <typeAlias alias="user" type="com.ginkgocap.ywxt.user.model.User" />
+          <typeAlias alias="meetingOrgan" type="com.ginkgocap.ywxt.model.meeting.MeetingOrgan" />
+          <typeAlias alias="meetingTemplate" type="com.ginkgocap.ywxt.model.meeting.MeetingTemplate" />
+          <typeAlias alias="meetingCount" type="com.ginkgocap.ywxt.model.meeting.MeetingCount" />
+          <typeAlias alias="socialStatus" type="com.ginkgocap.ywxt.model.meeting.SocialStatus" />
+          <typeAlias alias="socialListReq" type="com.ginkgocap.ywxt.model.meeting.SocialListReq" />
+    </typeAliases>
+</configuration>

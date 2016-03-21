@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+"http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+
+<!-- 不使用namespace的话sql搜索定位会比较方便 -->
+<mapper namespace="ImMucinfo">
+
+	<resultMap id="imMucinfoMap" type="com.ginkgocap.ywxt.model.meeting.ImMucinfo">
+        <result property="id" column="Id"/>
+        <result property="title" column="title"/>
+        <result property="subject" column="subject"/>
+        <result property="type" column="type"/>
+        <result property="organizationId" column="organization_Id"/>
+        <result property="content" column="content"/>
+        <result property="max" column="max"/>
+        <result property="stickType" column="stick_Type"/>
+        <result property="autoSaveType" column="auto_Save_Type"/>
+        <result property="time" column="time"/>
+        <result property="status" column="status"/>
+        <result property="createUserId" column="create_User_Id"/>
+	</resultMap>
+	
+	<!-- 用于select查询公用抽取的列 -->
+	<sql id="columns">
+	    <![CDATA[
+		Id as id,title as title,subject as subject,type as type,organization_Id as organizationId,content as content,max as max,stick_Type as stickType,auto_Save_Type as autoSaveType,time as time,status as status,create_User_Id as createUserId
+	    ]]>
+	</sql>
+
+	<!-- useGeneratedKeys="true" keyProperty="xxx" for sqlserver and mysql -->
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id">
+    <![CDATA[
+        INSERT INTO t_im_MUCInfo (
+        	Id ,
+        	title ,
+        	subject ,
+        	type ,
+        	organization_Id ,
+        	content ,
+        	max ,
+        	stick_Type ,
+        	auto_Save_Type ,
+        	time ,
+        	status ,
+        	create_User_Id 
+        ) VALUES (
+        	#{id} ,
+        	#{title} ,
+        	#{subject} ,
+        	#{type} ,
+        	#{organizationId} ,
+        	#{content} ,
+        	#{max} ,
+        	#{stickType} ,
+        	#{autoSaveType} ,
+        	#{time} ,
+        	#{status} ,
+        	#{createUserId} 
+        )
+    ]]>
+		<!--	
+			oracle: order="BEFORE" SELECT sequenceName.nextval AS ID FROM DUAL 
+			DB2: order="BEFORE"" values nextval for sequenceName
+		<selectKey resultType="java.lang.Long" order="BEFORE" keyProperty="userId">
+			SELECT sequenceName.nextval AS ID FROM DUAL 
+        </selectKey>
+		-->
+	</insert>
+    
+	<update id="update" >
+    <![CDATA[
+        UPDATE t_im_MUCInfo SET
+	        title = #{title} ,
+	        subject = #{subject} ,
+	        type = #{type} ,
+	        organization_Id = #{organizationId} ,
+	        content = #{content} ,
+	        max = #{max} ,
+	        stick_Type = #{stickType} ,
+	        auto_Save_Type = #{autoSaveType} ,
+	        time = #{time} ,
+	        status = #{status} ,
+	        create_User_Id = #{createUserId} 
+        WHERE 
+	        Id = #{id} 
+    ]]>
+	</update>
+
+    <delete id="delete">
+    <![CDATA[
+        DELETE FROM t_im_MUCInfo WHERE
+        Id = #{id} 
+    ]]>
+    </delete>
+    
+    <select id="getById" resultMap="imMucinfoMap">
+		SELECT <include refid="columns" />
+	    <![CDATA[
+		    FROM t_im_MUCInfo 
+	        WHERE 
+		        Id = #{id} 
+	    ]]>
+	</select>
+	
+    <select id="getByIds" resultMap="imMucinfoMap" parameterType="java.util.Map">
+		SELECT <include refid="columns" />
+		    FROM t_im_MUCInfo 
+	        WHERE 
+		        Id in
+		<foreach collection="ids" item="item" open="(" separator="," close=")">
+    	    #{item}
+    	</foreach>
+	</select>
+	
+
+
+    <select id="getByTitle" resultMap="imMucinfoMap" parameterType="java.lang.String">
+	    SELECT <include refid="columns"/>
+	    <![CDATA[
+	        FROM t_im_MUCInfo where title = #{title}
+	    ]]>
+    </select>
+    
+    <select id="getBySubject" resultMap="imMucinfoMap" parameterType="java.lang.String">
+	    SELECT <include refid="columns"/>
+	    <![CDATA[
+	        FROM t_im_MUCInfo where subject = #{subject}
+	    ]]>
+    </select>
+    
+    <select id="getByType" resultMap="imMucinfoMap" parameterType="java.lang.Integer">
+	    SELECT <include refid="columns"/>
+	    <![CDATA[
+	        FROM t_im_MUCInfo where type = #{type}
+	    ]]>
+    </select>
+    
+    <select id="getByOrganizationId" resultMap="imMucinfoMap" parameterType="java.lang.Long">
+	    SELECT <include refid="columns"/>
+	    <![CDATA[
+	        FROM t_im_MUCInfo where organization_Id = #{organizationId}
+	    ]]>
+    </select>
+    
+    <select id="getByContent" resultMap="imMucinfoMap" parameterType="java.lang.String">
+	    SELECT <include refid="columns"/>
+	    <![CDATA[
+	        FROM t_im_MUCInfo where content = #{content}
+	    ]]>
+    </select>
+    
+    <select id="getByMax" resultMap="imMucinfoMap" parameterType="java.lang.Integer">
+	    SELECT <include refid="columns"/>
+	    <![CDATA[
+	        FROM t_im_MUCInfo where max = #{max}
+	    ]]>
+    </select>
+    
+    <select id="getByStickType" resultMap="imMucinfoMap" parameterType="java.lang.Integer">
+	    SELECT <include refid="columns"/>
+	    <![CDATA[
+	        FROM t_im_MUCInfo where stick_Type = #{stickType}
+	    ]]>
+    </select>
+    
+    <select id="getByAutoSaveType" resultMap="imMucinfoMap" parameterType="java.lang.Integer">
+	    SELECT <include refid="columns"/>
+	    <![CDATA[
+	        FROM t_im_MUCInfo where auto_Save_Type = #{autoSaveType}
+	    ]]>
+    </select>
+    
+    <select id="getByTime" resultMap="imMucinfoMap" parameterType="java.util.Date">
+	    SELECT <include refid="columns"/>
+	    <![CDATA[
+	        FROM t_im_MUCInfo where time = #{time}
+	    ]]>
+    </select>
+    
+    <select id="getByStatus" resultMap="imMucinfoMap" parameterType="java.lang.String">
+	    SELECT <include refid="columns"/>
+	    <![CDATA[
+	        FROM t_im_MUCInfo where status = #{status}
+	    ]]>
+    </select>
+    
+    <select id="getByCreateUserId" resultMap="imMucinfoMap" parameterType="java.lang.Integer">
+	    SELECT <include refid="columns"/>
+	    <![CDATA[
+	        FROM t_im_MUCInfo where create_User_Id = #{createUserId}
+	    ]]>
+    </select>
+    
+	
+</mapper>
+

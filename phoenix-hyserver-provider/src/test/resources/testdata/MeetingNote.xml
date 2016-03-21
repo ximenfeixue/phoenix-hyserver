@@ -1,0 +1,15 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- DBUnit flatXml DataFile -->
+<dataset>
+
+
+	  <meeting_note 
+			id='809' 
+			meeting_id='816' 
+			meeting_note_title='MeetingNoteTitle750' 
+			meeting_chat_id='363' 
+			careater='551' 
+			create_time='2014-09-16 17:11:27.891' 
+	  />	
+  
+</dataset>

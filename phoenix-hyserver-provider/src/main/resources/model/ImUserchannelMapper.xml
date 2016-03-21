@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+"http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+
+<!-- 不使用namespace的话sql搜索定位会比较方便 -->
+<mapper namespace="ImUserchannel">
+
+	<resultMap id="imUserchannelMap" type="com.ginkgocap.ywxt.model.meeting.ImUserchannel">
+        <result property="id" column="Id"/>
+        <result property="userId" column="user_Id"/>
+        <result property="channelId" column="channel_Id"/>
+        <result property="secretKey" column="secret_Key"/>
+        <result property="baiduUserId" column="baidu_User_Id"/>
+        <result property="channelType" column="channel_Type"/>
+	</resultMap>
+	
+	<!-- 用于select查询公用抽取的列 -->
+	<sql id="columns">
+	    <![CDATA[
+		Id as id,user_Id as userId,channel_Id as channelId,secret_Key as secretKey,baidu_User_Id as baiduUserId,channel_Type as channelType
+	    ]]>
+	</sql>
+
+	<!-- useGeneratedKeys="true" keyProperty="xxx" for sqlserver and mysql -->
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id">
+    <![CDATA[
+        INSERT INTO t_im_userchannel (
+        	Id ,
+        	user_Id ,
+        	channel_Id ,
+        	secret_Key ,
+        	baidu_User_Id ,
+        	channel_Type 
+        ) VALUES (
+        	#{id} ,
+        	#{userId} ,
+        	#{channelId} ,
+        	#{secretKey} ,
+        	#{baiduUserId} ,
+        	#{channelType} 
+        )
+    ]]>
+		<!--	
+			oracle: order="BEFORE" SELECT sequenceName.nextval AS ID FROM DUAL 
+			DB2: order="BEFORE"" values nextval for sequenceName
+		<selectKey resultType="java.lang.Long" order="BEFORE" keyProperty="userId">
+			SELECT sequenceName.nextval AS ID FROM DUAL 
+        </selectKey>
+		-->
+	</insert>
+    
+	<update id="update" >
+    <![CDATA[
+        UPDATE t_im_userchannel SET
+	        user_Id = #{userId} ,
+	        channel_Id = #{channelId} ,
+	        secret_Key = #{secretKey} ,
+	        baidu_User_Id = #{baiduUserId} ,
+	        channel_Type = #{channelType} 
+        WHERE 
+	        Id = #{id} 
+    ]]>
+	</update>
+
+    <delete id="delete">
+    <![CDATA[
+        DELETE FROM t_im_userchannel WHERE
+        Id = #{id} 
+    ]]>
+    </delete>
+    
+    <select id="getById" resultMap="imUserchannelMap">
+		SELECT <include refid="columns" />
+	    <![CDATA[
+		    FROM t_im_userchannel 
+	        WHERE 
+		        Id = #{id} 
+	    ]]>
+	</select>
+	
+
+
+    <select id="getByUserId" resultMap="imUserchannelMap" parameterType="java.lang.Integer">
+	    SELECT <include refid="columns"/>
+	    <![CDATA[
+	        FROM t_im_userchannel where user_Id = #{userId}
+	    ]]>
+    </select>
+    
+    <select id="getByChannelId" resultMap="imUserchannelMap" parameterType="java.lang.String">
+	    SELECT <include refid="columns"/>
+	    <![CDATA[
+	        FROM t_im_userchannel where channel_Id = #{channelId}
+	    ]]>
+    </select>
+    
+    <select id="getBySecretKey" resultMap="imUserchannelMap" parameterType="java.lang.String">
+	    SELECT <include refid="columns"/>
+	    <![CDATA[
+	        FROM t_im_userchannel where secret_Key = #{secretKey}
+	    ]]>
+    </select>
+    
+    <select id="getByBaiduUserId" resultMap="imUserchannelMap" parameterType="java.lang.String">
+	    SELECT <include refid="columns"/>
+	    <![CDATA[
+	        FROM t_im_userchannel where baidu_User_Id = #{baiduUserId}
+	    ]]>
+    </select>
+    
+    <select id="getByChannelType" resultMap="imUserchannelMap" parameterType="java.lang.Integer">
+	    SELECT <include refid="columns"/>
+	    <![CDATA[
+	        FROM t_im_userchannel where channel_Type = #{channelType}
+	    ]]>
+    </select>
+    
+	
+</mapper>
+

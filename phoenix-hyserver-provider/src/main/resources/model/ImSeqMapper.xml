@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+"http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+
+<!-- 不使用namespace的话sql搜索定位会比较方便 -->
+<mapper namespace="ImSeq">
+
+	<resultMap id="imSeqMap" type="com.ginkgocap.ywxt.model.meeting.ImSeq">
+        <result property="id" column="id"/>
+        <result property="seq" column="seq"/>
+	</resultMap>
+	
+	<!-- 用于select查询公用抽取的列 -->
+	<sql id="columns">
+	    <![CDATA[
+		id as id,seq as seq
+	    ]]>
+	</sql>
+
+	<!-- useGeneratedKeys="true" keyProperty="xxx" for sqlserver and mysql -->
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id">
+    <![CDATA[
+        INSERT INTO t_im_seq (
+        	id ,
+        	seq 
+        ) VALUES (
+        	#{id} ,
+        	#{seq} 
+        )
+    ]]>
+		<!--	
+			oracle: order="BEFORE" SELECT sequenceName.nextval AS ID FROM DUAL 
+			DB2: order="BEFORE"" values nextval for sequenceName
+		<selectKey resultType="java.lang.Long" order="BEFORE" keyProperty="userId">
+			SELECT sequenceName.nextval AS ID FROM DUAL 
+        </selectKey>
+		-->
+	</insert>
+    
+	<update id="update" >
+    <![CDATA[
+        UPDATE t_im_seq SET
+	        seq = #{seq} 
+        WHERE 
+	        id = #{id} 
+    ]]>
+	</update>
+
+    <delete id="delete">
+    <![CDATA[
+        DELETE FROM t_im_seq WHERE
+        id = #{id} 
+    ]]>
+    </delete>
+    
+    <select id="getById" resultMap="imSeqMap">
+		SELECT <include refid="columns" />
+	    <![CDATA[
+		    FROM t_im_seq 
+	        WHERE 
+		        id = #{id} 
+	    ]]>
+	</select>
+	
+
+
+    <select id="getBySeq" resultMap="imSeqMap" parameterType="java.lang.Long">
+	    SELECT <include refid="columns"/>
+	    <![CDATA[
+	        FROM t_im_seq where seq = #{seq}
+	    ]]>
+    </select>
+    
+	
+</mapper>
+

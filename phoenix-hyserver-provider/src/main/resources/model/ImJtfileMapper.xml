@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+"http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+
+<!-- 不使用namespace的话sql搜索定位会比较方便 -->
+<mapper namespace="ImJtfile">
+
+	<resultMap id="imJtfileMap" type="com.ginkgocap.ywxt.model.meeting.ImJtfile">
+        <result property="id" column="Id"/>
+        <result property="parentId" column="parent_Id"/>
+        <result property="parentType" column="parent_Type"/>
+        <result property="url" column="url"/>
+        <result property="suffixName" column="suffix_Name"/>
+        <result property="type" column="type"/>
+        <result property="fileName" column="file_Name"/>
+        <result property="fileSize" column="file_Size"/>
+        <result property="moduleType" column="module_Type"/>
+        <result property="taskId" column="task_Id"/>
+        <result property="reserved1" column="reserved1"/>
+        <result property="reserved2" column="reserved2"/>
+        <result property="reserved3" column="reserved3"/>
+	</resultMap>
+	
+	<!-- 用于select查询公用抽取的列 -->
+	<sql id="columns">
+	    <![CDATA[
+		Id as id,parent_Id as parentId,parent_Type as parentType,url as url,suffix_Name as suffixName,type as type,file_Name as fileName,file_Size as fileSize,module_Type as moduleType,task_Id as taskId,reserved1 as reserved1,reserved2 as reserved2,reserved3 as reserved3
+	    ]]>
+	</sql>
+
+	<!-- useGeneratedKeys="true" keyProperty="xxx" for sqlserver and mysql -->
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id">
+    <![CDATA[
+        INSERT INTO t_im_jtfile (
+        	Id ,
+        	parent_Id ,
+        	parent_Type ,
+        	url ,
+        	suffix_Name ,
+        	type ,
+        	file_Name ,
+        	file_Size ,
+        	module_Type ,
+        	task_Id ,
+        	reserved1 ,
+        	reserved2 ,
+        	reserved3 
+        ) VALUES (
+        	#{id} ,
+        	#{parentId} ,
+        	#{parentType} ,
+        	#{url} ,
+        	#{suffixName} ,
+        	#{type} ,
+        	#{fileName} ,
+        	#{fileSize} ,
+        	#{moduleType} ,
+        	#{taskId} ,
+        	#{reserved1} ,
+        	#{reserved2} ,
+        	#{reserved3} 
+        )
+    ]]>
+		<!--	
+			oracle: order="BEFORE" SELECT sequenceName.nextval AS ID FROM DUAL 
+			DB2: order="BEFORE"" values nextval for sequenceName
+		<selectKey resultType="java.lang.Long" order="BEFORE" keyProperty="userId">
+			SELECT sequenceName.nextval AS ID FROM DUAL 
+        </selectKey>
+		-->
+	</insert>
+    
+	<update id="update" >
+    <![CDATA[
+        UPDATE t_im_jtfile SET
+	        parent_Id = #{parentId} ,
+	        parent_Type = #{parentType} ,
+	        url = #{url} ,
+	        suffix_Name = #{suffixName} ,
+	        type = #{type} ,
+	        file_Name = #{fileName} ,
+	        file_Size = #{fileSize} ,
+	        module_Type = #{moduleType} ,
+	        task_Id = #{taskId} ,
+	        reserved1 = #{reserved1} ,
+	        reserved2 = #{reserved2} ,
+	        reserved3 = #{reserved3} 
+        WHERE 
+	        Id = #{id} 
+    ]]>
+	</update>
+
+    <delete id="delete">
+    <![CDATA[
+        DELETE FROM t_im_jtfile WHERE
+        Id = #{id} 
+    ]]>
+    </delete>
+    
+    <select id="getById" resultMap="imJtfileMap">
+		SELECT <include refid="columns" />
+	    <![CDATA[
+		    FROM t_im_jtfile 
+	        WHERE 
+		        Id = #{id} 
+	    ]]>
+	</select>
+	
+
+
+    <select id="getByParentId" resultMap="imJtfileMap" parameterType="java.lang.Integer">
+	    SELECT <include refid="columns"/>
+	    <![CDATA[
+	        FROM t_im_jtfile where parent_Id = #{parentId}
+	    ]]>
+    </select>
+    
+    <select id="getByParentType" resultMap="imJtfileMap" parameterType="java.lang.Integer">
+	    SELECT <include refid="columns"/>
+	    <![CDATA[
+	        FROM t_im_jtfile where parent_Type = #{parentType}
+	    ]]>
+    </select>
+    
+    <select id="getByUrl" resultMap="imJtfileMap" parameterType="java.lang.String">
+	    SELECT <include refid="columns"/>
+	    <![CDATA[
+	        FROM t_im_jtfile where url = #{url}
+	    ]]>
+    </select>
+    
+    <select id="getBySuffixName" resultMap="imJtfileMap" parameterType="java.lang.String">
+	    SELECT <include refid="columns"/>
+	    <![CDATA[
+	        FROM t_im_jtfile where suffix_Name = #{suffixName}
+	    ]]>
+    </select>
+    
+    <select id="getByType" resultMap="imJtfileMap" parameterType="java.lang.Integer">
+	    SELECT <include refid="columns"/>
+	    <![CDATA[
+	        FROM t_im_jtfile where type = #{type}
+	    ]]>
+    </select>
+    
+    <select id="getByFileName" resultMap="imJtfileMap" parameterType="java.lang.String">
+	    SELECT <include refid="columns"/>
+	    <![CDATA[
+	        FROM t_im_jtfile where file_Name = #{fileName}
+	    ]]>
+    </select>
+    
+    <select id="getByFileSize" resultMap="imJtfileMap" parameterType="java.lang.Integer">
+	    SELECT <include refid="columns"/>
+	    <![CDATA[
+	        FROM t_im_jtfile where file_Size = #{fileSize}
+	    ]]>
+    </select>
+    
+    <select id="getByModuleType" resultMap="imJtfileMap" parameterType="java.lang.Integer">
+	    SELECT <include refid="columns"/>
+	    <![CDATA[
+	        FROM t_im_jtfile where module_Type = #{moduleType}
+	    ]]>
+    </select>
+    
+    <select id="getByTaskId" resultMap="imJtfileMap" parameterType="java.lang.String">
+	    SELECT <include refid="columns"/>
+	    <![CDATA[
+	        FROM t_im_jtfile where task_Id = #{taskId}
+	    ]]>
+    </select>
+    
+    <select id="getByReserved1" resultMap="imJtfileMap" parameterType="java.lang.String">
+	    SELECT <include refid="columns"/>
+	    <![CDATA[
+	        FROM t_im_jtfile where reserved1 = #{reserved1}
+	    ]]>
+    </select>
+    
+    <select id="getByReserved2" resultMap="imJtfileMap" parameterType="java.lang.String">
+	    SELECT <include refid="columns"/>
+	    <![CDATA[
+	        FROM t_im_jtfile where reserved2 = #{reserved2}
+	    ]]>
+    </select>
+    
+    <select id="getByReserved3" resultMap="imJtfileMap" parameterType="java.lang.String">
+	    SELECT <include refid="columns"/>
+	    <![CDATA[
+	        FROM t_im_jtfile where reserved3 = #{reserved3}
+	    ]]>
+    </select>
+    
+	
+</mapper>
+

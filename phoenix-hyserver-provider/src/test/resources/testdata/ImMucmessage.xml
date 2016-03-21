@@ -1,0 +1,28 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- DBUnit flatXml DataFile -->
+<dataset>
+
+
+	  <im_mucmessage 
+			Id='991' 
+			MUC_Id='269' 
+			sender_Id='925' 
+			sender_Type='644' 
+			msg='Msg200' 
+			msg_Type='359' 
+			time='2015-01-15 10:44:47.882' 
+			message_Id='MessageId158' 
+			jtFile_Url='JtFileUrl013' 
+			jtFile_Suffix_Name='JtFileSuffixName069' 
+			jtFile_Type='JtFileType535' 
+			jtFile_Name='JtFileName794' 
+			jtFile_Size='454' 
+			jtFile_Module_Type='522' 
+			jtFile_Task_Id='JtFileTaskId197' 
+			jtFile_Reserved1='JtFileReserved1786' 
+			jtFile_Reserved2='JtFileReserved2885' 
+			jtFile_Reserved3='JtFileReserved3302' 
+			sequence='807' 
+	  />	
+  
+</dataset>

@@ -1,0 +1,16 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- DBUnit flatXml DataFile -->
+<dataset>
+
+
+	  <meeting_sign_label 
+			id='305' 
+			meeting_id='760' 
+			label_name='LabelName254' 
+			is_custom='748' 
+			create_id='673' 
+			create_Name='CreateName288' 
+			create_time='2014-10-29 10:50:39.542' 
+	  />	
+  
+</dataset>

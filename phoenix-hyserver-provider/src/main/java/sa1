@@ -1,0 +1,283 @@
+{			"id":"6",
+            "meetingName": "test2",
+            "meetingAddress": "朝阳区",
+            "meetingAddressPos": "101.21",
+            "startTime": 1411008348000,
+            "endTime": 1411440354000,
+            "meetingType": 0,
+            "meetingStatus": 0,
+            "isSecrecy": true,
+            "memberCount": 21,
+            "meetingDesc": "123123",
+            "crateId": 2,
+            "crateName": null,
+            "taskId": "2",
+            "crateTime": 1410922006000,
+            "listMeetingMember": [
+                {	"memberId":2,
+                    "memberType": 1,
+                    "memberName": "xxj",
+                    "memberPhoto": "pic.jpg",
+                    "memberMeetStatus": 0,
+                    "attendMeetStatus": 0,
+                    "attendMeetType": 0
+                },
+                {
+                	"memberId":14386,
+                    "memberType": 1,
+                    "memberName": "xxj",
+                    "memberPhoto": "/meet/a.jpg",
+                    "memberMeetStatus": 0,
+                    "attendMeetStatus": 0,
+                    "attendMeetType": 1
+                },
+                {	"memberId":14561,
+                    "memberType": 1,
+                    "memberName": "xxj",
+                    "memberPhoto": "/meet/a.jpg",
+                    "memberMeetStatus": 0,
+                    "attendMeetStatus": 0,
+                    "attendMeetType": 1
+                }
+            ],
+            "listMeetingPic": [
+                {
+                    "picPath": "/meeting/pic/0059187979",
+                    "picName": null,
+                    "picRealName": "DSC_0251.JPG",
+                    "picDesc": null,
+                    "ishomePage": null,
+                    "fileIndexId": null,
+                    "createUserId": 0,
+                    "createUserName": "",
+                    "createDate": 1411895294000,
+                    "picStatus": "1",
+                    "picDel": null,
+                    "updateDate": null,
+                    "createDateString": "2014-09-28",
+                    "updateDateString": null
+                },
+                {
+                    "picPath": "/meeting/pic/0059187981",
+                    "picName": null,
+                    "picRealName": "DSC_0251.JPG",
+                    "picDesc": null,
+                    "ishomePage": null,
+                    "fileIndexId": null,
+                    "createUserId": 0,
+                    "createUserName": "",
+                    "createDate": 1411895380000,
+                    "picStatus": "1",
+                    "picDel": null,
+                    "updateDate": null,
+                    "createDateString": "2014-09-28",
+                    "updateDateString": null
+                },
+                {
+                    "picPath": "/meeting/pic/0059187989",
+                    "picName": null,
+                    "picRealName": "DSC_0251.JPG",
+                    "picDesc": null,
+                    "ishomePage": null,
+                    "fileIndexId": null,
+                    "createUserId": 0,
+                    "createUserName": "",
+                    "createDate": 1411954493000,
+                    "picStatus": "1",
+                    "picDel": null,
+                    "updateDate": null,
+                    "createDateString": "2014-09-29",
+                    "updateDateString": null
+                },
+                {
+                    "picPath": "/meeting/pic/0059187973",
+                    "picName": null,
+                    "picRealName": "DSC_0251.JPG",
+                    "picDesc": null,
+                    "ishomePage": null,
+                    "fileIndexId": null,
+                    "createUserId": 0,
+                    "createUserName": "",
+                    "createDate": 1411893597000,
+                    "picStatus": "1",
+                    "picDel": null,
+                    "updateDate": null,
+                    "createDateString": "2014-09-28",
+                    "updateDateString": null
+                },
+                {
+                    "picPath": "/meeting/pic/0059187975",
+                    "picName": null,
+                    "picRealName": "DSC_0251.JPG",
+                    "picDesc": null,
+                    "ishomePage": null,
+                    "fileIndexId": null,
+                    "createUserId": 0,
+                    "createUserName": "",
+                    "createDate": 1411893819000,
+                    "picStatus": "1",
+                    "picDel": null,
+                    "updateDate": null,
+                    "createDateString": "2014-09-28",
+                    "updateDateString": null
+                },
+                {
+                    "picPath": "/meeting/pic/0059187977",
+                    "picName": null,
+                    "picRealName": "DSC_0251.JPG",
+                    "picDesc": null,
+                    "ishomePage": null,
+                    "fileIndexId": null,
+                    "createUserId": 0,
+                    "createUserName": "",
+                    "createDate": 1411894141000,
+                    "picStatus": "1",
+                    "picDel": null,
+                    "updateDate": null,
+                    "createDateString": "2014-09-28",
+                    "updateDateString": null
+                },
+                {
+                    "picPath": "/meeting/pic/0023145539",
+                    "picName": null,
+                    "picRealName": "DSC_0251.JPG",
+                    "picDesc": null,
+                    "ishomePage": null,
+                    "fileIndexId": null,
+                    "createUserId": 0,
+                    "createUserName": "",
+                    "createDate": 1411894207000,
+                    "picStatus": "1",
+                    "picDel": null,
+                    "updateDate": null,
+                    "createDateString": "2014-09-28",
+                    "updateDateString": null
+                },
+                {
+                    "picPath": "/meeting/pic/0059187983",
+                    "picName": null,
+                    "picRealName": "DSC_0251.JPG",
+                    "picDesc": null,
+                    "ishomePage": null,
+                    "fileIndexId": null,
+                    "createUserId": 0,
+                    "createUserName": "",
+                    "createDate": 1411896250000,
+                    "picStatus": "1",
+                    "picDel": null,
+                    "updateDate": null,
+                    "createDateString": "2014-09-28",
+                    "updateDateString": null
+                },
+                {
+                    "picPath": "/meeting/pic/0059187985",
+                    "picName": null,
+                    "picRealName": "DSC_0251.JPG",
+                    "picDesc": null,
+                    "ishomePage": null,
+                    "fileIndexId": null,
+                    "createUserId": 0,
+                    "createUserName": "",
+                    "createDate": 1411896883000,
+                    "picStatus": "1",
+                    "picDel": null,
+                    "updateDate": null,
+                    "createDateString": "2014-09-28",
+                    "updateDateString": null
+                },
+                {
+                    "picPath": "/meeting/pic/0059187987",
+                    "picName": null,
+                    "picRealName": "DSC_0251.JPG",
+                    "picDesc": null,
+                    "ishomePage": null,
+                    "fileIndexId": null,
+                    "createUserId": 0,
+                    "createUserName": "",
+                    "createDate": 1411908733000,
+                    "picStatus": "1",
+                    "picDel": null,
+                    "updateDate": null,
+                    "createDateString": "2014-09-28",
+                    "updateDateString": null
+                },
+                {
+                    "picPath": "/meeting/pic/0023145540",
+                    "picName": null,
+                    "picRealName": "DSC_0251.JPG",
+                    "picDesc": null,
+                    "ishomePage": null,
+                    "fileIndexId": null,
+                    "createUserId": 0,
+                    "createUserName": "",
+                    "createDate": 1411909041000,
+                    "picStatus": "1",
+                    "picDel": null,
+                    "updateDate": null,
+                    "createDateString": "2014-09-28",
+                    "updateDateString": null
+                }
+            ],
+            "listMeetingTime": [
+            	{
+            		"start_time":1409622795000,
+            		"end_time":1411985690000
+            	},
+            	{"
+            		start_time":1409622795000,
+            		"end_time":1411985690000
+            	}
+            ],
+            "listMeetingTopic": [
+                {
+                    "topicCoutent": "test",
+                    "topicStartTime": null,
+                    "topicEndTime": 1409622795000,
+                    "topicDesc": "sadasd",
+                    "topicFileName": "asd",
+                    "topicFilePath": "sad",
+                    "taskId": "asd"
+                },
+                {
+                    "topicCoutent": "八荣八耻",
+                    "topicStartTime": null,
+                    "topicEndTime": 1411985690000,
+                    "topicDesc": "听听八荣八耻",
+                    "topicFileName": null,
+                    "topicFilePath": null,
+                    "taskId": null
+                }
+            ],
+            "listMeetingData": [
+                {
+                    "dataName": "12",
+                    "dataId": 12,
+                    "dataType": 0,
+                    "dataReqType": 0,
+                    "dataUrl": ""
+                },
+                {
+                    "dataName": "32",
+                    "dataId": 12,
+                    "dataType": 1,
+                    "dataReqType": 0,
+                    "dataUrl": "www.baidu.com"
+                }
+            ],
+            "listMeetingPeople": [
+                {
+                    "peopleId": 1,
+                    "peopleName": "21",
+                    "peoplePhoto": "12",
+                    "peopleDesc": "12",
+                    "isShare": true
+                },
+                {
+                    "peopleId": 2,
+                    "peopleName": "22",
+                    "peoplePhoto": "22",
+                    "peopleDesc": "22",
+                    "isShare": true
+                }
+            ]
+        }

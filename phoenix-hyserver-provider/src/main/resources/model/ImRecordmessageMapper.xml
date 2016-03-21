@@ -1,0 +1,351 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+"http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+
+<!-- 不使用namespace的话sql搜索定位会比较方便 -->
+<mapper namespace="ImRecordmessage">
+
+	<resultMap id="imRecordmessageMap" type="com.ginkgocap.ywxt.model.meeting.ImRecordmessage">
+        <result property="id" column="Id"/>
+        <result property="userId" column="user_Id"/>
+        <result property="userId2" column="user_Id2"/>
+        <result property="chatMessageId" column="chat_Message_Id"/>
+        <result property="mucId" column="muc_Id"/>
+        <result property="mucCreateUserId" column="muc_Create_User_Id"/>
+        <result property="mucMessageId" column="muc_Message_Id"/>
+        <result property="mucStartDate" column="muc_Start_Date"/>
+        <result property="type" column="type"/>
+        <result property="lastMessageDate" column="last_Message_Date"/>
+        <result property="newCount" column="new_Count"/>
+        <result property="messageStartTime" column="message_Start_Time"/>
+        <result property="status" column="status"/>
+        <result property="ifRead" column="if_read" javaType="java.lang.Byte"/>
+	</resultMap>
+	
+	<resultMap id="imRecordmessageMapForCommunity" extends = "imRecordmessageMap" type="com.ginkgocap.ywxt.model.meeting.ImRecordmessageForCommunity">
+        <result property="newMessageRemind" column="new_message_remind"/>
+        <result property="nickname" column="nickname"/>
+        <result property="showNickname" column="show_nickname"/>
+	</resultMap>
+	
+	<!-- 用于select查询公用抽取的列 -->
+	<sql id="columns">
+	    <![CDATA[
+		Id as id,user_Id as userId,user_Id2 as userId2,chat_Message_Id as chatMessageId,muc_Id as mucId,muc_Create_User_Id as mucCreateUserId,muc_Message_Id as mucMessageId,muc_Start_Date as mucStartDate,type as type,last_Message_Date as lastMessageDate,new_Count as newCount,message_Start_Time as messageStartTime,status as status,if_read as ifRead
+	    ]]>
+	</sql>
+
+	<insert id="batchInsert" useGeneratedKeys="true" keyProperty="id" parameterType="map">
+		<if test="imRecordMessageList != null">
+			INSERT INTO t_im_RecordMessage (
+			Id ,
+			user_Id ,
+			user_Id2 ,
+			chat_Message_Id ,
+			muc_Id ,
+			muc_Create_User_Id ,
+			muc_Message_Id ,
+			muc_Start_Date ,
+			type ,
+			last_Message_Date ,
+			new_Count ,
+			message_Start_Time ,
+			status
+			)
+			VALUES 
+			<foreach collection="imRecordMessageList" index="index" item="item"
+				separator=",">
+				(#{item.id}, #{item.userId},
+				#{item.userId2},#{item.chatMessageId},#{item.mucId},#{item.mucCreateUserId},#{item.mucMessageId},
+				#{item.mucStartDate},#{item.type},#{item.lastMessageDate},#{item.newCount},#{item.messageStartTime},#{item.status})
+			</foreach>
+		</if>
+	</insert>
+
+	<delete id="batchDelete" parameterType="map">
+		<if test="meetingMemberList != null">
+			delete from t_im_RecordMessage where type=3 and muc_id = #{meetingId} and user_id in
+			<foreach collection="meetingMemberList" index="index" item="item"
+				open="(" separator="," close=")">
+				#{item}
+			</foreach>
+		</if>
+	</delete>
+
+	<!-- useGeneratedKeys="true" keyProperty="xxx" for sqlserver and mysql -->
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id">
+    <![CDATA[
+        INSERT INTO t_im_RecordMessage (
+        	Id ,
+        	user_Id ,
+        	user_Id2 ,
+        	chat_Message_Id ,
+        	muc_Id ,
+        	muc_Create_User_Id ,
+        	muc_Message_Id ,
+        	muc_Start_Date ,
+        	type ,
+        	last_Message_Date ,
+        	new_Count ,
+        	message_Start_Time ,
+        	status 
+        ) VALUES (
+        	#{id} ,
+        	#{userId} ,
+        	#{userId2} ,
+        	#{chatMessageId} ,
+        	#{mucId} ,
+        	#{mucCreateUserId} ,
+        	#{mucMessageId} ,
+        	#{mucStartDate} ,
+        	#{type} ,
+        	#{lastMessageDate} ,
+        	#{newCount} ,
+        	#{messageStartTime} ,
+        	#{status} 
+        )
+    ]]>
+		<!--	
+			oracle: order="BEFORE" SELECT sequenceName.nextval AS ID FROM DUAL 
+			DB2: order="BEFORE"" values nextval for sequenceName
+		<selectKey resultType="java.lang.Long" order="BEFORE" keyProperty="userId">
+			SELECT sequenceName.nextval AS ID FROM DUAL 
+        </selectKey>
+		-->
+	</insert>
+    
+	<update id="update" >
+    <![CDATA[
+        UPDATE t_im_RecordMessage SET
+	        user_Id = #{userId} ,
+	        user_Id2 = #{userId2} ,
+	        chat_Message_Id = #{chatMessageId} ,
+	        muc_Id = #{mucId} ,
+	        muc_Create_User_Id = #{mucCreateUserId} ,
+	        muc_Message_Id = #{mucMessageId} ,
+	        muc_Start_Date = #{mucStartDate} ,
+	        type = #{type} ,
+	        last_Message_Date = #{lastMessageDate} ,
+	        new_Count = #{newCount} ,
+	        message_Start_Time = #{messageStartTime} ,
+	        status = #{status} 
+        WHERE 
+	        Id = #{id} 
+    ]]>
+	</update>
+
+    <delete id="delete">
+    <![CDATA[
+        DELETE FROM t_im_RecordMessage WHERE
+        Id = #{id} 
+    ]]>
+    </delete>
+    
+    <select id="getById" resultMap="imRecordmessageMap">
+		SELECT <include refid="columns" />
+	    <![CDATA[
+		    FROM t_im_RecordMessage 
+	        WHERE 
+		        Id = #{id} 
+	    ]]>
+	</select>
+	
+
+
+    <select id="getByUserId" resultMap="imRecordmessageMap" parameterType="java.lang.Integer">
+	    SELECT <include refid="columns"/>
+	    <![CDATA[
+	        FROM t_im_RecordMessage where user_Id = #{userId}
+	    ]]>
+    </select>
+    
+    <select id="getByUserId2" resultMap="imRecordmessageMap" parameterType="java.lang.Integer">
+	    SELECT <include refid="columns"/>
+	    <![CDATA[
+	        FROM t_im_RecordMessage where user_Id2 = #{userId2}
+	    ]]>
+    </select>
+    
+    <select id="getByChatMessageId" resultMap="imRecordmessageMap" parameterType="java.lang.Integer">
+	    SELECT <include refid="columns"/>
+	    <![CDATA[
+	        FROM t_im_RecordMessage where chat_Message_Id = #{chatMessageId}
+	    ]]>
+    </select>
+    
+    <select id="getByMucId" resultMap="imRecordmessageMap" parameterType="java.lang.Integer">
+	    SELECT <include refid="columns"/>
+	    <![CDATA[
+	        FROM t_im_RecordMessage where muc_Id = #{mucId}
+	    ]]>
+    </select>
+    
+    <select id="getByMucCreateUserId" resultMap="imRecordmessageMap" parameterType="java.lang.Integer">
+	    SELECT <include refid="columns"/>
+	    <![CDATA[
+	        FROM t_im_RecordMessage where muc_Create_User_Id = #{mucCreateUserId}
+	    ]]>
+    </select>
+    
+    <select id="getByMucMessageId" resultMap="imRecordmessageMap" parameterType="java.lang.Integer">
+	    SELECT <include refid="columns"/>
+	    <![CDATA[
+	        FROM t_im_RecordMessage where muc_Message_Id = #{mucMessageId}
+	    ]]>
+    </select>
+    
+    <select id="getByMucStartDate" resultMap="imRecordmessageMap" parameterType="java.util.Date">
+	    SELECT <include refid="columns"/>
+	    <![CDATA[
+	        FROM t_im_RecordMessage where muc_Start_Date = #{mucStartDate}
+	    ]]>
+    </select>
+    
+    <select id="getByType" resultMap="imRecordmessageMap" parameterType="java.lang.Integer">
+	    SELECT <include refid="columns"/>
+	    <![CDATA[
+	        FROM t_im_RecordMessage where type = #{type}
+	    ]]>
+    </select>
+    
+    <select id="getByLastMessageDate" resultMap="imRecordmessageMap" parameterType="java.util.Date">
+	    SELECT <include refid="columns"/>
+	    <![CDATA[
+	        FROM t_im_RecordMessage where last_Message_Date = #{lastMessageDate}
+	    ]]>
+    </select>
+    
+    <select id="getByNewCount" resultMap="imRecordmessageMap" parameterType="java.lang.Integer">
+	    SELECT <include refid="columns"/>
+	    <![CDATA[
+	        FROM t_im_RecordMessage where new_Count = #{newCount}
+	    ]]>
+    </select>
+    
+    <select id="getByMessageStartTime" resultMap="imRecordmessageMap" parameterType="java.util.Date">
+	    SELECT <include refid="columns"/>
+	    <![CDATA[
+	        FROM t_im_RecordMessage where message_Start_Time = #{messageStartTime}
+	    ]]>
+    </select>
+    
+    <select id="getByStatus" resultMap="imRecordmessageMap" parameterType="java.lang.String">
+	    SELECT <include refid="columns"/>
+	    <![CDATA[
+	        FROM t_im_RecordMessage where status = #{status}
+	    ]]>
+    </select>
+    
+    <select id="getByUserIdAndStatus" resultMap="imRecordmessageMap" parameterType="java.lang.Integer">
+	    SELECT <include refid="columns"/>
+	    <![CDATA[
+	        FROM t_im_RecordMessage where user_Id = #{userId} and status = 1 order by last_Message_Date desc
+	    ]]>
+    </select>
+
+	<select id="getByUserIdAndStatusWithoutAffair" resultMap="imRecordmessageMap"
+		parameterType="socialListReq">
+	    <![CDATA[
+	    		 (select r.* from t_im_RecordMessage r join t_im_MUCInfo m on r.muc_id = m.id and m.affair_id is null and r.user_Id=#{userId} and r.status = 1) 
+	    	UNION all (select m.*  from t_im_RecordMessage m where m.muc_id is null and m.user_Id=#{userId} and  m.status = 1) 
+	    		order by last_Message_Date desc  
+	    ]]>
+	   	<if test="startRow!=null and startRow>-1 and pageSize!=null and pageSize>0">
+			LIMIT #{startRow},#{pageSize}
+	 	</if>
+	</select>
+	
+	<select id="getCommunityByUserIdAndStatus" resultMap="imRecordmessageMapForCommunity"
+		parameterType="socialListReq">
+	    <![CDATA[
+	    		 select r.*,ifnull(s.new_message_remind,0) as new_message_remind,s.nickname,ifnull(s.show_nickname,0) as show_nickname from t_im_RecordMessage r join t_im_MUCInfo m on r.muc_id = m.id and m.affair_id is null and m.type = '4' and r.user_Id=#{userId} and r.status = 1
+	    		  left join t_community_user_setting s on r.muc_id = s.community_id and r.user_id = s.created_user_id
+	    		order by last_Message_Date desc  
+	    ]]>
+	   	<if test="startRow!=null and startRow>-1 and pageSize!=null and pageSize>0">
+			LIMIT #{startRow},#{pageSize}
+	 	</if>
+	</select>
+	
+	<select id="getRecordMessageListByUserId" resultMap="imRecordmessageMap"
+		parameterType="java.lang.Integer">
+	    <![CDATA[
+	    	 select DISTINCT r.muc_id,r.new_count  from t_im_RecordMessage r join t_im_MUCInfo m on r.muc_id = m.id and m.affair_id is null and r.user_Id=#{userId} and r.status = 1 and m.type=4
+	    ]]>
+	</select>
+	
+	<!-- 获取社群的未读消息数 -->
+	<select id="getCommunityNewCountByUserId" resultType="com.ginkgocap.ywxt.vo.query.social.CommunityNewCount"
+		parameterType="java.lang.Integer">
+	    <![CDATA[
+select DISTINCT m.id as mucId,c.new_message_remind as newMessageRemind from t_im_MUCInfo m join t_im_MUCMember b on b.muc_id=m.id  and b.user_id=#{userId} and m.type=4 and m.affair_id is null 
+LEFT JOIN t_community_user_setting c on c.community_id=m.id and c.created_user_id=#{userId}
+
+	    ]]>
+	</select>
+	
+     <select id="getMeetingRecordMessage" resultMap="imRecordmessageMap" parameterType="java.lang.Long">
+	    SELECT <include refid="columns"/>
+	    <![CDATA[
+	        FROM t_im_RecordMessage where user_Id = #{userId} and type = 3
+	    ]]>
+     </select>
+     
+     <select id="getAllMeetingNewCount" resultType="java.lang.Integer" parameterType="java.lang.Long">
+	    <![CDATA[
+	    	SELECT SUM(r.new_count) 
+	    	FROM (
+	    		SELECT DISTINCT user_id,
+	    			muc_id,
+	    			new_count
+	    		FROM t_im_RecordMessage 
+	    		WHERE user_Id = #{userId} 
+	    			AND type = 3
+	    	) AS r 
+	    	INNER JOIN (
+		    	SELECT tm.id
+				FROM tb_meeting  AS tm
+				INNER JOIN tb_meeting_member AS tmm 
+					ON tm.id = tmm.meeting_id  
+				LEFT JOIN tb_meeting_pic AS tmp 
+					ON tm.id = tmp.module_id 
+					AND tmp.module_type = 1 
+					AND tmp.ishome_page = 1 
+				WHERE tmm.member_id = #{userId}
+					AND tm.is_delete = 0
+					AND tmm.is_delete = 0
+					AND tmm.member_meet_status != 2
+					AND (
+						(tmm.attend_meet_type = 0 AND tmm.attend_meet_status = 1) 
+						OR (tmm.attend_meet_type = 1 AND tmm.attend_meet_status = 4 AND tmm.excute_meet_sign = 1)
+					)
+					AND tm.meeting_status != 0
+		    ) AS m
+		    ON m.id = r.muc_id
+	    ]]>
+     </select>
+     <select id="getNewCountOfMeetingInvitation" resultType="java.lang.Integer" parameterType="java.lang.Long">
+	    <![CDATA[
+	    SELECT COUNT(distinct muc_id) FROM t_im_RecordMessage WHERE user_Id = #{userId} AND type = 3 AND if_read = 0
+	    ]]>
+     </select>
+     
+     <update id="updateMeetingInvitationForReadStatus"  parameterType="java.lang.Long">
+	    <![CDATA[
+	    UPDATE t_im_RecordMessage SET
+		if_read = 1  WHERE user_Id = #{userId} AND type = 3
+	    ]]>
+     </update>
+     
+     <select id="getByUserIdGroup" resultMap="imRecordmessageMap" parameterType="java.lang.Long">
+	    SELECT <include refid="columns"/>
+	    <![CDATA[
+	        FROM t_im_RecordMessage where user_Id = #{userId} and status = 1 and type = 2
+	    ]]>
+    </select>
+    
+	
+</mapper>
+

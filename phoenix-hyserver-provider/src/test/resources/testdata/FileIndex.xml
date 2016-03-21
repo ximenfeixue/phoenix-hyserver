@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- DBUnit flatXml DataFile -->
+<dataset>
+
+
+	  <file_index 
+			id='Id430' 
+			file_path='FilePath132' 
+			file_title='FileTitle574' 
+			file_size='933' 
+			status='0' 
+			author_id='159' 
+			md5='Md5260' 
+			task_id='TaskId814' 
+			module_type='432' 
+			ctime='2014-09-16 17:11:25.908' 
+			author_name='AuthorName065' 
+			crc32='Crc32477' 
+	  />	
+  
+</dataset>
