@@ -1318,6 +1318,7 @@ PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
 			END AS TYPE,
 			tm.meeting_type as meetingType,	 
 			tmp.pic_path AS path,
+			tm.group_id as groupId,
 			tm.start_time as "time"
 		FROM tb_meeting  AS tm
 		INNER JOIN tb_meeting_member AS tmm 

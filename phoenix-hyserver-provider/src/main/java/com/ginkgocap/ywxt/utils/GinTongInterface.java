@@ -384,7 +384,65 @@ public class GinTongInterface {
 				}
 			}
 		} catch (Exception e) {
-			logger.error("req frrechat.createMUC failed!", e);
+			logger.error("req frrechat.getListIMRecord failed!", e);
+		}
+		logger.info("socail list size ==> " + listSocial.size());
+		return listSocial;
+	}
+	
+	/**
+	 * 获取用户会议会话列表
+	 * 
+	 * @param groupName
+	 * @param roomsize
+	 * @param ownerId
+	 * @param memberIds
+	 * @return
+	 */
+	public static List<Social> getListMeetingRecord(Long userId) {
+		List<Social> listSocial = new ArrayList<Social>();
+
+		ObjectMapper objectMap = new ObjectMapper();
+		String url = resource.getString("imUrl");
+		String interfaceName = "/mobile/im/getListMeetingRecord.action";
+		try {
+			UserBean userBean = new UserBean();
+			userBean.setId(userId);
+			String responseJson = HttpClientUtil.getGintongPost(url, interfaceName, "{}", userBean);
+			JsonNode jsonNode = objectMap.readTree(responseJson);
+
+			if ("0000".equals(jsonNode.get("notification").get("notifCode").asText())) {
+				JsonNode listIMRecordNode = jsonNode.get("responseData").get("page").get("listIMRecord");
+				for (JsonNode node : listIMRecordNode) {
+					logger.debug("imrecord ==> " + node.toString());
+					Social socail = new Social();
+					socail.setId(node.get("id").asLong());
+					socail.setNewCount(node.get("newCount").asInt());
+					socail.setTime(DateConvertUtils.parse(getString(node, "startTime", "")));
+					socail.setOrderTime(DateConvertUtils.parse(getString(node, "startTime", "")));
+					socail.setTitle(getString(node, "title", ""));
+					socail.setType(node.get("type").asInt());
+					socail.setAtMsgId(getString(node, "atMsgId", ""));
+					socail.setAtName(getString(node, "atName", ""));
+					socail.setCompereName(getString(node, "compereName", ""));
+
+					SocialDetail socialDetail = new SocialDetail();
+					List<String> listImageUrl = new ArrayList<String>();
+					for (JsonNode n : node.get("listImageUrl")) {
+						listImageUrl.add(n.asText());
+					}
+					socialDetail.setListImageUrl(listImageUrl);
+
+					socialDetail.setSenderID(node.get("senderId").asLong());
+					socialDetail.setSenderName(getString(node, "senderName", ""));
+					socialDetail.setContent(getString(node, "content", ""));
+					socail.setSocialDetail(socialDetail);
+					logger.debug("socail ==> " + node.toString());
+					listSocial.add(socail);
+				}
+			}
+		} catch (Exception e) {
+			logger.error("req frrechat.getListMeetingRecord failed!", e);
 		}
 		logger.info("socail list size ==> " + listSocial.size());
 		return listSocial;

@@ -87,14 +87,12 @@ import com.ginkgocap.ywxt.vo.query.social.CommunityNewCount;
 import com.ginkgocap.ywxt.vo.query.social.Social;
 import com.ginkgocap.ywxt.vo.query.social.SocialDetail;
 import com.gintong.easemob.server.comm.GsonUtils;
-import com.gintong.easemob.server.httpclient.api.EasemobChatGroupsHandler;
 import com.gintong.rocketmq.api.DefaultMessageService;
 import com.gintong.rocketmq.api.enums.TopicType;
 import com.gintong.rocketmq.api.model.RocketSendResult;
 import com.gintong.rocketmq.api.utils.FlagTypeUtils;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonObject;
 
 //import com.ginkgocap.ywxt.model.meeting.FileIndex;
 
@@ -1262,7 +1260,7 @@ public class MeetingController extends BaseController {
 		if (null != listMeeting && listMeeting.size() > 0) {
 			// 先获取人名、最后一次聊天时间
 			Map<Long, String> names = new HashMap<Long, String>();
-			Map<Long, Date> dates = new HashMap<Long, Date>();
+//			Map<Long, Date> dates = new HashMap<Long, Date>();
 			List<Long> list = new ArrayList<Long>();
 			List<Long> list2 = new ArrayList<Long>();
 			List<Long> listMeetingId = new ArrayList<Long>();
@@ -1313,16 +1311,28 @@ public class MeetingController extends BaseController {
 					names.put(u.getId(), u.getName());
 				}
 			}
+			
+			Map<String,Social> sessionMap = new HashMap<String,Social>();
 			if (list2.size() > 0) {
-				Map<String, Object> map = new HashMap<String, Object>();
-				map.put("ids", list2);
-				List<Map<String, Object>> chats = topicChatService.getLastNoticeTimes(map);
-				if (null == chats)
-					chats = new ArrayList<Map<String, Object>>();
-				for (Map<String, Object> m : chats) {
-					dates.put(Long.valueOf(m.get("id").toString()), (Date) m.get("time"));
+				// todo : 在这里取session, 然后重新对social的未读消息数跟最后消息时间赋值
+				List<Social> socialSession = GinTongInterface.getListMeetingRecord(userId);
+				for (Social s : socialSession) {
+					if (StringUtils.isNotEmpty(s.getGroupId())) {
+						sessionMap.put(s.getGroupId(), s);
+					}
 				}
 			}
+			
+//			if (list2.size() > 0) {
+//				Map<String, Object> map = new HashMap<String, Object>();
+//				map.put("ids", list2);
+//				List<Map<String, Object>> chats = topicChatService.getLastNoticeTimes(map);
+//				if (null == chats)
+//					chats = new ArrayList<Map<String, Object>>();
+//				for (Map<String, Object> m : chats) {
+//					dates.put(Long.valueOf(m.get("id").toString()), (Date) m.get("time"));
+//				}
+//			}
 
 			// 组装会议对象
 			for (Social social : listMeeting) {
@@ -1333,8 +1343,15 @@ public class MeetingController extends BaseController {
 				// 会议封装最后聊天时间
 				if (SocialType.INVITATION.code() != social.getType()) {
 					// 获取最后消息时间
-					Date time = dates.get(social.getId());
-					social.setTime(time);
+//					Date time = dates.get(social.getId());
+//					social.setTime(time);
+					//将从畅聊获得session信息注入social
+					Social s = sessionMap.get(social.getGroupId());
+					logger.debug("getMeetingList ==> " + ReflectionToStringBuilder.toString(s));
+					if (s != null) {
+						social.setTime(s.getTime());
+						social.setNewCount(s.getNewCount());
+					}
 				}
 				SocialDetail socialDetail = social.getSocialDetail();
 				if (isNullOrEmpty(socialDetail)) {

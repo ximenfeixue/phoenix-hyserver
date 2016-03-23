@@ -1048,7 +1048,7 @@
 				<gintongservice.url>http://192.168.101.90:5555/</gintongservice.url>
 				<!-- 本地项目地址 -->
 				<!-- <gintongIm.url>http://192.168.150.79:3333/ImServer/</gintongIm.url> -->
-				<gintongIm.url>http://192.168.101.203:8080/</gintongIm.url>
+				<gintongIm.url>http://192.168.101.203:8081/</gintongIm.url>
 				<bigData.url>http://192.168.101.9:8090/</bigData.url>
 			</properties>
 		</profile>

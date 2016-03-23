@@ -52,6 +52,14 @@ public class Social implements Serializable {
 	
 	private Integer userType;//1个人好友 2组织好友
 	
+	private String groupId;
+	
+	public String getGroupId() {
+		return groupId;
+	}
+	public void setGroupId(String groupId) {
+		this.groupId = groupId;
+	}
 	/**getXXX() and SetXX()*/
 	public java.lang.Long getId() {
 		return id;
