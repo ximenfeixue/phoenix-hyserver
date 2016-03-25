@@ -10,6 +10,7 @@ import java.util.ResourceBundle;
 
 import net.sf.json.JSONObject;
 
+import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -358,12 +359,12 @@ public class GinTongInterface {
 				for (JsonNode node : listIMRecordNode) {
 					logger.debug("imrecord ==> " + node.toString());
 					Social socail = new Social();
-					socail.setId(node.get("id").asLong());
-					socail.setNewCount(node.get("newCount").asInt());
+					socail.setId(getLong(node,"id",0L));
+					socail.setNewCount(getInt(node,"newCount",0));
 					socail.setTime(DateConvertUtils.parse(getString(node, "startTime", "")));
 					socail.setOrderTime(DateConvertUtils.parse(getString(node, "startTime", "")));
 					socail.setTitle(getString(node, "title", ""));
-					socail.setType(node.get("type").asInt());
+					socail.setType(getInt(node,"type",0));
 					socail.setAtMsgId(getString(node, "atMsgId", ""));
 					socail.setAtName(getString(node, "atName", ""));
 					socail.setCompereName(getString(node, "compereName", ""));
@@ -375,11 +376,11 @@ public class GinTongInterface {
 					}
 					socialDetail.setListImageUrl(listImageUrl);
 
-					socialDetail.setSenderID(node.get("senderId").asLong());
+					socialDetail.setSenderID(getLong(node,"senderId",0L));
 					socialDetail.setSenderName(getString(node, "senderName", ""));
 					socialDetail.setContent(getString(node, "content", ""));
 					socail.setSocialDetail(socialDetail);
-					logger.debug("socail ==> " + node.toString());
+					logger.debug("socail ==> " + ReflectionToStringBuilder.toString(socail));
 					listSocial.add(socail);
 				}
 			}
@@ -389,7 +390,7 @@ public class GinTongInterface {
 		logger.info("socail list size ==> " + listSocial.size());
 		return listSocial;
 	}
-	
+
 	/**
 	 * 获取用户会议会话列表
 	 * 
@@ -416,12 +417,12 @@ public class GinTongInterface {
 				for (JsonNode node : listIMRecordNode) {
 					logger.debug("imrecord ==> " + node.toString());
 					Social socail = new Social();
-					socail.setId(node.get("id").asLong());
-					socail.setNewCount(node.get("newCount").asInt());
+					socail.setId(getLong(node, "id", 0L));
+					socail.setNewCount(getInt(node, "newCount", 0));
 					socail.setTime(DateConvertUtils.parse(getString(node, "startTime", "")));
 					socail.setOrderTime(DateConvertUtils.parse(getString(node, "startTime", "")));
 					socail.setTitle(getString(node, "title", ""));
-					socail.setType(node.get("type").asInt());
+					socail.setType(getInt(node, "type", 0));
 					socail.setAtMsgId(getString(node, "atMsgId", ""));
 					socail.setAtName(getString(node, "atName", ""));
 					socail.setCompereName(getString(node, "compereName", ""));
@@ -433,11 +434,11 @@ public class GinTongInterface {
 					}
 					socialDetail.setListImageUrl(listImageUrl);
 
-					socialDetail.setSenderID(node.get("senderId").asLong());
+					socialDetail.setSenderID(getLong(node, "senderId", 0L));
 					socialDetail.setSenderName(getString(node, "senderName", ""));
 					socialDetail.setContent(getString(node, "content", ""));
 					socail.setSocialDetail(socialDetail);
-					logger.debug("socail ==> " + node.toString());
+					logger.debug("socail ==> " + ReflectionToStringBuilder.toString(socail));
 					listSocial.add(socail);
 				}
 			}
@@ -449,7 +450,33 @@ public class GinTongInterface {
 	}
 
 	private static String getString(JsonNode node, String key, String defaultValue) {
-		return node.get(key) != null ? node.get(key).asText() : defaultValue;
+		Object val = node.get(key);
+		if (val == null) {
+			logger.warn(key + " is null, use default : " + defaultValue);
+			return defaultValue;
+		}
+
+		return node.get(key).asText();
+	}
+
+	private static long getLong(JsonNode node, String key, long defaultValue) {
+		Object val = node.get(key);
+		if (val == null) {
+			logger.warn(key + " is null, use default : " + defaultValue);
+			return defaultValue;
+		}
+
+		return node.get(key).asLong();
+	}
+
+	private static int getInt(JsonNode node, String key, int defaultValue) {
+		Object val = node.get(key);
+		if (val == null) {
+			logger.warn(key + " is null, use default : " + defaultValue);
+			return defaultValue;
+		}
+
+		return node.get(key).asInt();
 	}
 
 	/**
@@ -530,6 +557,6 @@ public class GinTongInterface {
 
 	public static void updateMuc(String groupId, Map<String, Object> params) {
 		// TODO Auto-generated method stub
-		
+
 	}
 }

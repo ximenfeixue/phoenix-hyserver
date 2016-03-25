@@ -21,6 +21,8 @@ import org.apache.http.message.BasicHeader;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.ginkgocap.ywxt.vo.query.meeting.UserBean;
 
@@ -31,6 +33,7 @@ import com.ginkgocap.ywxt.vo.query.meeting.UserBean;
  * @Version: [v1.0]
  */
 public class HttpClientUtil {
+	private static Logger logger = LoggerFactory.getLogger(HttpClientUtil.class);
 
 	private static final String dateTimeFormat = "MM/dd/yyyy HH:mm:ss";
 
@@ -152,15 +155,16 @@ public class HttpClientUtil {
 			if (entity != null) {
 
 				// System.out.println(EntityUtils.toString(entity));
+				logger.info("REQEST => " + url + interfaceName);
+				logger.info("PARAMS => " + json);
 				String a = EntityUtils.toString(entity).toString();
-				System.out.println(a);
+				logger.info("RETURN => " + a);
 				return a;
 			}
 
 		} catch (IOException e) {
-			System.out.println("请求phoenix-mobile异常");
-			e.printStackTrace(); // To change body of catch statement use File |
-									// Settings | File Templates.
+			logger.info("RETURN => ");
+			logger.error("请求phoenix-mobile异常", e);
 		}
 		return "";
 	}

@@ -10,7 +10,7 @@
 		</layout> 
 		<filter class="org.apache.log4j.varia.LevelRangeFilter"> 
 			<param name="LevelMax" value="ERROR"></param> 
-			<param name="LevelMin" value="INFO  "></param> 
+			<param name="LevelMin" value="DEBUG  "></param> 
 			<param name="AcceptOnMatch" value="true" /> 
 		</filter> 
 	</appender>
@@ -24,7 +24,7 @@
 		</layout>
 	</appender>
 	<logger name="com.ginkgocap.ywxt">
-		<level value="INFO"></level>
+		<level value="DEBUG"></level>
 	</logger>
 	<logger name="com.ibatis" additivity="true">
 

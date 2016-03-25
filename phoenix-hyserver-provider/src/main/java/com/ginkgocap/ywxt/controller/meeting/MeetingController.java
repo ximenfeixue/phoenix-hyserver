@@ -1377,7 +1377,7 @@ public class MeetingController extends BaseController {
 					// social.setTime(time);
 					// 将从畅聊获得session信息注入social
 					Social s = sessionMap.get(social.getGroupId());
-					logger.debug("getMeetingList ==> " + ReflectionToStringBuilder.toString(s));
+					logger.debug("meeting with groupid["+social.getGroupId()+"] ==> " + ReflectionToStringBuilder.toString(s));
 					if (s != null) {
 						social.setTime(s.getTime());
 						social.setNewCount(s.getNewCount());
