@@ -421,7 +421,7 @@ public class MeetingController extends BaseController {
 						ThreadPoolUtils.getExecutorService().execute(new Runnable() {
 							@Override
 							public void run() {
-								modifyMeeting(meetingParams,creatorParams);
+								modifyMeeting(meetingParams, creatorParams);
 							}
 						});
 
@@ -1397,6 +1397,8 @@ public class MeetingController extends BaseController {
 
 			Collections.sort(listResult, new Comparator<Social>() {
 				public int compare(Social o1, Social o2) {
+					if (o1 == o2)
+						return 0;
 					if (o1.getType().intValue() != o2.getType().intValue()) {
 						if (o1.getType().intValue() == 5) {
 							return 1;
@@ -1404,6 +1406,9 @@ public class MeetingController extends BaseController {
 						if (o2.getType().intValue() == 5) {
 							return -1;
 						}
+					}
+					if (o1.getTime() == o2.getTime()) {
+						return 0;
 					}
 					if (null == o1.getTime()) {
 						return 1;
@@ -1790,7 +1795,7 @@ public class MeetingController extends BaseController {
 			notificationMap.put("notifCode", "0001");
 			notificationMap.put("notifInfo", "hello App");
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error("", e);
 			responseDataMap.put("listSocial", null);
 			notificationMap.put("notifCode", "0002");
 			notificationMap.put("notifInfo", e.getMessage());
