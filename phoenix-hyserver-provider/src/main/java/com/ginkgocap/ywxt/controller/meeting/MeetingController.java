@@ -143,8 +143,7 @@ public class MeetingController extends BaseController {
 	/*
 	 * 在社交列表中移除单聊、群聊、会议
 	 */
-	@RequestMapping(value = "/removeSocial.json", method = RequestMethod.POST, produces = {
-			"application/json;charset=UTF-8" })
+	@RequestMapping(value = "/removeSocial.json", method = RequestMethod.POST, produces = {"application/json;charset=UTF-8"})
 	@ResponseBody
 	public Map<String, Object> removeSocial(HttpServletRequest request, HttpServletResponse response) {
 		// 获取json参数串
@@ -201,8 +200,7 @@ public class MeetingController extends BaseController {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/add.json", method = RequestMethod.GET)
-	public Map<String, Object> addMettingGet(HttpServletRequest request, HttpServletResponse response)
-			throws IOException {
+	public Map<String, Object> addMettingGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		Map<String, Object> model = addMetting(request, response);
 		return model;
 	}
@@ -249,8 +247,7 @@ public class MeetingController extends BaseController {
 					classMap.put("listMeetingOrgan", MeetingOrgan.class);
 					classMap.put("listMeetingSignLabel", MeetingSignLabel.class);
 					// json 转为对象
-					JSONUtils.getMorpherRegistry()
-							.registerMorpher(new DateMorpher(new String[] { "yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd" }));
+					JSONUtils.getMorpherRegistry().registerMorpher(new DateMorpher(new String[]{"yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd"}));
 					/*
 					 * MeetingQuery meetingObj = (MeetingQuery)
 					 * JSONObject.toBean(j, MeetingQuery.class, classMap);
@@ -259,8 +256,7 @@ public class MeetingController extends BaseController {
 					MeetingQuery meetingObj = (MeetingQuery) gson.fromJson(requestJson, MeetingQuery.class);
 					String nfsHome = (String) request.getSession().getServletContext().getAttribute("nfsHome");
 					String path = request.getContextPath();
-					String basePath = request.getScheme() + "://" + request.getServerName() + ":"
-							+ request.getServerPort() + path + "/";
+					String basePath = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + path + "/";
 					String url = basePath + "/file/get/image/?url=" + nfsHome;
 
 					Long meetingid = meetingService.saveMeetingInterfix(meetingObj, user, url);
@@ -354,8 +350,7 @@ public class MeetingController extends BaseController {
 
 	@ResponseBody
 	@RequestMapping(value = "/upate.json", method = RequestMethod.GET)
-	public Map<String, Object> updateMeetingGet(HttpServletRequest request, HttpServletResponse response)
-			throws IOException {
+	public Map<String, Object> updateMeetingGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		Map<String, Object> model = updateMeeting(request, response);
 		return model;
 	}
@@ -414,8 +409,7 @@ public class MeetingController extends BaseController {
 					} else {
 						String nfsHome = (String) request.getSession().getServletContext().getAttribute("nfsHome");
 						String path = request.getContextPath();
-						String basePath = request.getScheme() + "://" + request.getServerName() + ":"
-								+ request.getServerPort() + path + "/";
+						String basePath = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + path + "/";
 						String url = basePath + "/file/get/image/?url=" + nfsHome;
 						meetingService.updateMeetingInterfix(meetingObj, user, url);
 
@@ -423,17 +417,17 @@ public class MeetingController extends BaseController {
 						 * 集成环信：更新会议
 						 */
 						final MeetingQuery meetingParams = meetingObj;
+						final User creatorParams = user;
 						ThreadPoolUtils.getExecutorService().execute(new Runnable() {
 							@Override
 							public void run() {
-								modifyMeeting(meetingParams);
+								modifyMeeting(meetingParams,creatorParams);
 							}
 						});
 
 						if (!isNullOrEmpty(meetingObj) && !isNullOrEmpty(meetingObj.getId())) {
 
-							pushIndexByMQ(FlagTypeUtils.updateMeetingFlag(),
-									getMeetingQueryToIndexJsonString(meetingObj.getId()));
+							pushIndexByMQ(FlagTypeUtils.updateMeetingFlag(), getMeetingQueryToIndexJsonString(meetingObj.getId()));
 
 						}
 						responseDataMap.put("succeed", true);
@@ -457,23 +451,21 @@ public class MeetingController extends BaseController {
 		return model;
 	}
 
-	private void modifyMeeting(MeetingQuery meetingObj) {
+	private void modifyMeeting(MeetingQuery meetingObj, User creator) {
 		Map<String, Object> params = new HashMap<String, Object>();
 		String name = meetingObj.getMeetingName();
-		if (StringUtils.isNotEmpty(name)) {
-			params.put("groupname", name);
+		if (StringUtils.isEmpty(name)) {
+			name = "";
 		}
 		String desc = meetingObj.getMeetingDesc();
-		if (StringUtils.isNotEmpty(desc)) {
-			params.put("description", desc);
+		if (StringUtils.isEmpty(desc)) {
+			desc = "";
 		}
 		Integer maxusersSize = meetingObj.getAttendMeetingCount();
-		if (maxusersSize != null && maxusersSize > 0) {
-			params.put("maxusers", maxusersSize);
+		if (maxusersSize == null || maxusersSize <= 0) {
+			maxusersSize = 0;
 		}
-		// EasemobChatGroupsHandler.updateChatGroup(meetingObj.getGroupId(),
-		// params);
-		GinTongInterface.updateMuc(meetingObj.getGroupId(), params);
+		GinTongInterface.updateMuc(creator.getId(), meetingObj.getId(), name, desc, maxusersSize);
 	}
 
 	/**
@@ -488,8 +480,7 @@ public class MeetingController extends BaseController {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/deleteByMeetingIdAndCreateId.json", method = RequestMethod.GET)
-	public Map<String, Object> deleteMettingGet(HttpServletRequest request, HttpServletResponse response)
-			throws IOException {
+	public Map<String, Object> deleteMettingGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		Map<String, Object> model = deleteMetting(request, response);
 		return model;
 	}
@@ -555,8 +546,7 @@ public class MeetingController extends BaseController {
 							}
 						});
 					} else {
-						logger.error(
-								"执行 " + CLASS_NAME + " 类中的 deleteMetting 方法时出错：环信的群组 Id ( groupId ) 为空，删除环信服务器上的该群组失败");
+						logger.error("执行 " + CLASS_NAME + " 类中的 deleteMetting 方法时出错：环信的群组 Id ( groupId ) 为空，删除环信服务器上的该群组失败");
 					}
 
 				} else {
@@ -589,8 +579,7 @@ public class MeetingController extends BaseController {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/getByIdAndMemberId.json", method = RequestMethod.GET)
-	public Map<String, Object> getMettingByIdAndMemberIdGet(HttpServletRequest request, HttpServletResponse response)
-			throws IOException {
+	public Map<String, Object> getMettingByIdAndMemberIdGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		Map<String, Object> model = getMettingByIdAndMemberId(request, response);
 		return model;
 	}
@@ -640,8 +629,7 @@ public class MeetingController extends BaseController {
 					meetingObj = meetingService.getMeetingByIdAndMemberId(id, memberId);
 					if (!Utils.isNullOrEmpty(meetingObj)) {
 						// 封装会议笔记
-						List<MeetingNoteQuery> listMeetingNoteQuery = meetingNoteService
-								.getNoteAndDetailtByMeetingIdAndCreater(id, memberId);
+						List<MeetingNoteQuery> listMeetingNoteQuery = meetingNoteService.getNoteAndDetailtByMeetingIdAndCreater(id, memberId);
 						meetingObj.setListMeetingNoteQuery(listMeetingNoteQuery);
 						MeetingQuery meetingTemp = meetingTopicService.getMeetingTopicList(id);
 						if (!isNullOrEmpty(meetingTemp)) {
@@ -690,8 +678,7 @@ public class MeetingController extends BaseController {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/changeMeetingStatus.json", method = RequestMethod.GET)
-	public Map<String, Object> changeMeetingStatusGet(HttpServletRequest request, HttpServletResponse response)
-			throws IOException {
+	public Map<String, Object> changeMeetingStatusGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		Map<String, Object> model = changeMeetingStatus(request, response);
 		return model;
 	}
@@ -733,12 +720,10 @@ public class MeetingController extends BaseController {
 				// 会议成员id
 				String memberId = getStringJsonValueByKey(j, "meetingId");
 				if (Utils.isAllNotNullOrEmpty(meetingStatusStr, meetingIdStr, memberId)) {
-					flag = meetingService.changeMeetingStatus(Long.valueOf(meetingIdStr),
-							Integer.valueOf(meetingStatusStr), user.getId());
+					flag = meetingService.changeMeetingStatus(Long.valueOf(meetingIdStr), Integer.valueOf(meetingStatusStr), user.getId());
 					if (!isNullOrEmpty(meetingIdStr)) {
 
-						pushIndexByMQ(FlagTypeUtils.updateMeetingFlag(),
-								getMeetingQueryToIndexJsonString(Long.getLong(meetingIdStr)));
+						pushIndexByMQ(FlagTypeUtils.updateMeetingFlag(), getMeetingQueryToIndexJsonString(Long.getLong(meetingIdStr)));
 
 						GinTongInterface.addMeetingIndex(Long.valueOf(meetingIdStr), "upd");
 					}
@@ -769,8 +754,7 @@ public class MeetingController extends BaseController {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/getFileListByTaskId.json", method = RequestMethod.GET)
-	public Map<String, Object> getFileListByTaskIdGet(HttpServletRequest request, HttpServletResponse response,
-			ModelMap model) throws IOException {
+	public Map<String, Object> getFileListByTaskIdGet(HttpServletRequest request, HttpServletResponse response, ModelMap model) throws IOException {
 		return this.getFileListByTaskId(request, response, model);
 	}
 
@@ -782,8 +766,7 @@ public class MeetingController extends BaseController {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/getFileListByTaskId.json", method = RequestMethod.POST)
-	public Map<String, Object> getFileListByTaskId(HttpServletRequest request, HttpServletResponse response,
-			ModelMap model) throws IOException {
+	public Map<String, Object> getFileListByTaskId(HttpServletRequest request, HttpServletResponse response, ModelMap model) throws IOException {
 		Map<String, Object> result = new HashMap<String, Object>();
 		Map<String, Object> responseDataMap = new HashMap<String, Object>();
 		Map<String, Object> notificationMap = new HashMap<String, Object>();
@@ -827,8 +810,7 @@ public class MeetingController extends BaseController {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/deleteNotBeginMeeting.json", method = RequestMethod.GET)
-	public Map<String, Object> deleteNotBeginMeetingGet(HttpServletRequest request, HttpServletResponse response,
-			ModelMap model) throws IOException {
+	public Map<String, Object> deleteNotBeginMeetingGet(HttpServletRequest request, HttpServletResponse response, ModelMap model) throws IOException {
 		return this.deleteNotBeginMeeting(request, response, model);
 	}
 
@@ -840,8 +822,7 @@ public class MeetingController extends BaseController {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/deleteNotBeginMeeting.json", method = RequestMethod.POST)
-	public Map<String, Object> deleteNotBeginMeeting(HttpServletRequest request, HttpServletResponse response,
-			ModelMap model) throws IOException {
+	public Map<String, Object> deleteNotBeginMeeting(HttpServletRequest request, HttpServletResponse response, ModelMap model) throws IOException {
 		Map<String, Object> result = new HashMap<String, Object>();
 		Map<String, Object> responseDataMap = new HashMap<String, Object>();
 		Map<String, Object> notificationMap = new HashMap<String, Object>();
@@ -889,8 +870,7 @@ public class MeetingController extends BaseController {
 							}
 						});
 					} else {
-						logger.error("执行 " + CLASS_NAME
-								+ " 类中的 deleteNotBeginMeeting 方法时出错：环信的群组 Id ( groupId ) 为空，删除环信服务器上的该群组失败");
+						logger.error("执行 " + CLASS_NAME + " 类中的 deleteNotBeginMeeting 方法时出错：环信的群组 Id ( groupId ) 为空，删除环信服务器上的该群组失败");
 					}
 
 				} else {
@@ -1025,8 +1005,7 @@ public class MeetingController extends BaseController {
 
 	@ResponseBody
 	@RequestMapping(value = "/seach.json", method = RequestMethod.GET)
-	public Map<String, Object> meetingSeachGet(HttpServletRequest request, HttpServletResponse response)
-			throws IOException {
+	public Map<String, Object> meetingSeachGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		Map<String, Object> model = this.meetingSeachPost(request, response);
 		return model;
 	}
@@ -1043,8 +1022,7 @@ public class MeetingController extends BaseController {
 	@SuppressWarnings("unchecked")
 	@ResponseBody
 	@RequestMapping(value = "/seach.json", method = RequestMethod.POST)
-	public Map<String, Object> meetingSeachPost(HttpServletRequest request, HttpServletResponse response)
-			throws IOException {
+	public Map<String, Object> meetingSeachPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		String requestJson = "";
 		try {
 			requestJson = getJsonParamStr(request);
@@ -1245,8 +1223,7 @@ public class MeetingController extends BaseController {
 
 	@ResponseBody
 	@RequestMapping(value = "/meetingList.json", method = RequestMethod.POST)
-	public Map<String, Object> meetingList(HttpServletRequest request, HttpServletResponse response)
-			throws IOException {
+	public Map<String, Object> meetingList(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		Map<String, Object> model = new HashMap<String, Object>();
 		Map<String, Object> responseDataMap = new HashMap<String, Object>();
 		Map<String, Object> notificationMap = new HashMap<String, Object>();
@@ -1296,12 +1273,10 @@ public class MeetingController extends BaseController {
 				if (null != compereId && list.contains(compereId) == false) {
 					list.add(compereId);
 				}
-				if (null != social.getId() && SocialType.INVITATION.code() != social.getType()
-						&& list2.contains(social.getId()) == false) {
+				if (null != social.getId() && SocialType.INVITATION.code() != social.getType() && list2.contains(social.getId()) == false) {
 					list2.add(social.getId());
 				}
-				if (3 == social.getType().intValue() || 4 == social.getType().intValue()
-						|| 5 == social.getType().intValue()) {
+				if (3 == social.getType().intValue() || 4 == social.getType().intValue() || 5 == social.getType().intValue()) {
 					listMeetingId.add(social.getId());
 				}
 			}
@@ -1312,8 +1287,7 @@ public class MeetingController extends BaseController {
 				if (!Utils.isNullOrEmpty(listMeetingTopic)) {
 					for (MeetingTopic meetingTopic : listMeetingTopic) {
 						if (meetingTopic.getIsFinished() != 1) {// 社交列表不能转发到已结束的议题
-							List<MeetingTopic> tempListMeetingTopic = mapMeetingTopic
-									.get("" + meetingTopic.getMeetingId());
+							List<MeetingTopic> tempListMeetingTopic = mapMeetingTopic.get("" + meetingTopic.getMeetingId());
 							if (Utils.isNullOrEmpty(tempListMeetingTopic)) {
 								tempListMeetingTopic = new ArrayList<MeetingTopic>();
 							}
@@ -1323,8 +1297,7 @@ public class MeetingController extends BaseController {
 					}
 				}
 				for (Social social : listMeeting) {
-					if (3 == social.getType().intValue() || 4 == social.getType().intValue()
-							|| 5 == social.getType().intValue()) {
+					if (3 == social.getType().intValue() || 4 == social.getType().intValue() || 5 == social.getType().intValue()) {
 						social.setListMeetingTopic(mapMeetingTopic.get("" + social.getId()));
 					}
 				}
@@ -1345,8 +1318,8 @@ public class MeetingController extends BaseController {
 				// todo : 在这里取session, 然后重新对social的未读消息数跟最后消息时间赋值
 				List<Social> socialSession = GinTongInterface.getListMeetingRecord(userId);
 				for (Social s : socialSession) {
-					if (StringUtils.isNotEmpty(s.getGroupId())) {
-						sessionMap.put(s.getId().toString(), s);
+					if (s.getId() != null) {
+						sessionMap.put(String.valueOf(s.getId().longValue()), s);
 					}
 				}
 			}
@@ -1377,7 +1350,7 @@ public class MeetingController extends BaseController {
 					// social.setTime(time);
 					// 将从畅聊获得session信息注入social
 					Social s = sessionMap.get(social.getGroupId());
-					logger.debug("meeting with groupid["+social.getGroupId()+"] ==> " + ReflectionToStringBuilder.toString(s));
+					logger.debug("meeting with groupid[" + social.getGroupId() + "] ==> " + ReflectionToStringBuilder.toString(s));
 					if (s != null) {
 						social.setTime(s.getTime());
 						social.setNewCount(s.getNewCount());
@@ -1459,19 +1432,15 @@ public class MeetingController extends BaseController {
 	}
 
 	static boolean defineUnique(Social source, Social target) {
-		if ((source.getId() == null ? 0 : source.getId().longValue()) == (target.getId() == null ? 0
-				: target.getId().longValue())
-				&& (source.getTitle() == null ? "" : source.getTitle())
-						.equals((target.getTitle() == null ? "" : target.getTitle()))
-				&& (source.getType() == null ? 0 : source.getType().intValue()) == (target.getType() == null ? 0
-						: target.getType().intValue())
-				&& (source.getCompereId() == null ? 0
-						: source.getCompereId().longValue()) == (target.getCompereId() == null ? 0
-								: target.getCompereId().longValue())
-				&& (source.getCompereName() == null ? "" : source.getCompereName()) == (target.getCompereName() == null
-						? "" : target.getCompereName())
-				&& (source.getNewCount() == null ? 0 : source.getNewCount().intValue()) == (target.getNewCount() == null
-						? 0 : target.getNewCount().intValue())) {
+		if ((source.getId() == null ? 0 : source.getId().longValue()) == (target.getId() == null ? 0 : target.getId().longValue())
+				&& (source.getTitle() == null ? "" : source.getTitle()).equals((target.getTitle() == null ? "" : target.getTitle()))
+				&& (source.getType() == null ? 0 : source.getType().intValue()) == (target.getType() == null ? 0 : target.getType().intValue())
+				&& (source.getCompereId() == null ? 0 : source.getCompereId().longValue()) == (target.getCompereId() == null ? 0 : target
+						.getCompereId().longValue())
+				&& (source.getCompereName() == null ? "" : source.getCompereName()) == (target.getCompereName() == null ? "" : target
+						.getCompereName())
+				&& (source.getNewCount() == null ? 0 : source.getNewCount().intValue()) == (target.getNewCount() == null ? 0 : target.getNewCount()
+						.intValue())) {
 			return true;
 		} else {
 			return false;
@@ -1668,8 +1637,7 @@ public class MeetingController extends BaseController {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/socialList2.json", method = RequestMethod.POST)
-	public Map<String, Object> socialList2(HttpServletRequest request, HttpServletResponse response)
-			throws IOException {
+	public Map<String, Object> socialList2(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		Map<String, Object> model = new HashMap<String, Object>();
 		Map<String, Object> responseDataMap = new HashMap<String, Object>();
 		Map<String, Object> notificationMap = new HashMap<String, Object>();
@@ -1838,8 +1806,7 @@ public class MeetingController extends BaseController {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/getCommunityList.json", method = RequestMethod.POST)
-	public Map<String, Object> getCommunityList(HttpServletRequest request, HttpServletResponse response)
-			throws IOException {
+	public Map<String, Object> getCommunityList(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		Map<String, Object> model = new HashMap<String, Object>();
 		Map<String, Object> responseDataMap = new HashMap<String, Object>();
 		Map<String, Object> notificationMap = new HashMap<String, Object>();
@@ -1913,8 +1880,7 @@ public class MeetingController extends BaseController {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/socialListNext.json", method = RequestMethod.POST)
-	public Map<String, Object> socialListNext(HttpServletRequest request, HttpServletResponse response)
-			throws IOException {
+	public Map<String, Object> socialListNext(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		Map<String, Object> model = new HashMap<String, Object>();
 		Map<String, Object> responseDataMap = new HashMap<String, Object>();
 		Map<String, Object> notificationMap = new HashMap<String, Object>();
@@ -1975,8 +1941,7 @@ public class MeetingController extends BaseController {
 
 	@ResponseBody
 	@RequestMapping(value = "/socialListNext.json", method = RequestMethod.GET)
-	public Map<String, Object> socialListNextGet(HttpServletRequest request, HttpServletResponse response)
-			throws IOException {
+	public Map<String, Object> socialListNextGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		return this.socialListNext(request, response);
 	}
 
@@ -2011,8 +1976,7 @@ public class MeetingController extends BaseController {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/socialList2.json", method = RequestMethod.GET)
-	public Map<String, Object> socialListGet2(HttpServletRequest request, HttpServletResponse response)
-			throws IOException {
+	public Map<String, Object> socialListGet2(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		return this.socialList2(request, response);
 	}
 
@@ -2058,12 +2022,10 @@ public class MeetingController extends BaseController {
 					if (null != compereId && list.contains(compereId) == false) {
 						list.add(compereId);
 					}
-					if (null != social.getId() && SocialType.INVITATION.code() != social.getType()
-							&& list2.contains(social.getId()) == false) {
+					if (null != social.getId() && SocialType.INVITATION.code() != social.getType() && list2.contains(social.getId()) == false) {
 						list2.add(social.getId());
 					}
-					if (3 == social.getType().intValue() || 4 == social.getType().intValue()
-							|| 5 == social.getType().intValue()) {
+					if (3 == social.getType().intValue() || 4 == social.getType().intValue() || 5 == social.getType().intValue()) {
 						listMeetingId.add(social.getId());
 					}
 				}
@@ -2074,8 +2036,7 @@ public class MeetingController extends BaseController {
 					if (!Utils.isNullOrEmpty(listMeetingTopic)) {
 						for (MeetingTopic meetingTopic : listMeetingTopic) {
 							if (meetingTopic.getIsFinished() != 1) {// 社交列表不能转发到已结束的议题
-								List<MeetingTopic> tempListMeetingTopic = mapMeetingTopic
-										.get("" + meetingTopic.getMeetingId());
+								List<MeetingTopic> tempListMeetingTopic = mapMeetingTopic.get("" + meetingTopic.getMeetingId());
 								if (Utils.isNullOrEmpty(tempListMeetingTopic)) {
 									tempListMeetingTopic = new ArrayList<MeetingTopic>();
 								}
@@ -2085,8 +2046,7 @@ public class MeetingController extends BaseController {
 						}
 					}
 					for (Social social : listMeetingAndInvitation) {
-						if (3 == social.getType().intValue() || 4 == social.getType().intValue()
-								|| 5 == social.getType().intValue()) {
+						if (3 == social.getType().intValue() || 4 == social.getType().intValue() || 5 == social.getType().intValue()) {
 							social.setListMeetingTopic(mapMeetingTopic.get("" + social.getId()));
 						}
 					}
@@ -2229,8 +2189,7 @@ public class MeetingController extends BaseController {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/socialList3.json", method = RequestMethod.POST)
-	public Map<String, Object> privateMessageList(HttpServletRequest request, HttpServletResponse response)
-			throws IOException {
+	public Map<String, Object> privateMessageList(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		Map<String, Object> model = new HashMap<String, Object>();
 		Map<String, Object> responseDataMap = new HashMap<String, Object>();
 		Map<String, Object> notificationMap = new HashMap<String, Object>();
@@ -2349,8 +2308,7 @@ public class MeetingController extends BaseController {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/socialList.json", method = RequestMethod.GET)
-	public Map<String, Object> socialListGet(HttpServletRequest request, HttpServletResponse response)
-			throws IOException {
+	public Map<String, Object> socialListGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		return this.socialList(request, response);
 	}
 
@@ -2362,8 +2320,7 @@ public class MeetingController extends BaseController {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/getMyForwardingSocial.json", method = RequestMethod.GET)
-	public Map<String, Object> getMyForwardingSocialGet(HttpServletRequest request, HttpServletResponse response)
-			throws IOException {
+	public Map<String, Object> getMyForwardingSocialGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		return getMyForwardingSocial(request, response);
 	}
 
@@ -2375,8 +2332,7 @@ public class MeetingController extends BaseController {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/getMyForwardingSocial.json", method = RequestMethod.POST)
-	public Map<String, Object> getMyForwardingSocial(HttpServletRequest request, HttpServletResponse response)
-			throws IOException {
+	public Map<String, Object> getMyForwardingSocial(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		Map<String, Object> model = new HashMap<String, Object>();
 		Map<String, Object> responseDataMap = new HashMap<String, Object>();
 		Map<String, Object> notificationMap = new HashMap<String, Object>();
@@ -2408,8 +2364,7 @@ public class MeetingController extends BaseController {
 									social.setTime(null);
 								}
 								// 如果会议为有议题类型 获取议题列表
-								List<MeetingTopic> listMeetingTopic = meetingTopicService
-										.getForwardingTopicByMeetingId(social.getId());
+								List<MeetingTopic> listMeetingTopic = meetingTopicService.getForwardingTopicByMeetingId(social.getId());
 								if (!isNullOrEmpty(listMeetingTopic)) {
 									social.setListMeetingTopic(listMeetingTopic);
 								}
@@ -2471,8 +2426,7 @@ public class MeetingController extends BaseController {
 				if (!Utils.isNullOrEmpty(keyword) && keyword.length() > 0) {
 					for (int i = listResult.size() - 1; i >= 0; i--) {
 						Social social = listResult.get(i);
-						if (!Utils.isNullOrEmpty(keyword) && !Utils.isNullOrEmpty(social.getTitle())
-								&& !social.getTitle().contains(keyword)) {
+						if (!Utils.isNullOrEmpty(keyword) && !Utils.isNullOrEmpty(social.getTitle()) && !social.getTitle().contains(keyword)) {
 							listResult.remove(i);
 						}
 					}
@@ -2504,8 +2458,7 @@ public class MeetingController extends BaseController {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/getForwardingMeetingData.json", method = RequestMethod.GET)
-	public Map<String, Object> getForwardingMeetingDataGet(HttpServletRequest request, HttpServletResponse response)
-			throws IOException {
+	public Map<String, Object> getForwardingMeetingDataGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		return this.getForwardingMeetingData(request, response);
 	}
 
@@ -2518,8 +2471,7 @@ public class MeetingController extends BaseController {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/getForwardingMeetingData.json", method = RequestMethod.POST)
-	public Map<String, Object> getForwardingMeetingData(HttpServletRequest request, HttpServletResponse response)
-			throws IOException {
+	public Map<String, Object> getForwardingMeetingData(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
 		Map<String, Object> result = new HashMap<String, Object>();
 		Map<String, Object> responseDataMap = new HashMap<String, Object>();
@@ -2540,8 +2492,7 @@ public class MeetingController extends BaseController {
 				String memberIdStr = getStringJsonValueByKey(j, "topicId");
 
 				if (Utils.isAllNotNullOrEmpty(meetingIdStr, memberIdStr)) {
-					meetingQuery = meetingService.getForwardingMeetingData(Long.valueOf(meetingIdStr),
-							Long.valueOf(memberIdStr));
+					meetingQuery = meetingService.getForwardingMeetingData(Long.valueOf(meetingIdStr), Long.valueOf(memberIdStr));
 					notificationMap.put("notifCode", "0001");
 					notificationMap.put("notifInfo", "hello App");
 				} else {
@@ -2579,8 +2530,7 @@ public class MeetingController extends BaseController {
 
 	@ResponseBody
 	@RequestMapping(value = "/getMeetingIndustryData.json", method = RequestMethod.GET)
-	public Map<String, Object> getMeetingIndustryDataGet(HttpServletRequest request, HttpServletResponse response)
-			throws IOException {
+	public Map<String, Object> getMeetingIndustryDataGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		return this.getForwardingMeetingData(request, response);
 	}
 
@@ -2593,8 +2543,7 @@ public class MeetingController extends BaseController {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/getMeetingIndustryData.json", method = RequestMethod.POST)
-	public Map<String, Object> getMeetingIndustryData(HttpServletRequest request, HttpServletResponse response)
-			throws IOException {
+	public Map<String, Object> getMeetingIndustryData(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		Map<String, Object> result = new HashMap<String, Object>();
 		Map<String, Object> responseDataMap = new HashMap<String, Object>();
 		Map<String, Object> notificationMap = new HashMap<String, Object>();
@@ -2637,8 +2586,8 @@ public class MeetingController extends BaseController {
 		String page = getStringJsonValueByKey(j, "page");
 		String rows = getStringJsonValueByKey(j, "rows");
 		String scope = getStringJsonValueByKey(j, "scope");
-		String url = resource.getString("hotUrl") + "/API/relation.do?userId=" + userId + "&targetId=" + targetId
-				+ "&targetType=5" + "&page=" + page + "&rows=" + rows + "&scope=" + scope;
+		String url = resource.getString("hotUrl") + "/API/relation.do?userId=" + userId + "&targetId=" + targetId + "&targetType=5" + "&page=" + page
+				+ "&rows=" + rows + "&scope=" + scope;
 		logger.info(url);
 		String json = "";
 		try {
@@ -2735,15 +2684,13 @@ public class MeetingController extends BaseController {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/getSimilarMeeting.json", method = RequestMethod.GET)
-	public Map<String, Object> getSimilarMeetingGet(HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
+	public Map<String, Object> getSimilarMeetingGet(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		return getSimilarMeeting(request, response);
 	}
 
 	@ResponseBody
 	@RequestMapping(value = "/getSimilarMeeting.json", method = RequestMethod.POST)
-	public Map<String, Object> getSimilarMeeting(HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
+	public Map<String, Object> getSimilarMeeting(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		logger.info("into /getSimilarMeeting.json");
 		Map<String, Object> responseData = new HashMap<String, Object>();
 		String requestJson = "";
@@ -2752,8 +2699,7 @@ public class MeetingController extends BaseController {
 		String targetId = getStringJsonValueByKey(j, "targetId");
 		String page = getStringJsonValueByKey(j, "page");
 		String rows = getStringJsonValueByKey(j, "rows");
-		String url = resource.getString("hotUrl") + "/API/simMeet.do?targetId=" + targetId + "&page=" + page + "&rows="
-				+ rows;
+		String url = resource.getString("hotUrl") + "/API/simMeet.do?targetId=" + targetId + "&page=" + page + "&rows=" + rows;
 		logger.info(url);
 		String json = "";
 		try {
@@ -2822,15 +2768,13 @@ public class MeetingController extends BaseController {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/getMeetingMessage.json", method = RequestMethod.GET)
-	public Map<String, Object> getMeetingMessageGet(HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
+	public Map<String, Object> getMeetingMessageGet(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		return getMeetingMessage(request, response);
 	}
 
 	@ResponseBody
 	@RequestMapping(value = "/getMeetingMessage.json", method = RequestMethod.POST)
-	public Map<String, Object> getMeetingMessage(HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
+	public Map<String, Object> getMeetingMessage(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		logger.info("into /getMeetingMessage.json");
 		Map<String, Object> responseData = new HashMap<String, Object>();
 		String requestJson = "";
@@ -2917,8 +2861,8 @@ public class MeetingController extends BaseController {
 
 	@ResponseBody
 	@RequestMapping(value = "/getCommunityNewCountByUserId/{userId}", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
-	public Map<String, Object> getCommunityNewCountByUserId(@PathVariable("userId") Integer userId,
-			HttpServletRequest request, HttpServletResponse response) {
+	public Map<String, Object> getCommunityNewCountByUserId(@PathVariable("userId") Integer userId, HttpServletRequest request,
+			HttpServletResponse response) {
 		Map<String, Object> resultMap = new HashMap<String, Object>();
 		List<CommunityNewCount> result = imRecordmessageService.getCommunityNewCountByUserId(userId);
 		Notification notification = new Notification();

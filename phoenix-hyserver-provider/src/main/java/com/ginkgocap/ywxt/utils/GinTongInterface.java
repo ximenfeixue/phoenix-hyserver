@@ -555,8 +555,32 @@ public class GinTongInterface {
 		GinTongInterface.exitFromMUC(userId, exitUserId, groupId);
 	}
 
-	public static void updateMuc(String groupId, Map<String, Object> params) {
-		// TODO Auto-generated method stub
 
+	public static void updateMuc(Long operatorUserId, Long meetingId, String name, String desc, Integer maxusersSize) {
+		ObjectMapper objectMap = new ObjectMapper();
+		String url = resource.getString("imUrl");
+		String interfaceName = "/mobile/im/modifyConference.action";
+		try {
+			UserBean userBean = new UserBean();
+			userBean.setId(operatorUserId);
+
+			ObjectNode objectNode = objectMap.createObjectNode();
+			objectNode.put("id", meetingId);
+			objectNode.put("title", name);
+			objectNode.put("maxusersSize", maxusersSize);
+			String jsonbody = objectMap.writeValueAsString(objectNode);
+
+			String responseJson = HttpClientUtil.getGintongPost(url, interfaceName, jsonbody, userBean);
+			JsonNode jsonNode = objectMap.readTree(responseJson);
+
+			logger.info("resp freechat.updateMuc =>" + objectMap.writeValueAsString(jsonNode));
+			if ("0000".equals(jsonNode.get("notification").get("notifCode").asText())) {
+				logger.info("更新会议畅聊" + meetingId + "成功!");
+			} else {
+				logger.info("更新会议畅聊" + meetingId + "失败!");
+			}
+		} catch (Exception e) {
+			logger.error("req frrechat.exitFromMUC failed!", e);
+		}
 	}
 }
