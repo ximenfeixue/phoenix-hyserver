@@ -29,6 +29,7 @@ import net.sf.json.util.JSONUtils;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
+import org.eclipse.jetty.util.log.Log;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -142,7 +143,8 @@ public class MeetingController extends BaseController {
 	/*
 	 * 在社交列表中移除单聊、群聊、会议
 	 */
-	@RequestMapping(value = "/removeSocial.json", method = RequestMethod.POST, produces = {"application/json;charset=UTF-8"})
+	@RequestMapping(value = "/removeSocial.json", method = RequestMethod.POST, produces = {
+			"application/json;charset=UTF-8" })
 	@ResponseBody
 	public Map<String, Object> removeSocial(HttpServletRequest request, HttpServletResponse response) {
 		// 获取json参数串
@@ -199,7 +201,8 @@ public class MeetingController extends BaseController {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/add.json", method = RequestMethod.GET)
-	public Map<String, Object> addMettingGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+	public Map<String, Object> addMettingGet(HttpServletRequest request, HttpServletResponse response)
+			throws IOException {
 		Map<String, Object> model = addMetting(request, response);
 		return model;
 	}
@@ -246,7 +249,8 @@ public class MeetingController extends BaseController {
 					classMap.put("listMeetingOrgan", MeetingOrgan.class);
 					classMap.put("listMeetingSignLabel", MeetingSignLabel.class);
 					// json 转为对象
-					JSONUtils.getMorpherRegistry().registerMorpher(new DateMorpher(new String[]{"yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd"}));
+					JSONUtils.getMorpherRegistry()
+							.registerMorpher(new DateMorpher(new String[] { "yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd" }));
 					/*
 					 * MeetingQuery meetingObj = (MeetingQuery)
 					 * JSONObject.toBean(j, MeetingQuery.class, classMap);
@@ -255,7 +259,8 @@ public class MeetingController extends BaseController {
 					MeetingQuery meetingObj = (MeetingQuery) gson.fromJson(requestJson, MeetingQuery.class);
 					String nfsHome = (String) request.getSession().getServletContext().getAttribute("nfsHome");
 					String path = request.getContextPath();
-					String basePath = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + path + "/";
+					String basePath = request.getScheme() + "://" + request.getServerName() + ":"
+							+ request.getServerPort() + path + "/";
 					String url = basePath + "/file/get/image/?url=" + nfsHome;
 
 					Long meetingid = meetingService.saveMeetingInterfix(meetingObj, user, url);
@@ -349,7 +354,8 @@ public class MeetingController extends BaseController {
 
 	@ResponseBody
 	@RequestMapping(value = "/upate.json", method = RequestMethod.GET)
-	public Map<String, Object> updateMeetingGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+	public Map<String, Object> updateMeetingGet(HttpServletRequest request, HttpServletResponse response)
+			throws IOException {
 		Map<String, Object> model = updateMeeting(request, response);
 		return model;
 	}
@@ -408,7 +414,8 @@ public class MeetingController extends BaseController {
 					} else {
 						String nfsHome = (String) request.getSession().getServletContext().getAttribute("nfsHome");
 						String path = request.getContextPath();
-						String basePath = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + path + "/";
+						String basePath = request.getScheme() + "://" + request.getServerName() + ":"
+								+ request.getServerPort() + path + "/";
 						String url = basePath + "/file/get/image/?url=" + nfsHome;
 						meetingService.updateMeetingInterfix(meetingObj, user, url);
 
@@ -425,7 +432,8 @@ public class MeetingController extends BaseController {
 
 						if (!isNullOrEmpty(meetingObj) && !isNullOrEmpty(meetingObj.getId())) {
 
-							pushIndexByMQ(FlagTypeUtils.updateMeetingFlag(), getMeetingQueryToIndexJsonString(meetingObj.getId()));
+							pushIndexByMQ(FlagTypeUtils.updateMeetingFlag(),
+									getMeetingQueryToIndexJsonString(meetingObj.getId()));
 
 						}
 						responseDataMap.put("succeed", true);
@@ -463,7 +471,8 @@ public class MeetingController extends BaseController {
 		if (maxusersSize != null && maxusersSize > 0) {
 			params.put("maxusers", maxusersSize);
 		}
-//		EasemobChatGroupsHandler.updateChatGroup(meetingObj.getGroupId(), params);
+		// EasemobChatGroupsHandler.updateChatGroup(meetingObj.getGroupId(),
+		// params);
 		GinTongInterface.updateMuc(meetingObj.getGroupId(), params);
 	}
 
@@ -479,7 +488,8 @@ public class MeetingController extends BaseController {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/deleteByMeetingIdAndCreateId.json", method = RequestMethod.GET)
-	public Map<String, Object> deleteMettingGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+	public Map<String, Object> deleteMettingGet(HttpServletRequest request, HttpServletResponse response)
+			throws IOException {
 		Map<String, Object> model = deleteMetting(request, response);
 		return model;
 	}
@@ -539,13 +549,14 @@ public class MeetingController extends BaseController {
 						ThreadPoolUtils.getExecutorService().execute(new Runnable() {
 							@Override
 							public void run() {
-								//2016-03-14 tanmin 同步删除会议对应的畅聊,创建者将自己退出会议即为解散
+								// 2016-03-14 tanmin 同步删除会议对应的畅聊,创建者将自己退出会议即为解散
 								GinTongInterface.exitFromMUC(creatorId, creatorId, chatgroupid);
-//								EasemobChatGroupsHandler.deleteChatGroups(chatgroupid);
+								// EasemobChatGroupsHandler.deleteChatGroups(chatgroupid);
 							}
 						});
 					} else {
-						logger.error("执行 " + CLASS_NAME + " 类中的 deleteMetting 方法时出错：环信的群组 Id ( groupId ) 为空，删除环信服务器上的该群组失败");
+						logger.error(
+								"执行 " + CLASS_NAME + " 类中的 deleteMetting 方法时出错：环信的群组 Id ( groupId ) 为空，删除环信服务器上的该群组失败");
 					}
 
 				} else {
@@ -578,7 +589,8 @@ public class MeetingController extends BaseController {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/getByIdAndMemberId.json", method = RequestMethod.GET)
-	public Map<String, Object> getMettingByIdAndMemberIdGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+	public Map<String, Object> getMettingByIdAndMemberIdGet(HttpServletRequest request, HttpServletResponse response)
+			throws IOException {
 		Map<String, Object> model = getMettingByIdAndMemberId(request, response);
 		return model;
 	}
@@ -628,7 +640,8 @@ public class MeetingController extends BaseController {
 					meetingObj = meetingService.getMeetingByIdAndMemberId(id, memberId);
 					if (!Utils.isNullOrEmpty(meetingObj)) {
 						// 封装会议笔记
-						List<MeetingNoteQuery> listMeetingNoteQuery = meetingNoteService.getNoteAndDetailtByMeetingIdAndCreater(id, memberId);
+						List<MeetingNoteQuery> listMeetingNoteQuery = meetingNoteService
+								.getNoteAndDetailtByMeetingIdAndCreater(id, memberId);
 						meetingObj.setListMeetingNoteQuery(listMeetingNoteQuery);
 						MeetingQuery meetingTemp = meetingTopicService.getMeetingTopicList(id);
 						if (!isNullOrEmpty(meetingTemp)) {
@@ -677,7 +690,8 @@ public class MeetingController extends BaseController {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/changeMeetingStatus.json", method = RequestMethod.GET)
-	public Map<String, Object> changeMeetingStatusGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+	public Map<String, Object> changeMeetingStatusGet(HttpServletRequest request, HttpServletResponse response)
+			throws IOException {
 		Map<String, Object> model = changeMeetingStatus(request, response);
 		return model;
 	}
@@ -719,10 +733,12 @@ public class MeetingController extends BaseController {
 				// 会议成员id
 				String memberId = getStringJsonValueByKey(j, "meetingId");
 				if (Utils.isAllNotNullOrEmpty(meetingStatusStr, meetingIdStr, memberId)) {
-					flag = meetingService.changeMeetingStatus(Long.valueOf(meetingIdStr), Integer.valueOf(meetingStatusStr), user.getId());
+					flag = meetingService.changeMeetingStatus(Long.valueOf(meetingIdStr),
+							Integer.valueOf(meetingStatusStr), user.getId());
 					if (!isNullOrEmpty(meetingIdStr)) {
 
-						pushIndexByMQ(FlagTypeUtils.updateMeetingFlag(), getMeetingQueryToIndexJsonString(Long.getLong(meetingIdStr)));
+						pushIndexByMQ(FlagTypeUtils.updateMeetingFlag(),
+								getMeetingQueryToIndexJsonString(Long.getLong(meetingIdStr)));
 
 						GinTongInterface.addMeetingIndex(Long.valueOf(meetingIdStr), "upd");
 					}
@@ -753,7 +769,8 @@ public class MeetingController extends BaseController {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/getFileListByTaskId.json", method = RequestMethod.GET)
-	public Map<String, Object> getFileListByTaskIdGet(HttpServletRequest request, HttpServletResponse response, ModelMap model) throws IOException {
+	public Map<String, Object> getFileListByTaskIdGet(HttpServletRequest request, HttpServletResponse response,
+			ModelMap model) throws IOException {
 		return this.getFileListByTaskId(request, response, model);
 	}
 
@@ -765,7 +782,8 @@ public class MeetingController extends BaseController {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/getFileListByTaskId.json", method = RequestMethod.POST)
-	public Map<String, Object> getFileListByTaskId(HttpServletRequest request, HttpServletResponse response, ModelMap model) throws IOException {
+	public Map<String, Object> getFileListByTaskId(HttpServletRequest request, HttpServletResponse response,
+			ModelMap model) throws IOException {
 		Map<String, Object> result = new HashMap<String, Object>();
 		Map<String, Object> responseDataMap = new HashMap<String, Object>();
 		Map<String, Object> notificationMap = new HashMap<String, Object>();
@@ -809,7 +827,8 @@ public class MeetingController extends BaseController {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/deleteNotBeginMeeting.json", method = RequestMethod.GET)
-	public Map<String, Object> deleteNotBeginMeetingGet(HttpServletRequest request, HttpServletResponse response, ModelMap model) throws IOException {
+	public Map<String, Object> deleteNotBeginMeetingGet(HttpServletRequest request, HttpServletResponse response,
+			ModelMap model) throws IOException {
 		return this.deleteNotBeginMeeting(request, response, model);
 	}
 
@@ -821,7 +840,8 @@ public class MeetingController extends BaseController {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/deleteNotBeginMeeting.json", method = RequestMethod.POST)
-	public Map<String, Object> deleteNotBeginMeeting(HttpServletRequest request, HttpServletResponse response, ModelMap model) throws IOException {
+	public Map<String, Object> deleteNotBeginMeeting(HttpServletRequest request, HttpServletResponse response,
+			ModelMap model) throws IOException {
 		Map<String, Object> result = new HashMap<String, Object>();
 		Map<String, Object> responseDataMap = new HashMap<String, Object>();
 		Map<String, Object> notificationMap = new HashMap<String, Object>();
@@ -863,13 +883,14 @@ public class MeetingController extends BaseController {
 						ThreadPoolUtils.getExecutorService().execute(new Runnable() {
 							@Override
 							public void run() {
-								//2016-03-14 tanmin 同步删除会议对应的畅聊,创建者将自己退出会议即为解散
+								// 2016-03-14 tanmin 同步删除会议对应的畅聊,创建者将自己退出会议即为解散
 								GinTongInterface.exitFromMUC(creatorId, creatorId, chatgroupid);
-//								EasemobChatGroupsHandler.deleteChatGroups(chatgroupid);
+								// EasemobChatGroupsHandler.deleteChatGroups(chatgroupid);
 							}
 						});
 					} else {
-						logger.error("执行 " + CLASS_NAME + " 类中的 deleteNotBeginMeeting 方法时出错：环信的群组 Id ( groupId ) 为空，删除环信服务器上的该群组失败");
+						logger.error("执行 " + CLASS_NAME
+								+ " 类中的 deleteNotBeginMeeting 方法时出错：环信的群组 Id ( groupId ) 为空，删除环信服务器上的该群组失败");
 					}
 
 				} else {
@@ -1004,7 +1025,8 @@ public class MeetingController extends BaseController {
 
 	@ResponseBody
 	@RequestMapping(value = "/seach.json", method = RequestMethod.GET)
-	public Map<String, Object> meetingSeachGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+	public Map<String, Object> meetingSeachGet(HttpServletRequest request, HttpServletResponse response)
+			throws IOException {
 		Map<String, Object> model = this.meetingSeachPost(request, response);
 		return model;
 	}
@@ -1021,7 +1043,8 @@ public class MeetingController extends BaseController {
 	@SuppressWarnings("unchecked")
 	@ResponseBody
 	@RequestMapping(value = "/seach.json", method = RequestMethod.POST)
-	public Map<String, Object> meetingSeachPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+	public Map<String, Object> meetingSeachPost(HttpServletRequest request, HttpServletResponse response)
+			throws IOException {
 		String requestJson = "";
 		try {
 			requestJson = getJsonParamStr(request);
@@ -1134,7 +1157,7 @@ public class MeetingController extends BaseController {
 					doing_meeting.add(mi);
 					it.remove();
 				}
-			}// 此时meeting中 包含 未开始的 和 已经结束
+			} // 此时meeting中 包含 未开始的 和 已经结束
 
 			// 正在进行的会议按照 排序时间 asc
 			Collections.sort(doing_meeting, new Comparator<MeetingVo>() {
@@ -1222,7 +1245,8 @@ public class MeetingController extends BaseController {
 
 	@ResponseBody
 	@RequestMapping(value = "/meetingList.json", method = RequestMethod.POST)
-	public Map<String, Object> meetingList(HttpServletRequest request, HttpServletResponse response) throws IOException {
+	public Map<String, Object> meetingList(HttpServletRequest request, HttpServletResponse response)
+			throws IOException {
 		Map<String, Object> model = new HashMap<String, Object>();
 		Map<String, Object> responseDataMap = new HashMap<String, Object>();
 		Map<String, Object> notificationMap = new HashMap<String, Object>();
@@ -1260,7 +1284,7 @@ public class MeetingController extends BaseController {
 		if (null != listMeeting && listMeeting.size() > 0) {
 			// 先获取人名、最后一次聊天时间
 			Map<Long, String> names = new HashMap<Long, String>();
-//			Map<Long, Date> dates = new HashMap<Long, Date>();
+			// Map<Long, Date> dates = new HashMap<Long, Date>();
 			List<Long> list = new ArrayList<Long>();
 			List<Long> list2 = new ArrayList<Long>();
 			List<Long> listMeetingId = new ArrayList<Long>();
@@ -1272,10 +1296,12 @@ public class MeetingController extends BaseController {
 				if (null != compereId && list.contains(compereId) == false) {
 					list.add(compereId);
 				}
-				if (null != social.getId() && SocialType.INVITATION.code() != social.getType() && list2.contains(social.getId()) == false) {
+				if (null != social.getId() && SocialType.INVITATION.code() != social.getType()
+						&& list2.contains(social.getId()) == false) {
 					list2.add(social.getId());
 				}
-				if (3 == social.getType().intValue() || 4 == social.getType().intValue() || 5 == social.getType().intValue()) {
+				if (3 == social.getType().intValue() || 4 == social.getType().intValue()
+						|| 5 == social.getType().intValue()) {
 					listMeetingId.add(social.getId());
 				}
 			}
@@ -1286,7 +1312,8 @@ public class MeetingController extends BaseController {
 				if (!Utils.isNullOrEmpty(listMeetingTopic)) {
 					for (MeetingTopic meetingTopic : listMeetingTopic) {
 						if (meetingTopic.getIsFinished() != 1) {// 社交列表不能转发到已结束的议题
-							List<MeetingTopic> tempListMeetingTopic = mapMeetingTopic.get("" + meetingTopic.getMeetingId());
+							List<MeetingTopic> tempListMeetingTopic = mapMeetingTopic
+									.get("" + meetingTopic.getMeetingId());
 							if (Utils.isNullOrEmpty(tempListMeetingTopic)) {
 								tempListMeetingTopic = new ArrayList<MeetingTopic>();
 							}
@@ -1296,7 +1323,8 @@ public class MeetingController extends BaseController {
 					}
 				}
 				for (Social social : listMeeting) {
-					if (3 == social.getType().intValue() || 4 == social.getType().intValue() || 5 == social.getType().intValue()) {
+					if (3 == social.getType().intValue() || 4 == social.getType().intValue()
+							|| 5 == social.getType().intValue()) {
 						social.setListMeetingTopic(mapMeetingTopic.get("" + social.getId()));
 					}
 				}
@@ -1311,28 +1339,30 @@ public class MeetingController extends BaseController {
 					names.put(u.getId(), u.getName());
 				}
 			}
-			
-			Map<String,Social> sessionMap = new HashMap<String,Social>();
+
+			Map<String, Social> sessionMap = new HashMap<String, Social>();
 			if (list2.size() > 0) {
 				// todo : 在这里取session, 然后重新对social的未读消息数跟最后消息时间赋值
 				List<Social> socialSession = GinTongInterface.getListMeetingRecord(userId);
 				for (Social s : socialSession) {
 					if (StringUtils.isNotEmpty(s.getGroupId())) {
-						sessionMap.put(s.getGroupId(), s);
+						sessionMap.put(s.getId().toString(), s);
 					}
 				}
 			}
-			
-//			if (list2.size() > 0) {
-//				Map<String, Object> map = new HashMap<String, Object>();
-//				map.put("ids", list2);
-//				List<Map<String, Object>> chats = topicChatService.getLastNoticeTimes(map);
-//				if (null == chats)
-//					chats = new ArrayList<Map<String, Object>>();
-//				for (Map<String, Object> m : chats) {
-//					dates.put(Long.valueOf(m.get("id").toString()), (Date) m.get("time"));
-//				}
-//			}
+
+			// if (list2.size() > 0) {
+			// Map<String, Object> map = new HashMap<String, Object>();
+			// map.put("ids", list2);
+			// List<Map<String, Object>> chats =
+			// topicChatService.getLastNoticeTimes(map);
+			// if (null == chats)
+			// chats = new ArrayList<Map<String, Object>>();
+			// for (Map<String, Object> m : chats) {
+			// dates.put(Long.valueOf(m.get("id").toString()), (Date)
+			// m.get("time"));
+			// }
+			// }
 
 			// 组装会议对象
 			for (Social social : listMeeting) {
@@ -1343,9 +1373,9 @@ public class MeetingController extends BaseController {
 				// 会议封装最后聊天时间
 				if (SocialType.INVITATION.code() != social.getType()) {
 					// 获取最后消息时间
-//					Date time = dates.get(social.getId());
-//					social.setTime(time);
-					//将从畅聊获得session信息注入social
+					// Date time = dates.get(social.getId());
+					// social.setTime(time);
+					// 将从畅聊获得session信息注入social
 					Social s = sessionMap.get(social.getGroupId());
 					logger.debug("getMeetingList ==> " + ReflectionToStringBuilder.toString(s));
 					if (s != null) {
@@ -1374,6 +1404,8 @@ public class MeetingController extends BaseController {
 			}
 
 			removeDuplicateSocial(listResult);
+
+			logger.info(userId + "meetting-listResult:" + listResult.size());
 
 			/*
 			 * Collections.sort(listResult, new Comparator<Social>() { public
@@ -1427,15 +1459,19 @@ public class MeetingController extends BaseController {
 	}
 
 	static boolean defineUnique(Social source, Social target) {
-		if ((source.getId() == null ? 0 : source.getId().longValue()) == (target.getId() == null ? 0 : target.getId().longValue())
-				&& (source.getTitle() == null ? "" : source.getTitle()).equals((target.getTitle() == null ? "" : target.getTitle()))
-				&& (source.getType() == null ? 0 : source.getType().intValue()) == (target.getType() == null ? 0 : target.getType().intValue())
-				&& (source.getCompereId() == null ? 0 : source.getCompereId().longValue()) == (target.getCompereId() == null ? 0 : target
-						.getCompereId().longValue())
-				&& (source.getCompereName() == null ? "" : source.getCompereName()) == (target.getCompereName() == null ? "" : target
-						.getCompereName())
-				&& (source.getNewCount() == null ? 0 : source.getNewCount().intValue()) == (target.getNewCount() == null ? 0 : target.getNewCount()
-						.intValue())) {
+		if ((source.getId() == null ? 0 : source.getId().longValue()) == (target.getId() == null ? 0
+				: target.getId().longValue())
+				&& (source.getTitle() == null ? "" : source.getTitle())
+						.equals((target.getTitle() == null ? "" : target.getTitle()))
+				&& (source.getType() == null ? 0 : source.getType().intValue()) == (target.getType() == null ? 0
+						: target.getType().intValue())
+				&& (source.getCompereId() == null ? 0
+						: source.getCompereId().longValue()) == (target.getCompereId() == null ? 0
+								: target.getCompereId().longValue())
+				&& (source.getCompereName() == null ? "" : source.getCompereName()) == (target.getCompereName() == null
+						? "" : target.getCompereName())
+				&& (source.getNewCount() == null ? 0 : source.getNewCount().intValue()) == (target.getNewCount() == null
+						? 0 : target.getNewCount().intValue())) {
 			return true;
 		} else {
 			return false;
@@ -1451,7 +1487,7 @@ public class MeetingController extends BaseController {
 	List<Social> socialListFilter(List<Social> listResult, Long userId) {
 		List<SocialStatus> execludeResult = socialStatusService.queryListWithoutMeetingByUserId(userId);
 		for (SocialStatus ss : execludeResult) {
-			logger.debug("exclued ====> "+ReflectionToStringBuilder.toString(ss));
+			logger.debug("exclued ====> " + ReflectionToStringBuilder.toString(ss));
 		}
 		return listFilter(listResult, execludeResult);
 	}
@@ -1479,50 +1515,57 @@ public class MeetingController extends BaseController {
 	 *            已被客户端删除的社交
 	 * @return
 	 */
-	List<Social> listFilter(final List<Social> listResult, final List<SocialStatus> execludeResult) {
+	List<Social> listFilter(List<Social> listResult, final List<SocialStatus> execludeResult) {
 		if (null == execludeResult || execludeResult.size() == 0) {
 			return listResult;
 		}
 		int size = execludeResult.size();
 		int end = 0;
 		if (size > 90) {
-			end = size / 3;
-			final List<Social> list1 = listResult.subList(0, end);
-			final List<Social> list2 = listResult.subList(end, end * 2);
-			final List<Social> list3 = listResult.subList(end * 2, size);
-			CompletionService<List<Social>> completionService = new ExecutorCompletionService<List<Social>>(ThreadPoolUtils.getExecutor());
-			List<Future<List<Social>>> futureList = new ArrayList<Future<List<Social>>>(3);
-			Future<List<Social>> future1 = completionService.submit(new Callable<List<Social>>() {
-				@Override
-				public List<Social> call() throws Exception {
-					return removeClientDeletedSocial(execludeResult, list1);
-				}
-			});
-			futureList.add(future1);
-			Future<List<Social>> future2 = completionService.submit(new Callable<List<Social>>() {
-				@Override
-				public List<Social> call() throws Exception {
-					return removeClientDeletedSocial(execludeResult, list2);
-				}
-			});
-			futureList.add(future2);
-			Future<List<Social>> future3 = completionService.submit(new Callable<List<Social>>() {
-				@Override
-				public List<Social> call() throws Exception {
-					return removeClientDeletedSocial(execludeResult, list3);
-				}
-			});
-			futureList.add(future3);
-			listResult.clear();
-			for (Future<List<Social>> flist : futureList) {
-				try {
-					List<Social> tempList = flist.get();
-					listResult.addAll(tempList);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-			return listResult;
+			// end = size / 3;
+			// final List<Social> list1 = listResult.subList(0, end);
+			// final List<Social> list2 = listResult.subList(end, end * 2);
+			// final List<Social> list3 = listResult.subList(end * 2, size);
+			// CompletionService<List<Social>> completionService = new
+			// ExecutorCompletionService<List<Social>>(
+			// ThreadPoolUtils.getExecutor());
+			// List<Future<List<Social>>> futureList = new
+			// ArrayList<Future<List<Social>>>(3);
+			// Future<List<Social>> future1 = completionService.submit(new
+			// Callable<List<Social>>() {
+			// @Override
+			// public List<Social> call() throws Exception {
+			// return removeClientDeletedSocial(execludeResult, list1);
+			// }
+			// });
+			// futureList.add(future1);
+			// Future<List<Social>> future2 = completionService.submit(new
+			// Callable<List<Social>>() {
+			// @Override
+			// public List<Social> call() throws Exception {
+			// return removeClientDeletedSocial(execludeResult, list2);
+			// }
+			// });
+			// futureList.add(future2);
+			// Future<List<Social>> future3 = completionService.submit(new
+			// Callable<List<Social>>() {
+			// @Override
+			// public List<Social> call() throws Exception {
+			// return removeClientDeletedSocial(execludeResult, list3);
+			// }
+			// });
+			// futureList.add(future3);
+			// listResult.clear();
+			// for (Future<List<Social>> flist : futureList) {
+			// try {
+			// List<Social> tempList = flist.get();
+			// listResult.addAll(tempList);
+			// } catch (Exception e) {
+			// e.printStackTrace();
+			// }
+			// }
+			// return listResult;
+			return removeClientDeletedSocial(execludeResult, listResult);
 		} else {
 			return removeClientDeletedSocial(execludeResult, listResult);
 		}
@@ -1624,157 +1667,169 @@ public class MeetingController extends BaseController {
 	 * @throws IOException
 	 */
 	@ResponseBody
-    @RequestMapping(value = "/socialList2.json", method = RequestMethod.POST)
-    public Map<String, Object> socialList2(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        Map<String, Object> model = new HashMap<String, Object>();
-        Map<String, Object> responseDataMap = new HashMap<String, Object>();
-        Map<String, Object> notificationMap = new HashMap<String, Object>();
-        model.put("responseData", responseDataMap);
-        model.put("notification", notificationMap);
-        // 获取json参数串
-        String requestJson = "";
-        SocialListReq socialListReq = null;
-        try {
-            requestJson = getJsonParamStr(request);
-            socialListReq = GsonUtils.StringToObject(SocialListReq.class, requestJson);
-        } catch (IOException e) {// 兼容老版本
-            socialListReq = new SocialListReq();
-        }
-        try {
-            User user = getUser(request);
-            socialListReq = socialListReq == null ? new SocialListReq() : socialListReq;
-            socialListReq.setUserId(user.getId());
-            List<Social> listResult = new ArrayList<Social>();
-            // 获取当前登录用户
-            if (null == user || user.getId() < 1) {
-                responseDataMap.put("listSocial", null);
-                notificationMap.put("notifCode", "0002");
-                notificationMap.put("notifInfo", "请先登录");
-                return model;
-            }
-            // 获取私聊和群聊列表
-            List<Social> chat = imRecordmessageService.getPrivateChatAndGroupChat(socialListReq); // 消息
-            if (!isNullOrEmpty(chat)) {
-                // 封装私聊和群聊
-                listResult.addAll(chat);
-            }
-            
-            // 过滤客户端删除的畅聊
-            // 2016-03-10 tanmin getPrivateChatAndGroupChat直接获取畅聊提供的数据,无需再过滤
-            //logger.debug("singeAndGroupChat ====> " + listResult.size());
-            // socialListFilter(listResult, user.getId());
-            //logger.debug("singeAndGroupChat after filter====> " + listResult.size());
-            
-            Collections.sort(listResult, new Comparator<Social>() {
-                public int compare(Social o1, Social o2) {
-                    if (null == o1.getOrderTime()) {
-                        return 1;
-                    }
-                    if (null == o2.getOrderTime()) {
-                        return -1;
-                    }
-                    return o2.getOrderTime().compareTo(o1.getOrderTime());
-                }
-            });
-            // 获取最新的通知
-            MeetingNotice meetingNotice = meetingNoticeService.getNewNotice(user.getId());
-            if (!isNullOrEmpty(meetingNotice)) {
-                Integer noticeCount = meetingNoticeService.getUnReadNoticeCount(user.getId());
-                if (Utils.isNullOrEmpty(noticeCount)) {
-                    noticeCount = 0;
-                }
-                // 封装通知
-                Social socialNotice = new Social();
-                socialNotice.setId(meetingNotice.getId());
-                socialNotice.setTitle("通知");
-                socialNotice.setType(SocialType.NOTICE.code());
-                SocialDetail socialDetailNotice = new SocialDetail();
-                socialDetailNotice.setContent(meetingNotice.getNoticeContent());
-                socialNotice.setTime(meetingNotice.getUpdateTime());
-                socialNotice.setOrderTime(meetingNotice.getUpdateTime());
-                socialNotice.setSocialDetail(socialDetailNotice);
-                socialNotice.setNewCount(noticeCount);
-                listResult.add(0, socialNotice);
-            }
-            // 获取邀请函
-            Social invitation = meetingService.getLatestInvitation(user.getId());
-            if (null != invitation) {
-                SocialDetail socialDetail = invitation.getSocialDetail();
-                if (isNullOrEmpty(socialDetail)) {
-                    socialDetail = new SocialDetail();
-                }
-                String content = invitation.getCompereName() + "邀请您参加";
-                socialDetail.setContent(content);
-                String path = invitation.getPath();// 指的是会议的封面图片
-                if (!isNullOrEmpty(path)) {// 数据库里面的路径就是带ip和端口的
-                    List<String> listImage = new ArrayList<String>();
-                    listImage.add(path);
-                    socialDetail.setListImageUrl(listImage);
-                }
-                invitation.setSocialDetail(socialDetail);
-                listResult.add(0, invitation);
-            }
+	@RequestMapping(value = "/socialList2.json", method = RequestMethod.POST)
+	public Map<String, Object> socialList2(HttpServletRequest request, HttpServletResponse response)
+			throws IOException {
+		Map<String, Object> model = new HashMap<String, Object>();
+		Map<String, Object> responseDataMap = new HashMap<String, Object>();
+		Map<String, Object> notificationMap = new HashMap<String, Object>();
+		model.put("responseData", responseDataMap);
+		model.put("notification", notificationMap);
+		// 获取json参数串
+		String requestJson = "";
+		SocialListReq socialListReq = null;
+		try {
+			requestJson = getJsonParamStr(request);
+			socialListReq = GsonUtils.StringToObject(SocialListReq.class, requestJson);
+		} catch (IOException e) {// 兼容老版本
+			socialListReq = new SocialListReq();
+		}
+		try {
+			User user = getUser(request);
+			socialListReq = socialListReq == null ? new SocialListReq() : socialListReq;
+			socialListReq.setUserId(user.getId());
+			List<Social> listResult = new ArrayList<Social>();
+			// 获取当前登录用户
+			if (null == user || user.getId() < 1) {
+				responseDataMap.put("listSocial", null);
+				notificationMap.put("notifCode", "0002");
+				notificationMap.put("notifInfo", "请先登录");
+				return model;
+			}
+			// 获取私聊和群聊列表
+			List<Social> chat = imRecordmessageService.getPrivateChatAndGroupChat(socialListReq); // 消息
+			// if (!isNullOrEmpty(chat)) {
+			// // 封装私聊和群聊
+			// listResult.addAll(chat);
+			// }
 
-            Social meetingSocial = new Social();
-            // meetingSocial.setNewCount(imRecordmessageService.getAllMeetingNewCount(user.getId()));
-            meetingSocial.setId(-1L);
-            List<Social> listMeeting = getMeetingList(user.getId());
-            String title = "会议暂无消息";
-            meetingSocial.setTitle(title);
-            if (!Utils.isNullOrEmpty(listMeeting)) {
-                Social meeting = listMeeting.get(0);
-                meetingSocial.setTitle(meeting.getTitle());// 标题
-                meetingSocial.setCompereName(getCompereName(userService, meeting.getCompereId()));// 发起人
-                meetingSocial.setTime(meeting.getOrderTime());// 右侧时间
-                meetingSocial.setType(meeting.getType());// 会议状态:3-进行中的会议，4-未开始的会议
-                // 5-已结束的会议
-                int meetingCount = 0;
-                if (!Utils.isNullOrEmpty(listMeeting)) {
-                    for (Social social : listMeeting) {
-                        if (social.getNewCount() != null && social.getNewCount().intValue() > 0) {
-                            meetingCount += social.getNewCount().intValue();
-                        }
-                    }
-                }
-                meetingSocial.setNewCount(meetingCount);
-            }
-            listResult.add(0, meetingSocial);
-            // String requestJson = getJsonParamStr(request);
-            // if(!Utils.isNullOrEmpty(requestJson)) {
-            // JSONObject j = JSONObject.fromObject(requestJson);
-            String withNewRelation = socialListReq.getWithNewRelation();
-            if (!Utils.isNullOrEmpty(withNewRelation) && withNewRelation.equals("true")) {
-                int relationCount = GinTongInterface.getNewConnectionsCount("" + user.getId());
-                Social socialRelation = new Social();
-                socialRelation.setId(-2L);
-                socialRelation.setTitle("新的关系");
-                socialRelation.setType(SocialType.RELATION.code());
-                SocialDetail socialDetailNotice = new SocialDetail();
-                socialRelation.setSocialDetail(socialDetailNotice);
-                socialRelation.setNewCount(relationCount);
-                listResult.add(0, socialRelation);
-            }
-            // }
-            int count = 0;
-            for (Social social : listResult) {
-            	logger.info("retToClient ===>"+ReflectionToStringBuilder.toString(social));
-                if (!Utils.isNullOrEmpty(social.getNewCount()) && social.getNewCount().intValue() != 0) {
-                    count += social.getNewCount().intValue();
-                }
-            }
-            
-            responseDataMap.put("count", count);
-            responseDataMap.put("listSocial", listResult);
-            notificationMap.put("notifCode", "0001");
-            notificationMap.put("notifInfo", "hello App");
-        } catch (Exception e) {
-            e.printStackTrace();
-            responseDataMap.put("listSocial", null);
-            notificationMap.put("notifCode", "0002");
-            notificationMap.put("notifInfo", e.getMessage());
-        }
-        return model;
-    }
+			logger.info("chat-size:" + chat.size());
+
+			listResult.addAll(chat);
+
+			for (Social s : chat) {
+				logger.info("SocialList ===>" + ReflectionToStringBuilder.toString(s));
+			}
+
+			// 过滤客户端删除的畅聊
+			// 2016-03-10 tanmin getPrivateChatAndGroupChat直接获取畅聊提供的数据,无需再过滤
+			// logger.debug("singeAndGroupChat ====> " + listResult.size());
+			// socialListFilter(listResult, user.getId());
+			// logger.debug("singeAndGroupChat after filter====> " +
+			// listResult.size());
+
+			Collections.sort(listResult, new Comparator<Social>() {
+				public int compare(Social o1, Social o2) {
+					if (null == o1.getOrderTime()) {
+						return 1;
+					}
+					if (null == o2.getOrderTime()) {
+						return -1;
+					}
+					return o2.getOrderTime().compareTo(o1.getOrderTime());
+				}
+			});
+			// 获取最新的通知
+			MeetingNotice meetingNotice = meetingNoticeService.getNewNotice(user.getId());
+			if (!isNullOrEmpty(meetingNotice)) {
+				Integer noticeCount = meetingNoticeService.getUnReadNoticeCount(user.getId());
+				if (Utils.isNullOrEmpty(noticeCount)) {
+					noticeCount = 0;
+				}
+				// 封装通知
+				Social socialNotice = new Social();
+				socialNotice.setId(meetingNotice.getId());
+				socialNotice.setTitle("通知");
+				socialNotice.setType(SocialType.NOTICE.code());
+				SocialDetail socialDetailNotice = new SocialDetail();
+				socialDetailNotice.setContent(meetingNotice.getNoticeContent());
+				socialNotice.setTime(meetingNotice.getUpdateTime());
+				socialNotice.setOrderTime(meetingNotice.getUpdateTime());
+				socialNotice.setSocialDetail(socialDetailNotice);
+				socialNotice.setNewCount(noticeCount);
+				listResult.add(0, socialNotice);
+			}
+			// 获取邀请函
+			Social invitation = meetingService.getLatestInvitation(user.getId());
+			if (null != invitation) {
+				SocialDetail socialDetail = invitation.getSocialDetail();
+				if (isNullOrEmpty(socialDetail)) {
+					socialDetail = new SocialDetail();
+				}
+				String content = invitation.getCompereName() + "邀请您参加";
+				socialDetail.setContent(content);
+				String path = invitation.getPath();// 指的是会议的封面图片
+				if (!isNullOrEmpty(path)) {// 数据库里面的路径就是带ip和端口的
+					List<String> listImage = new ArrayList<String>();
+					listImage.add(path);
+					socialDetail.setListImageUrl(listImage);
+				}
+				invitation.setSocialDetail(socialDetail);
+				listResult.add(0, invitation);
+			}
+
+			Social meetingSocial = new Social();
+			// meetingSocial.setNewCount(imRecordmessageService.getAllMeetingNewCount(user.getId()));
+			meetingSocial.setId(-1L);
+			List<Social> listMeeting = getMeetingList(user.getId());
+			String title = "会议暂无消息";
+			meetingSocial.setTitle(title);
+			if (!Utils.isNullOrEmpty(listMeeting)) {
+				Social meeting = listMeeting.get(0);
+				meetingSocial.setTitle(meeting.getTitle());// 标题
+				meetingSocial.setCompereName(getCompereName(userService, meeting.getCompereId()));// 发起人
+				meetingSocial.setTime(meeting.getOrderTime());// 右侧时间
+				meetingSocial.setType(meeting.getType());// 会议状态:3-进行中的会议，4-未开始的会议
+				// 5-已结束的会议
+				int meetingCount = 0;
+				if (!Utils.isNullOrEmpty(listMeeting)) {
+					for (Social social : listMeeting) {
+						if (social.getNewCount() != null && social.getNewCount().intValue() > 0) {
+							meetingCount += social.getNewCount().intValue();
+						}
+					}
+				}
+				meetingSocial.setNewCount(meetingCount);
+			}
+			listResult.add(0, meetingSocial);
+			// String requestJson = getJsonParamStr(request);
+			// if(!Utils.isNullOrEmpty(requestJson)) {
+			// JSONObject j = JSONObject.fromObject(requestJson);
+			String withNewRelation = socialListReq.getWithNewRelation();
+			if (!Utils.isNullOrEmpty(withNewRelation) && withNewRelation.equals("true")) {
+				int relationCount = GinTongInterface.getNewConnectionsCount("" + user.getId());
+				Social socialRelation = new Social();
+				socialRelation.setId(-2L);
+				socialRelation.setTitle("新的关系");
+				socialRelation.setType(SocialType.RELATION.code());
+				SocialDetail socialDetailNotice = new SocialDetail();
+				socialRelation.setSocialDetail(socialDetailNotice);
+				socialRelation.setNewCount(relationCount);
+				listResult.add(0, socialRelation);
+			}
+			// }
+			int count = 0;
+			for (Social social : listResult) {
+				// logger.info("retToClient ===>" +
+				// ReflectionToStringBuilder.toString(social));
+				if (!Utils.isNullOrEmpty(social.getNewCount()) && social.getNewCount().intValue() != 0) {
+					count += social.getNewCount().intValue();
+				}
+			}
+
+			responseDataMap.put("count", count);
+			responseDataMap.put("listSocial", listResult);
+			notificationMap.put("notifCode", "0001");
+			notificationMap.put("notifInfo", "hello App");
+		} catch (Exception e) {
+			e.printStackTrace();
+			responseDataMap.put("listSocial", null);
+			notificationMap.put("notifCode", "0002");
+			notificationMap.put("notifInfo", e.getMessage());
+		}
+		return model;
+	}
+
 	/**
 	 * 获取社群的社交列表-一般用在“消息”-“社群消息”中
 	 *
@@ -1783,7 +1838,8 @@ public class MeetingController extends BaseController {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/getCommunityList.json", method = RequestMethod.POST)
-	public Map<String, Object> getCommunityList(HttpServletRequest request, HttpServletResponse response) throws IOException {
+	public Map<String, Object> getCommunityList(HttpServletRequest request, HttpServletResponse response)
+			throws IOException {
 		Map<String, Object> model = new HashMap<String, Object>();
 		Map<String, Object> responseDataMap = new HashMap<String, Object>();
 		Map<String, Object> notificationMap = new HashMap<String, Object>();
@@ -1857,7 +1913,8 @@ public class MeetingController extends BaseController {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/socialListNext.json", method = RequestMethod.POST)
-	public Map<String, Object> socialListNext(HttpServletRequest request, HttpServletResponse response) throws IOException {
+	public Map<String, Object> socialListNext(HttpServletRequest request, HttpServletResponse response)
+			throws IOException {
 		Map<String, Object> model = new HashMap<String, Object>();
 		Map<String, Object> responseDataMap = new HashMap<String, Object>();
 		Map<String, Object> notificationMap = new HashMap<String, Object>();
@@ -1918,7 +1975,8 @@ public class MeetingController extends BaseController {
 
 	@ResponseBody
 	@RequestMapping(value = "/socialListNext.json", method = RequestMethod.GET)
-	public Map<String, Object> socialListNextGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+	public Map<String, Object> socialListNextGet(HttpServletRequest request, HttpServletResponse response)
+			throws IOException {
 		return this.socialListNext(request, response);
 	}
 
@@ -1953,7 +2011,8 @@ public class MeetingController extends BaseController {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/socialList2.json", method = RequestMethod.GET)
-	public Map<String, Object> socialListGet2(HttpServletRequest request, HttpServletResponse response) throws IOException {
+	public Map<String, Object> socialListGet2(HttpServletRequest request, HttpServletResponse response)
+			throws IOException {
 		return this.socialList2(request, response);
 	}
 
@@ -1999,10 +2058,12 @@ public class MeetingController extends BaseController {
 					if (null != compereId && list.contains(compereId) == false) {
 						list.add(compereId);
 					}
-					if (null != social.getId() && SocialType.INVITATION.code() != social.getType() && list2.contains(social.getId()) == false) {
+					if (null != social.getId() && SocialType.INVITATION.code() != social.getType()
+							&& list2.contains(social.getId()) == false) {
 						list2.add(social.getId());
 					}
-					if (3 == social.getType().intValue() || 4 == social.getType().intValue() || 5 == social.getType().intValue()) {
+					if (3 == social.getType().intValue() || 4 == social.getType().intValue()
+							|| 5 == social.getType().intValue()) {
 						listMeetingId.add(social.getId());
 					}
 				}
@@ -2013,7 +2074,8 @@ public class MeetingController extends BaseController {
 					if (!Utils.isNullOrEmpty(listMeetingTopic)) {
 						for (MeetingTopic meetingTopic : listMeetingTopic) {
 							if (meetingTopic.getIsFinished() != 1) {// 社交列表不能转发到已结束的议题
-								List<MeetingTopic> tempListMeetingTopic = mapMeetingTopic.get("" + meetingTopic.getMeetingId());
+								List<MeetingTopic> tempListMeetingTopic = mapMeetingTopic
+										.get("" + meetingTopic.getMeetingId());
 								if (Utils.isNullOrEmpty(tempListMeetingTopic)) {
 									tempListMeetingTopic = new ArrayList<MeetingTopic>();
 								}
@@ -2023,7 +2085,8 @@ public class MeetingController extends BaseController {
 						}
 					}
 					for (Social social : listMeetingAndInvitation) {
-						if (3 == social.getType().intValue() || 4 == social.getType().intValue() || 5 == social.getType().intValue()) {
+						if (3 == social.getType().intValue() || 4 == social.getType().intValue()
+								|| 5 == social.getType().intValue()) {
 							social.setListMeetingTopic(mapMeetingTopic.get("" + social.getId()));
 						}
 					}
@@ -2166,7 +2229,8 @@ public class MeetingController extends BaseController {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/socialList3.json", method = RequestMethod.POST)
-	public Map<String, Object> privateMessageList(HttpServletRequest request, HttpServletResponse response) throws IOException {
+	public Map<String, Object> privateMessageList(HttpServletRequest request, HttpServletResponse response)
+			throws IOException {
 		Map<String, Object> model = new HashMap<String, Object>();
 		Map<String, Object> responseDataMap = new HashMap<String, Object>();
 		Map<String, Object> notificationMap = new HashMap<String, Object>();
@@ -2285,7 +2349,8 @@ public class MeetingController extends BaseController {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/socialList.json", method = RequestMethod.GET)
-	public Map<String, Object> socialListGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+	public Map<String, Object> socialListGet(HttpServletRequest request, HttpServletResponse response)
+			throws IOException {
 		return this.socialList(request, response);
 	}
 
@@ -2297,7 +2362,8 @@ public class MeetingController extends BaseController {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/getMyForwardingSocial.json", method = RequestMethod.GET)
-	public Map<String, Object> getMyForwardingSocialGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+	public Map<String, Object> getMyForwardingSocialGet(HttpServletRequest request, HttpServletResponse response)
+			throws IOException {
 		return getMyForwardingSocial(request, response);
 	}
 
@@ -2309,7 +2375,8 @@ public class MeetingController extends BaseController {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/getMyForwardingSocial.json", method = RequestMethod.POST)
-	public Map<String, Object> getMyForwardingSocial(HttpServletRequest request, HttpServletResponse response) throws IOException {
+	public Map<String, Object> getMyForwardingSocial(HttpServletRequest request, HttpServletResponse response)
+			throws IOException {
 		Map<String, Object> model = new HashMap<String, Object>();
 		Map<String, Object> responseDataMap = new HashMap<String, Object>();
 		Map<String, Object> notificationMap = new HashMap<String, Object>();
@@ -2341,7 +2408,8 @@ public class MeetingController extends BaseController {
 									social.setTime(null);
 								}
 								// 如果会议为有议题类型 获取议题列表
-								List<MeetingTopic> listMeetingTopic = meetingTopicService.getForwardingTopicByMeetingId(social.getId());
+								List<MeetingTopic> listMeetingTopic = meetingTopicService
+										.getForwardingTopicByMeetingId(social.getId());
 								if (!isNullOrEmpty(listMeetingTopic)) {
 									social.setListMeetingTopic(listMeetingTopic);
 								}
@@ -2403,7 +2471,8 @@ public class MeetingController extends BaseController {
 				if (!Utils.isNullOrEmpty(keyword) && keyword.length() > 0) {
 					for (int i = listResult.size() - 1; i >= 0; i--) {
 						Social social = listResult.get(i);
-						if (!Utils.isNullOrEmpty(keyword) && !Utils.isNullOrEmpty(social.getTitle()) && !social.getTitle().contains(keyword)) {
+						if (!Utils.isNullOrEmpty(keyword) && !Utils.isNullOrEmpty(social.getTitle())
+								&& !social.getTitle().contains(keyword)) {
 							listResult.remove(i);
 						}
 					}
@@ -2435,7 +2504,8 @@ public class MeetingController extends BaseController {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/getForwardingMeetingData.json", method = RequestMethod.GET)
-	public Map<String, Object> getForwardingMeetingDataGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+	public Map<String, Object> getForwardingMeetingDataGet(HttpServletRequest request, HttpServletResponse response)
+			throws IOException {
 		return this.getForwardingMeetingData(request, response);
 	}
 
@@ -2448,7 +2518,8 @@ public class MeetingController extends BaseController {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/getForwardingMeetingData.json", method = RequestMethod.POST)
-	public Map<String, Object> getForwardingMeetingData(HttpServletRequest request, HttpServletResponse response) throws IOException {
+	public Map<String, Object> getForwardingMeetingData(HttpServletRequest request, HttpServletResponse response)
+			throws IOException {
 
 		Map<String, Object> result = new HashMap<String, Object>();
 		Map<String, Object> responseDataMap = new HashMap<String, Object>();
@@ -2469,7 +2540,8 @@ public class MeetingController extends BaseController {
 				String memberIdStr = getStringJsonValueByKey(j, "topicId");
 
 				if (Utils.isAllNotNullOrEmpty(meetingIdStr, memberIdStr)) {
-					meetingQuery = meetingService.getForwardingMeetingData(Long.valueOf(meetingIdStr), Long.valueOf(memberIdStr));
+					meetingQuery = meetingService.getForwardingMeetingData(Long.valueOf(meetingIdStr),
+							Long.valueOf(memberIdStr));
 					notificationMap.put("notifCode", "0001");
 					notificationMap.put("notifInfo", "hello App");
 				} else {
@@ -2507,7 +2579,8 @@ public class MeetingController extends BaseController {
 
 	@ResponseBody
 	@RequestMapping(value = "/getMeetingIndustryData.json", method = RequestMethod.GET)
-	public Map<String, Object> getMeetingIndustryDataGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+	public Map<String, Object> getMeetingIndustryDataGet(HttpServletRequest request, HttpServletResponse response)
+			throws IOException {
 		return this.getForwardingMeetingData(request, response);
 	}
 
@@ -2520,7 +2593,8 @@ public class MeetingController extends BaseController {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/getMeetingIndustryData.json", method = RequestMethod.POST)
-	public Map<String, Object> getMeetingIndustryData(HttpServletRequest request, HttpServletResponse response) throws IOException {
+	public Map<String, Object> getMeetingIndustryData(HttpServletRequest request, HttpServletResponse response)
+			throws IOException {
 		Map<String, Object> result = new HashMap<String, Object>();
 		Map<String, Object> responseDataMap = new HashMap<String, Object>();
 		Map<String, Object> notificationMap = new HashMap<String, Object>();
@@ -2563,8 +2637,8 @@ public class MeetingController extends BaseController {
 		String page = getStringJsonValueByKey(j, "page");
 		String rows = getStringJsonValueByKey(j, "rows");
 		String scope = getStringJsonValueByKey(j, "scope");
-		String url = resource.getString("hotUrl") + "/API/relation.do?userId=" + userId + "&targetId=" + targetId + "&targetType=5" + "&page=" + page
-				+ "&rows=" + rows + "&scope=" + scope;
+		String url = resource.getString("hotUrl") + "/API/relation.do?userId=" + userId + "&targetId=" + targetId
+				+ "&targetType=5" + "&page=" + page + "&rows=" + rows + "&scope=" + scope;
 		logger.info(url);
 		String json = "";
 		try {
@@ -2661,13 +2735,15 @@ public class MeetingController extends BaseController {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/getSimilarMeeting.json", method = RequestMethod.GET)
-	public Map<String, Object> getSimilarMeetingGet(HttpServletRequest request, HttpServletResponse response) throws Exception {
+	public Map<String, Object> getSimilarMeetingGet(HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
 		return getSimilarMeeting(request, response);
 	}
 
 	@ResponseBody
 	@RequestMapping(value = "/getSimilarMeeting.json", method = RequestMethod.POST)
-	public Map<String, Object> getSimilarMeeting(HttpServletRequest request, HttpServletResponse response) throws Exception {
+	public Map<String, Object> getSimilarMeeting(HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
 		logger.info("into /getSimilarMeeting.json");
 		Map<String, Object> responseData = new HashMap<String, Object>();
 		String requestJson = "";
@@ -2676,7 +2752,8 @@ public class MeetingController extends BaseController {
 		String targetId = getStringJsonValueByKey(j, "targetId");
 		String page = getStringJsonValueByKey(j, "page");
 		String rows = getStringJsonValueByKey(j, "rows");
-		String url = resource.getString("hotUrl") + "/API/simMeet.do?targetId=" + targetId + "&page=" + page + "&rows=" + rows;
+		String url = resource.getString("hotUrl") + "/API/simMeet.do?targetId=" + targetId + "&page=" + page + "&rows="
+				+ rows;
 		logger.info(url);
 		String json = "";
 		try {
@@ -2745,13 +2822,15 @@ public class MeetingController extends BaseController {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/getMeetingMessage.json", method = RequestMethod.GET)
-	public Map<String, Object> getMeetingMessageGet(HttpServletRequest request, HttpServletResponse response) throws Exception {
+	public Map<String, Object> getMeetingMessageGet(HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
 		return getMeetingMessage(request, response);
 	}
 
 	@ResponseBody
 	@RequestMapping(value = "/getMeetingMessage.json", method = RequestMethod.POST)
-	public Map<String, Object> getMeetingMessage(HttpServletRequest request, HttpServletResponse response) throws Exception {
+	public Map<String, Object> getMeetingMessage(HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
 		logger.info("into /getMeetingMessage.json");
 		Map<String, Object> responseData = new HashMap<String, Object>();
 		String requestJson = "";
@@ -2838,8 +2917,8 @@ public class MeetingController extends BaseController {
 
 	@ResponseBody
 	@RequestMapping(value = "/getCommunityNewCountByUserId/{userId}", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
-	public Map<String, Object> getCommunityNewCountByUserId(@PathVariable("userId") Integer userId, HttpServletRequest request,
-			HttpServletResponse response) {
+	public Map<String, Object> getCommunityNewCountByUserId(@PathVariable("userId") Integer userId,
+			HttpServletRequest request, HttpServletResponse response) {
 		Map<String, Object> resultMap = new HashMap<String, Object>();
 		List<CommunityNewCount> result = imRecordmessageService.getCommunityNewCountByUserId(userId);
 		Notification notification = new Notification();
