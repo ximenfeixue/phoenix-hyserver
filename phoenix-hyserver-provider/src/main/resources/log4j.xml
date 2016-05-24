@@ -17,7 +17,7 @@
 	<!-- 全部日志 -->
 	<appender name="normal_log_file" class="org.apache.log4j.DailyRollingFileAppender">
 		<param name="encoding" value="UTF-8" />
-		<param name="File" value="${log4j.path}/phoenix-meeting/normal.log" />
+		<param name="File" value="${log4j.path}/phoenix-hyserver/normal.log" />
 		<param name="DatePattern" value=".yyyyMMdd" />
 		<layout class="org.apache.log4j.PatternLayout">
 			<param name="ConversionPattern" value="%d{yyyyMMddHHmmss} %p %c %t %m%n" />
