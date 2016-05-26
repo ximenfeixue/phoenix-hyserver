@@ -1562,7 +1562,9 @@ public class MeetingController extends BaseController {
 				long mucId = socialState.getMucId(), id = social.getId();
 				int stype = social.getType(), type = socialState.getType();
 				if (mucId == id && type == stype) {
-					listResult.remove(index);
+					if(social.getNewCount()==0){
+						listResult.remove(index);
+					}
 				}
 			}
 		}
@@ -1688,7 +1690,7 @@ public class MeetingController extends BaseController {
 			// 过滤客户端删除的畅聊
 			// 2016-03-10 tanmin getPrivateChatAndGroupChat直接获取畅聊提供的数据,无需再过滤
 			// logger.debug("singeAndGroupChat ====> " + listResult.size());
-			// socialListFilter(listResult, user.getId());
+			   socialListFilter(listResult, user.getId());
 			// logger.debug("singeAndGroupChat after filter====> " +
 			// listResult.size());
 
