@@ -103,6 +103,7 @@ import com.google.gson.GsonBuilder;
  * @CreateDate: 2014-4-18
  * @Version: [v1.0]
  */
+
 @Controller
 @RequestMapping("/meeting")
 public class MeetingController extends BaseController {
