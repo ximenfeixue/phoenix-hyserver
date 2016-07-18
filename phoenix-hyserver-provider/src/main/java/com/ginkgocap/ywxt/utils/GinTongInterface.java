@@ -379,6 +379,7 @@ public class GinTongInterface {
 					socialDetail.setSenderID(getLong(node,"senderId",0L));
 					socialDetail.setSenderName(getString(node, "senderName", ""));
 					socialDetail.setContent(getString(node, "content", ""));
+					socialDetail.setModal(getInt(node, "modal", 0));
 					socail.setSocialDetail(socialDetail);
 					logger.debug("socail ==> " + ReflectionToStringBuilder.toString(socail));
 					listSocial.add(socail);
