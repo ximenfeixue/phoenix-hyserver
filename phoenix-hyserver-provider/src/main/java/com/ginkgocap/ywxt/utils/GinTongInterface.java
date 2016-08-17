@@ -368,7 +368,7 @@ public class GinTongInterface {
 					socail.setAtMsgId(getString(node, "atMsgId", ""));
 					socail.setAtName(getString(node, "atName", ""));
 					socail.setCompereName(getString(node, "compereName", ""));
-
+					socail.setUserType(getInt(node, "userType", 0));
 					SocialDetail socialDetail = new SocialDetail();
 					List<String> listImageUrl = new ArrayList<String>();
 					for (JsonNode n : node.get("listImageUrl")) {
