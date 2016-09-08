@@ -221,9 +221,14 @@ public class MeetingController extends BaseController {
 	@RequestMapping(value = "/add.json", method = RequestMethod.POST)
 	public Map<String, Object> addMetting(HttpServletRequest request, HttpServletResponse response) {
 		// 获取json参数串
+		String debugStr="";
 		String requestJson = "";
 		try {
+			debugStr+="1";
 			requestJson = getJsonParamStr(request);
+
+			debugStr+="12";
+			
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -232,6 +237,7 @@ public class MeetingController extends BaseController {
 		Map<String, Object> responseDataMap = new HashMap<String, Object>();
 		Map<String, Object> notificationMap = new HashMap<String, Object>();
 		User user = getUser(request);
+		debugStr+="13";
 		if (!isNullOrEmpty(user) && !isNullOrEmpty(user.getId())) {
 
 			if (!isNullOrEmpty(requestJson)) {
@@ -284,6 +290,8 @@ public class MeetingController extends BaseController {
 		}
 		model.put("responseData", responseDataMap);
 		model.put("notification", notificationMap);
+		model.put("debugStr:", debugStr);
+		
 		return model;
 	}
 
