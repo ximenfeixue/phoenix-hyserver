@@ -20,7 +20,14 @@ public class SocialDetail implements Serializable {
 		/** 社交显示内容，社交类型为聊天时（包含私聊、群聊）封装最后一条聊天记录，通知显示通知内容，邀请函显示邀请函内容 */
 		private java.lang.String content;
 		 /**  会议开始时间，会议有效    */	
+		private int modal;
 		
+		public int getModal() {
+			return modal;
+		}
+		public void setModal(int modal) {
+			this.modal = modal;
+		}
 		/**getXXX() and SetXX()*/
 		public java.lang.Long getSenderID() {
 			return senderID;
