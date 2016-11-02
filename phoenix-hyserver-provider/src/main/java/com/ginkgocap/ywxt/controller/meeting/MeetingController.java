@@ -1661,9 +1661,6 @@ public class MeetingController extends BaseController {
 		}
 		try {
 			User user = getUser(request);
-			socialListReq = socialListReq == null ? new SocialListReq() : socialListReq;
-			socialListReq.setUserId(user.getId());
-			List<Social> listResult = new ArrayList<Social>();
 			// 获取当前登录用户
 			if (null == user || user.getId() < 1) {
 				responseDataMap.put("listSocial", null);
@@ -1671,6 +1668,9 @@ public class MeetingController extends BaseController {
 				notificationMap.put("notifInfo", "请先登录");
 				return model;
 			}
+			socialListReq = socialListReq == null ? new SocialListReq() : socialListReq;
+			socialListReq.setUserId(user.getId());
+			List<Social> listResult = new ArrayList<Social>();
 			// 获取私聊和群聊列表
 			List<Social> chat = imRecordmessageService.getPrivateChatAndGroupChat(socialListReq); // 消息
 			// if (!isNullOrEmpty(chat)) {
