@@ -8,8 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeSet;
 
-import javacommon.base.BaseController;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -23,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.ginkgocap.ywxt.common.base.BaseController;
 import com.ginkgocap.ywxt.model.meeting.Meeting;
 import com.ginkgocap.ywxt.model.meeting.MeetingNotice;
 import com.ginkgocap.ywxt.service.meeting.MeetingNoticeService;

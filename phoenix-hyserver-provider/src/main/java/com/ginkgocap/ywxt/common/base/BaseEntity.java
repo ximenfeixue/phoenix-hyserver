@@ -1,4 +1,4 @@
-package javacommon.base;
+package com.ginkgocap.ywxt.common.base;
 
 import java.lang.reflect.Field;
 

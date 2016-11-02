@@ -1,6 +1,6 @@
 package com.ginkgocap.ywxt.model.meeting;
 
-import javacommon.base.BaseEntity;
+import com.ginkgocap.ywxt.common.base.BaseEntity;
 
 
 public class MeetingCount extends BaseEntity implements java.io.Serializable {

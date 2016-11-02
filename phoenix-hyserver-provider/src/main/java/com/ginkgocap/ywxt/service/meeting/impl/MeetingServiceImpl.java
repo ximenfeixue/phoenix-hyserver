@@ -16,8 +16,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeSet;
 
-import javacommon.base.BaseServiceImpl;
-
 import org.apache.commons.beanutils.BeanUtils;
 import org.h2.util.StringUtils;
 import org.slf4j.Logger;
@@ -26,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.ginkgocap.ywxt.common.base.BaseServiceImpl;
 import com.ginkgocap.ywxt.dao.meeting.ImRecordmessageDao;
 import com.ginkgocap.ywxt.dao.meeting.MeetingDao;
 import com.ginkgocap.ywxt.dao.meeting.MeetingDataDao;

@@ -8,17 +8,18 @@ package com.ginkgocap.ywxt.dao.meeting;
 
 import java.util.*;
 
-import javacommon.base.*;
+
 
 
 import com.ginkgocap.ywxt.model.meeting.*;
+import com.ginkgocap.ywxt.common.base.*;
 import com.ginkgocap.ywxt.dao.meeting.*;
 import com.ginkgocap.ywxt.service.meeting.*;
 import com.ginkgocap.ywxt.vo.query.meeting.*;
 import com.ginkgocap.ywxt.utils.*;
 
-
 import java.util.List;
+
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.beans.BeansException;

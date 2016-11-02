@@ -12,13 +12,13 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
 
 import java.io.Serializable;
-
 import java.util.*;
 
-import javacommon.base.*;
+
 
 
 import com.ginkgocap.ywxt.model.meeting.*;
+import com.ginkgocap.ywxt.common.base.*;
 import com.ginkgocap.ywxt.dao.meeting.*;
 import com.ginkgocap.ywxt.service.meeting.*;
 import com.ginkgocap.ywxt.vo.query.meeting.*;

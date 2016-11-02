@@ -17,8 +17,6 @@ import java.util.concurrent.CompletionService;
 import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.Future;
 
-import javacommon.base.BaseController;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -41,6 +39,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.ginkgocap.ywxt.common.base.BaseController;
 import com.ginkgocap.ywxt.file.model.FileIndex;
 import com.ginkgocap.ywxt.file.service.FileIndexService;
 import com.ginkgocap.ywxt.model.meeting.ChatMini;

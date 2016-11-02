@@ -7,6 +7,7 @@
 package com.ginkgocap.ywxt.model.meeting;
 
 import javax.validation.constraints.*;
+
 import org.hibernate.validator.constraints.*;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
@@ -15,10 +16,11 @@ import org.apache.commons.lang.builder.ToStringStyle;
 
 import java.util.*;
 
-import javacommon.base.*;
+
 
 
 import com.ginkgocap.ywxt.model.meeting.*;
+import com.ginkgocap.ywxt.common.base.*;
 import com.ginkgocap.ywxt.dao.meeting.*;
 import com.ginkgocap.ywxt.service.meeting.*;
 import com.ginkgocap.ywxt.vo.query.meeting.*;

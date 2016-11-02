@@ -9,12 +9,12 @@ package com.ginkgocap.ywxt.model.meeting;
 import java.io.Serializable;
 import java.util.Date;
 
-import javacommon.base.BaseEntity;
-
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
+
+import com.ginkgocap.ywxt.common.base.BaseEntity;
 
 public class Meeting extends BaseEntity implements Serializable{
 	private static final long serialVersionUID = 5454155825314635342L;

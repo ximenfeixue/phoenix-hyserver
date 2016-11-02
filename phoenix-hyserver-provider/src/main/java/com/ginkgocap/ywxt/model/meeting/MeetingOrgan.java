@@ -2,13 +2,12 @@ package com.ginkgocap.ywxt.model.meeting;
 
 import java.util.Date;
 
-import javacommon.base.BaseEntity;
-
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
 
+import com.ginkgocap.ywxt.common.base.BaseEntity;
 import com.ginkgocap.ywxt.utils.Utils;
 
 public class MeetingOrgan extends BaseEntity implements java.io.Serializable, Comparable<MeetingOrgan>{

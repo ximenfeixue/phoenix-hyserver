@@ -1,4 +1,4 @@
-package javacommon;
+package com.ginkgocap.ywxt.common;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
