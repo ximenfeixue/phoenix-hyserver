@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+"http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+<mapper namespace="MeetingTopic">
+	<resultMap id="meetingTopicMap" type="com.ginkgocap.ywxt.model.meeting.MeetingTopic">
+        <result property="id" column="id"/>
+        <result property="meetingId" column="meeting_id"/>
+        <result property="topicContent" column="topic_content"/>
+        <result property="topicStartTime" column="topic_start_time"/>
+        <result property="topicEndTime" column="topic_end_time"/>
+        <result property="topicDesc" column="topic_desc"/>
+        <result property="taskId" column="task_id"/>
+        <result property="memberId" column="member_id"/>
+        <result property="memberName" column="member_name"/>
+        <result property="memberPic" column="member_pic"/>
+        <result property="memberDesc" column="member_desc"/>
+        <result property="createId" column="create_id"/>
+        <result property="createName" column="create_name"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="isFinished" column="is_finished"/>
+	</resultMap>
+	
+	<sql id="columns">
+	    <![CDATA[
+		id AS id,meeting_id AS meetingId,topic_content AS topicContent,topic_start_time AS topicStartTime,topic_end_time AS topicEndTime,topic_desc AS topicDesc,task_id AS taskId,member_id AS memberId,member_name AS memberName,member_pic AS memberPic,member_desc AS memberDesc,
+		create_id AS createId,create_name AS createName,create_time AS createTime,update_time AS updateTime,is_finished AS isFinished
+	    ]]>
+	</sql>
+
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id">
+	<![CDATA[
+		INSERT INTO tb_meeting_topic (
+			id,
+			meeting_id,
+			topic_content,
+			topic_start_time,
+			topic_end_time,
+			topic_desc,
+			task_id,
+			member_id,
+			member_name,
+			member_pic,
+			member_desc,
+			create_id,
+			create_name,
+			create_time,
+			update_time,
+			is_finished
+		) VALUES (
+			#{id},
+			#{meetingId},
+			#{topicContent},
+			#{topicStartTime},
+			#{topicEndTime},
+			#{topicDesc},
+			#{taskId},
+			#{memberId},
+			#{memberName},
+			#{memberPic},
+			#{memberDesc},
+			#{createId},
+			#{createName},
+			NOW(),
+			NOW(),
+			#{isFinished}
+		)
+	]]>
+	</insert>
+    
+	<update id="update" >
+	<![CDATA[
+		UPDATE tb_meeting_topic 
+		SET meeting_id = #{meetingId} ,
+			topic_content = #{topicContent} ,
+			topic_start_time = #{topicStartTime} ,
+			topic_end_time = #{topicEndTime} ,
+			topic_desc = #{topicDesc} ,
+			task_id = #{taskId} ,
+			member_id = #{memberId} ,
+			member_name = #{memberName} ,
+			member_pic = #{memberPic} ,
+			member_desc = #{memberDesc} ,
+			create_id = #{createId} ,
+			create_name = #{createName} ,
+			update_time = NOW(),
+			is_finished = #{isFinished}
+		WHERE 
+			id = #{id} 
+    ]]>
+	</update>
+
+	<delete id="delete">
+	<![CDATA[
+		DELETE FROM tb_meeting_topic 
+		WHERE id = #{id} 
+	]]>
+	</delete>
+    
+	<delete id="deleteByMeetingId">
+	<![CDATA[
+		DELETE FROM tb_meeting_topic 
+		WHERE meeting_id = #{meetingId} 
+	]]>
+	</delete>
+
+	<select id="getById" resultType="meetingTopic">
+		SELECT <include refid="columns" />
+		<![CDATA[
+			FROM tb_meeting_topic 
+			WHERE id = #{id} 
+		]]>
+	</select>
+
+	<select id="getByMeetingId" resultType="meetingTopic" parameterType="java.lang.Long">
+		SELECT <include refid="columns"/>
+		<![CDATA[
+			FROM tb_meeting_topic 
+			WHERE meeting_id = #{meetingId} 
+			ORDER BY topic_start_time
+		]]>
+	</select>
+
+	<select id="getByTopicCoutent" resultType="meetingTopic" parameterType="java.lang.String">
+		SELECT <include refid="columns"/>
+		<![CDATA[
+			FROM tb_meeting_topic 
+			WHERE topic_content = #{topicContent}
+		]]>
+	</select>
+
+	<select id="getByTopicTime" resultType="meetingTopic" parameterType="java.lang.String">
+		SELECT <include refid="columns"/>
+		<![CDATA[
+			FROM tb_meeting_topic 
+			WHERE topic_time = #{topicTime}
+		]]>
+	</select>
+    
+	<select id="getByTopicDesc" resultType="meetingTopic" parameterType="java.lang.String">
+		SELECT <include refid="columns"/>
+		<![CDATA[
+			FROM tb_meeting_topic 
+			WHERE topic_desc = #{topicDesc}
+		]]>
+	</select>
+
+	<select id="getByTaskId" resultType="meetingTopic" parameterType="java.lang.String">
+		SELECT <include refid="columns"/>
+		<![CDATA[
+			FROM tb_meeting_topic 
+			WHERE task_id = #{taskId}
+		]]>
+	</select>
+
+	<select id="getByMemberId" resultType="meetingTopic" parameterType="java.lang.Long">
+		SELECT <include refid="columns"/>
+		<![CDATA[
+			FROM tb_meeting_topic 
+			WHERE member_id = #{memberId}
+		]]>
+	</select>
+	
+    <select id="getForwardingTopicByMeetingId" resultType="meetingTopic" parameterType="java.lang.Long">
+		SELECT
+			mt.id AS id,
+			mt.meeting_id AS meetingId,
+			mt.topic_content AS topicContent,
+			mt.topic_desc AS topicDesc,
+			tc.publish_time AS updateTime
+		FROM tb_meeting_topic AS mt
+		LEFT JOIN (SELECT * FROM tb_topic_chat GROUP BY topic_id ORDER BY publish_time DESC ) AS tc 
+			ON mt.id = tc.topic_id
+		WHERE mt.meeting_id = #{meetingId} 
+			AND mt.is_finished != 1
+		ORDER BY mt.topic_start_time 
+	</select>
+    
+	<select id="getByMeetingIds" resultType="meetingTopic" parameterType="java.util.Map">
+		SELECT <include refid="columns"/>
+		FROM tb_meeting_topic 
+		WHERE meeting_id IN
+		<foreach collection="meetingIds" item="meetingId" index="index" open="(" close=")" separator=","> 
+			#{meetingId}        
+		</foreach> 
+	    ORDER BY topic_start_time
+    </select>
+</mapper>
+
