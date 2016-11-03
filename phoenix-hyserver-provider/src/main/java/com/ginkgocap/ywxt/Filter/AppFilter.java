@@ -2,6 +2,7 @@ package com.ginkgocap.ywxt.Filter;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.PrintWriter;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -44,42 +45,42 @@ public class AppFilter implements Filter {
 			FilterChain chain) throws IOException, ServletException {
 		HttpServletRequest req = (HttpServletRequest) request;
 		HttpServletResponse res = (HttpServletResponse) response;
-		String url=req.getRequestURI();
-//		if(loginFlag){
-//			User user=getUser(req);
-//			if (Utils.isNullOrEmpty(user)) {
-////				res.setHeader("errorCode", "-1");
-////				res.setHeader("errorMessage", Encodes.encodeBase64("Filter test".getBytes()));
-//				response.getWriter().write();
-//				return;
-//			}
-// 		}
+		String url = req.getRequestURI();
+
 		if(url.contains("file/")){
 			chain.doFilter(request, res);
 			return;
 		}
-		UserBean userBean=new UserBean();
+		
+		User user = getUser(req);
+		if (user == null) {
+			PrintWriter out = res.getWriter();
+			String errorStr="{\"notification\":{\"notifCode\": \"0003\",\"notifInfo\": \"用户长时间未操作或已过期,请重新登录\"}}";
+			out.println(errorStr);
+			out.flush();
+			return;
+		}
+		req.setAttribute("users",user);
+		
+		UserBean userBean = new UserBean();
 		String sessionId = req.getHeader("sessionID");
 		userBean.setSessionId(sessionId);
 		String jtUserIDs = req.getHeader("jtUserID");
-		String name = req.getHeader("jtNickName");
-		userBean.setName(name);
 
-		if(!Utils.isNullOrEmpty(jtUserIDs)){
+		if(Utils.isNullOrEmpty(jtUserIDs)){
+			userBean.setId(user.getId());
+			userBean.setName(user.getName());	
+		}
+		else{
 			Long jtUserId = Long.parseLong(jtUserIDs);
 			userBean.setId(jtUserId);
-			WebApplicationContext wac=	WebApplicationContextUtils.getWebApplicationContext(req.getSession().getServletContext());
-			UserService userService=(UserService) wac.getBean("userService");
-			User user=userService.selectByPrimaryKey(jtUserId);
-			userBean.setName(user.getName());
-			req.setAttribute("users",user);
-		}else{
-//			PrintWriter out=res.getWriter();
-//			String errorStr="{\"notification\":{\"notifCode\": \"0003\",\"notifInfo\": \"用户长时间未操作或已过期,请重新登录\"}}";
-//			out.println(errorStr);
-//			out.flush();
+			String name = req.getHeader("jtNickName");
+			if(Utils.isNullOrEmpty(name)) {
+				userBean.setName(user.getName());
+			}
 		}
 		req.setAttribute("userBean",userBean);
+		
 		//敏感词过滤
 		BufferedReader reader = request.getReader();
         String line = null;
