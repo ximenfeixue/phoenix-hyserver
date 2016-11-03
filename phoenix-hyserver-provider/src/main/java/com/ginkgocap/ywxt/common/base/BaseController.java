@@ -9,8 +9,10 @@ import net.sf.json.JSONObject;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 
+import com.ginkgocap.ywxt.controller.meeting.MeetingController;
 import com.ginkgocap.ywxt.user.model.User;
 import com.ginkgocap.ywxt.util.Encodes;
 import com.ginkgocap.ywxt.utils.JsonReadUtil;
@@ -26,7 +28,7 @@ import com.ginkgocap.ywxt.vo.query.meeting.UserBean;
 @Controller
 public abstract class BaseController {
 
-    public abstract Logger getLogger();
+	public abstract Logger getLogger();
 	 /**
      * 判断对象是否为null或空
      * @param obj
@@ -44,7 +46,9 @@ public abstract class BaseController {
      */
     public String getJsonParamStr(HttpServletRequest request) throws IOException{
         String result=JsonReadUtil.getJsonIn(request);
-        getLogger().info("{request:{url:"+request.getRequestURI()+","+"prarm:"+result+"}}" + "   请求的userId为：" + request.getHeader("jtUserID"));
+        User user = getUser(request);
+        long userId = user != null ? user.getId() : 0;
+        getLogger().info("{request:{url:"+request.getRequestURI()+","+"prarm:"+result+"}}" + "   请求的userId为：" + userId);
 		return result;
     }
     
@@ -155,7 +159,7 @@ public abstract class BaseController {
 	 * @return str
 	 */
 	public UserBean getUserBean(HttpServletRequest request){
-		UserBean userBean=(UserBean) request.getAttribute("userBean");
+		UserBean userBean = (UserBean) request.getAttribute("userBean");
 		return userBean;
 	}
 	

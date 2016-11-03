@@ -69,7 +69,7 @@ public class AppFilter implements Filter {
 
 		if(Utils.isNullOrEmpty(jtUserIDs)){
 			userBean.setId(user.getId());
-			userBean.setName(user.getName());	
+			userBean.setName(user.getName());
 		}
 		else{
 			Long jtUserId = Long.parseLong(jtUserIDs);
