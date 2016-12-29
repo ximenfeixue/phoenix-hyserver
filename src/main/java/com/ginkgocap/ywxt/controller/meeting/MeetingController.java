@@ -1465,9 +1465,11 @@ public class MeetingController extends BaseController {
 	 */
 	List<Social> socialListFilter(List<Social> listResult, Long userId) {
 		List<SocialStatus> execludeResult = socialStatusService.queryListWithoutMeetingByUserId(userId);
+		/*
 		for (SocialStatus ss : execludeResult) {
 			logger.debug("exclued ====> " + ReflectionToStringBuilder.toString(ss));
-		}
+		}*/
+		logger.info("exclued size: " + (execludeResult != null ? execludeResult.size() : 0));
 		return listFilter(listResult, execludeResult);
 	}
 
@@ -1679,18 +1681,20 @@ public class MeetingController extends BaseController {
 			List<Social> listResult = new ArrayList<Social>();
 			// 获取私聊和群聊列表
 			List<Social> chat = imRecordmessageService.getPrivateChatAndGroupChat(socialListReq); // 消息
-			 if (CollectionUtils.isNotEmpty(chat)) {
-				 this.setChatListToCache(chat, userId);
-			 } else {
-				 chat = this.getChatListFromCache(userId);
-			 }
+			if (CollectionUtils.isNotEmpty(chat)) {
+				this.setChatListToCache(chat, userId);
+			} else {
+				chat = this.getChatListFromCache(userId);
+			}
 
-			logger.info("chat-size:" + chat.size() + " userId: " + userId);
-			listResult.addAll(chat);
-
+			if (CollectionUtils.isNotEmpty(chat)) {
+				logger.info("chat-size:" + chat.size() + " userId: " + userId);
+				listResult.addAll(chat);
+			}
+			/*
 			for (Social s : chat) {
 				logger.info("SocialList ===>" + ReflectionToStringBuilder.toString(s));
-			}
+			}*/
 
 			// 过滤客户端删除的畅聊
 			// 2016-03-10 tanmin getPrivateChatAndGroupChat直接获取畅聊提供的数据,无需再过滤

@@ -357,7 +357,10 @@ public class GinTongInterface {
 			if ("0000".equals(jsonNode.get("notification").get("notifCode").asText())) {
 				JsonNode listIMRecordNode = jsonNode.get("responseData").get("page").get("listIMRecord");
 				for (JsonNode node : listIMRecordNode) {
-					logger.debug("imrecord ==> " + node.toString());
+					if (node == null) {
+						logger.error("node is null, so skip.");
+						continue;
+					}
 					Social socail = new Social();
 					socail.setId(getLong(node,"id",0L));
 					socail.setNewCount(getInt(node,"newCount",0));
@@ -381,14 +384,15 @@ public class GinTongInterface {
 					socialDetail.setContent(getString(node, "content", ""));
 					socialDetail.setModal(getInt(node, "modal", 0));
 					socail.setSocialDetail(socialDetail);
-					logger.debug("socail ==> " + ReflectionToStringBuilder.toString(socail));
+					logger.debug("socail info: id: " + socail.getId() + " title: " + socail.getTitle() +
+								" sendId: " + socialDetail.getSenderID() + " sendName" + socialDetail.getSenderName());
 					listSocial.add(socail);
 				}
 			}
 		} catch (Exception e) {
 			logger.error("req frrechat.getListIMRecord failed!", e);
 		}
-		logger.info("socail list size ==> " + listSocial.size());
+		logger.info("socail list size ==> " + (listSocial != null ? listSocial.size() : 0));
 		return listSocial;
 	}
 
