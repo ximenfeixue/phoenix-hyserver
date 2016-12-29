@@ -18,27 +18,6 @@ public class MeetingWebTest extends BaseTestCase
         
     	/*
     	login(loginUrl);
-        KnowledgeWebDemo demo = new KnowledgeWebDemo();
-        demo.createKnowledge();
-        demo.updateKnowledge();
-        demo.deleteKnowledge();
-        demo.knowledgeDetail();
-        demo.allKnowledgeList();
-        demo.allCreatedKnowledgeList();
-        demo.allCollectedKnowledgeList();
-        demo.allByColumnIdKnowledgeList();
-        demo.allByKeyWordKnowledgeList();
-        demo.allByColumnIdAndKeyWordKnowledgeList();
-        demo.allByUserIdKnowledgeList();
-        demo.knowledgeListByUserIdAndColumnId();
-        demo.knowledgeCollect();
-        demo.cancelCollectedKnowledge();
-        demo.reportKnowledge();
-
-        //Comment
-        demo.knowledgeCommentCreate();
-        demo.knowledgeCommentGetList();
-        demo.knowledgeCommentGetCount();
         demo.knowledgeCommentDelete();*/
     }
     
