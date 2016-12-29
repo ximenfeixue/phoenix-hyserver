@@ -385,7 +385,7 @@ public class GinTongInterface {
 					socialDetail.setModal(getInt(node, "modal", 0));
 					socail.setSocialDetail(socialDetail);
 					logger.debug("socail info: id: " + socail.getId() + " title: " + socail.getTitle() +
-								" sendId: " + socialDetail.getSenderID() + " sendName" + socialDetail.getSenderName());
+								" sendId: " + socialDetail.getSenderID() + " sendName: " + socialDetail.getSenderName());
 					listSocial.add(socail);
 				}
 			}
