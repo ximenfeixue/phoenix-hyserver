@@ -2891,12 +2891,12 @@ public class MeetingController extends BaseController {
 	}
 	
 	private void setChatListToCache(final List<Social> chat,final long userId) {
-		logger.info("set chat list for userId: " + userId);
+		logger.info("set chat list to cached. userId: " + userId);
 		cache.setByRedis(chatListKey(userId), chat, expiredTime);
 	}
 	
 	private List<Social> getChatListFromCache(final long userId) {
-		logger.info("get chat list for userId: " + userId);
+		logger.info("get chat list from cached. userId: " + userId);
 		return (List<Social>)cache.getByRedis(chatListKey(userId));
 	}
 	
