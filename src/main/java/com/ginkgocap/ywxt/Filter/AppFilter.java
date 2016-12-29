@@ -13,6 +13,8 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.ginkgocap.ywxt.utils.RedisKeyUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -26,28 +28,53 @@ public class AppFilter implements Filter {
 	String excludedUrl = "";
 	String[] excludedUrlArray={};
 	
-
 	public void destroy() {
 
 	}
-	public User getUser(HttpServletRequest request){
-		String sessionId=request.getHeader("sessionID");
-		if(sessionId!=null && !"null".equals(sessionId) && !"".equals(sessionId)){
-			WebApplicationContext wac=	WebApplicationContextUtils.getWebApplicationContext(request.getSession().getServletContext());
-			Cache cache=(Cache) wac.getBean("cache");
-			User user=(User) cache.getByRedis("user"+sessionId);
-			return user;
-		}else{
-			return null;
+
+	private User getUser(HttpServletRequest request) {
+		// 判断客户端请求方式
+		String s = request.getHeader("s");
+		if ("web".equals(s)) {
+			String sessionId = request.getHeader("sessionID");
+			if (StringUtils.isNotBlank(sessionId)) {
+				String key = RedisKeyUtils.getSessionIdKey(sessionId);
+				return getUser(request, key);
+			}
+		} else {
+			String sessionId = request.getHeader("sessionID");
+			if (sessionId != null && !"null".equals(sessionId)
+					&& !"".equals(sessionId)) {
+				String key = "user" + sessionId;
+				return getUser(request, key);
+			}
 		}
+		return null;
 	}
-	public void doFilter(ServletRequest request, ServletResponse response,
-			FilterChain chain) throws IOException, ServletException {
+
+	/**
+	 * 获取用户信息
+	 * @param request request
+	 * @param key    sessionId key
+	 * @return user
+	 * @author haiyan
+	 */
+	private User getUser(HttpServletRequest request, String key) {
+		WebApplicationContext wac = WebApplicationContextUtils
+				.getWebApplicationContext(request.getSession().getServletContext());
+		Cache cache = (Cache) wac.getBean("cache");
+		User user = (User) cache.getByRedis(key);
+		if (user != null) {
+			cache.setByRedis(key, user, 60 * 60 * 24 * 7);
+		}
+		return user;
+	}
+
+	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
 		HttpServletRequest req = (HttpServletRequest) request;
 		HttpServletResponse res = (HttpServletResponse) response;
 		String url = req.getRequestURI();
-
-		if(url.contains("file/")){
+		if (url.contains("file/")) {
 			chain.doFilter(request, res);
 			return;
 		}
