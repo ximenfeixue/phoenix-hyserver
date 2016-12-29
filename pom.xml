@@ -1091,13 +1091,13 @@
 			</properties>
 		</profile>
 		<profile>
-			<id>qatest</id>
+			<id>testOnline</id>
 			<activation>
 				<activeByDefault>false</activeByDefault>
 			</activation>
 			<build>
 				<filters>
-					<filter>${sa.config.file}</filter>
+					<filter>sa-testOnline.properties</filter>
 				</filters>
 			</build>
 		</profile>

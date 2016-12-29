@@ -25,6 +25,7 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import net.sf.json.util.JSONUtils;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 import org.eclipse.jetty.util.log.Log;
@@ -39,6 +40,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.ginkgocap.ywxt.cache.Cache;
 import com.ginkgocap.ywxt.common.base.BaseController;
 import com.ginkgocap.ywxt.file.model.FileIndex;
 import com.ginkgocap.ywxt.file.service.FileIndexService;
@@ -136,6 +138,9 @@ public class MeetingController extends BaseController {
 	private SocialStatusService socialStatusService;
 	@Autowired
 	private DefaultMessageService defaultMessageService;
+	@Autowired
+	private Cache cache;
+	private static int  expiredTime = 60 * 60 * 24 * 7;
 
 	private final Logger logger = LoggerFactory.getLogger(MeetingController.class);
 	private static final String CLASS_NAME = MeetingController.class.getName();
@@ -1668,18 +1673,19 @@ public class MeetingController extends BaseController {
 				notificationMap.put("notifInfo", "请先登录");
 				return model;
 			}
+			final long userId = user.getId();
 			socialListReq = socialListReq == null ? new SocialListReq() : socialListReq;
 			socialListReq.setUserId(user.getId());
 			List<Social> listResult = new ArrayList<Social>();
 			// 获取私聊和群聊列表
 			List<Social> chat = imRecordmessageService.getPrivateChatAndGroupChat(socialListReq); // 消息
-			// if (!isNullOrEmpty(chat)) {
-			// // 封装私聊和群聊
-			// listResult.addAll(chat);
-			// }
+			 if (CollectionUtils.isNotEmpty(chat)) {
+				 this.setChatListToCache(chat, userId);
+			 } else {
+				 chat = this.getChatListFromCache(userId);
+			 }
 
-			logger.info("chat-size:" + chat.size());
-
+			logger.info("chat-size:" + chat.size() + " userId: " + userId);
 			listResult.addAll(chat);
 
 			for (Social s : chat) {
@@ -2878,5 +2884,19 @@ public class MeetingController extends BaseController {
 		resultMap.put("responseData", result);
 		resultMap.put("notification", notification);
 		return resultMap;
+	}
+	
+	private void setChatListToCache(final List<Social> chat,final long userId) {
+		logger.info("set chat list for userId: " + userId);
+		cache.setByRedis(chatListKey(userId), chat, expiredTime);
+	}
+	
+	private List<Social> getChatListFromCache(final long userId) {
+		logger.info("get chat list for userId: " + userId);
+		return (List<Social>)cache.getByRedis(chatListKey(userId));
+	}
+	
+	private String chatListKey(long userId)	{
+		return "chat_list_" + userId + "_";
 	}
 }
