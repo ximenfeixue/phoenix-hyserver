@@ -335,11 +335,6 @@ public class GinTongInterface {
 
 	/**
 	 * 获取用户个人单聊与畅聊的会话列表
-	 * 
-	 * @param groupName
-	 * @param roomsize
-	 * @param ownerId
-	 * @param memberIds
 	 * @return
 	 */
 	public static List<Social> getListIMRecord(SocialListReq property) {

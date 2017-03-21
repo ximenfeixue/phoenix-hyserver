@@ -1,6 +1,7 @@
 package com.ginkgocap.ywxt.vo.query.social;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * @Description: 社交明细vo
@@ -15,7 +16,7 @@ public class SocialDetail implements Serializable {
 		/** 发送方名称 */
 		private java.lang.String senderName;
 		/** 社交图片*/
-		private java.util.List<String> listImageUrl;
+		private List<String> listImageUrl;
 		
 		/** 社交显示内容，社交类型为聊天时（包含私聊、群聊）封装最后一条聊天记录，通知显示通知内容，邀请函显示邀请函内容 */
 		private java.lang.String content;
@@ -41,10 +42,10 @@ public class SocialDetail implements Serializable {
 		public void setSenderName(java.lang.String senderName) {
 			this.senderName = senderName;
 		}
-		public java.util.List<String> getListImageUrl() {
+		public List<String> getListImageUrl() {
 			return listImageUrl;
 		}
-		public void setListImageUrl(java.util.List<String> listImageUrl) {
+		public void setListImageUrl(List<String> listImageUrl) {
 			this.listImageUrl = listImageUrl;
 		}
 		public java.lang.String getContent() {

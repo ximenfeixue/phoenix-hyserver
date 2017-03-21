@@ -1726,11 +1726,11 @@ public class MeetingController extends BaseController {
 				socialNotice.setId(meetingNotice.getId());
 				socialNotice.setTitle("通知");
 				socialNotice.setType(SocialType.NOTICE.code());
-				SocialDetail socialDetailNotice = new SocialDetail();
-				socialDetailNotice.setContent(meetingNotice.getNoticeContent());
+				SocialDetail socialDetail = new SocialDetail();
+				socialDetail.setContent(meetingNotice.getNoticeContent());
 				socialNotice.setTime(meetingNotice.getUpdateTime());
 				socialNotice.setOrderTime(meetingNotice.getUpdateTime());
-				socialNotice.setSocialDetail(socialDetailNotice);
+				socialNotice.setSocialDetail(socialDetail);
 				socialNotice.setNewCount(noticeCount);
 				listResult.add(0, socialNotice);
 			}
@@ -1787,8 +1787,8 @@ public class MeetingController extends BaseController {
 				socialRelation.setId(-2L);
 				socialRelation.setTitle("新的关系");
 				socialRelation.setType(SocialType.RELATION.code());
-				SocialDetail socialDetailNotice = new SocialDetail();
-				socialRelation.setSocialDetail(socialDetailNotice);
+				SocialDetail socialDetail = new SocialDetail();
+				socialRelation.setSocialDetail(socialDetail);
 				socialRelation.setNewCount(relationCount);
 				listResult.add(0, socialRelation);
 			}
