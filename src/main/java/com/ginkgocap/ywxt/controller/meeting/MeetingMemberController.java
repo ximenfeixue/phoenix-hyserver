@@ -109,8 +109,8 @@ public class MeetingMemberController extends BaseController {
 	/**
 	 * 名称: addMettingMemberGet 描述: 当面邀请
 	 * 
-	 * @param request请求
-	 * @param response响应
+	 * @param request 请求
+	 * @param response 响应
 	 * @return model
 	 */
 	@ResponseBody
@@ -124,8 +124,8 @@ public class MeetingMemberController extends BaseController {
 	/**
 	 * 名称: addMettingMember 描述: 当面邀请
 	 * 
-	 * @param request请求
-	 * @param response响应
+	 * @param request 请求
+	 * @param response 响应
 	 * @return model
 	 */
 	@ResponseBody
@@ -326,8 +326,8 @@ public class MeetingMemberController extends BaseController {
 	/**
 	 * 名称: signInMeetingGet 描述: 签到
 	 * 
-	 * @param request请求
-	 * @param response响应
+	 * @param request 请求
+	 * @param response 响应
 	 * @return model
 	 */
 	@ResponseBody
@@ -341,8 +341,8 @@ public class MeetingMemberController extends BaseController {
 	/**
 	 * 名称: signInMeeting 描述: 签到
 	 * 
-	 * @param request请求
-	 * @param response响应
+	 * @param request 请求
+	 * @param response 响应
 	 * @return model
 	 */
 	@ResponseBody
@@ -457,8 +457,8 @@ public class MeetingMemberController extends BaseController {
 	/**
 	 * 名称: signUpReviewGet 描述: 报名审核
 	 * 
-	 * @param request请求
-	 * @param response响应
+	 * @param request 请求
+	 * @param response 响应
 	 * @return model
 	 */
 	@ResponseBody
@@ -472,8 +472,8 @@ public class MeetingMemberController extends BaseController {
 	/**
 	 * 名称: signUpReview 描述: 报名审核
 	 * 
-	 * @param request请求
-	 * @param response响应
+	 * @param request 请求
+	 * @param response 响应
 	 * @return model
 	 */
 	@ResponseBody
@@ -651,9 +651,9 @@ public class MeetingMemberController extends BaseController {
 	
 	/**
 	 * 名称: signUpMeetingGet 描述: 报名会议
-	 * 
-	 * @param request请求
-	 * @param response响应
+	 *
+	 * @param request 请求
+	 * @param response 响应
 	 * @return model
 	 */
 	@ResponseBody
@@ -666,9 +666,9 @@ public class MeetingMemberController extends BaseController {
 
 	/**
 	 * 名称: signUpMeeting 描述: 报名会议
-	 * 
-	 * @param request请求
-	 * @param response响应
+	 *
+	 * @param request 请求
+	 * @param response 响应
 	 * @return model
 	 */
 	@ResponseBody
@@ -837,9 +837,9 @@ public class MeetingMemberController extends BaseController {
 
 	/**
 	 * 名称: changeAttendMeetStatusGet 描述: 改变成员参会状态: 0未答复1接受邀请（取消报名）2拒绝邀请，5取消报名
-	 * 
-	 * @param request请求
-	 * @param response响应
+	 *
+	 * @param request 请求
+	 * @param response 响应
 	 * @return model
 	 */
 	@ResponseBody
@@ -853,9 +853,9 @@ public class MeetingMemberController extends BaseController {
 
 	/**
 	 * 名称: changeAttendMeetStatusGet 描述: 改变成员参会状态 :0未答复1接受邀请2拒绝邀请，5取消报名
-	 * 
-	 * @param request请求
-	 * @param response响应
+	 *
+	 * @param request 请求
+	 * @param response 响应
 	 * @return model
 	 */
 	@ResponseBody
@@ -979,9 +979,9 @@ public class MeetingMemberController extends BaseController {
 
 	/**
 	 * 名称: getmeetingMemberListGet 描述: 获取参会人列表
-	 * 
-	 * @param request请求
-	 * @param response响应
+	 *
+	 * @param request 请求
+	 * @param response 响应
 	 * @return model
 	 */
 	@ResponseBody
@@ -995,9 +995,9 @@ public class MeetingMemberController extends BaseController {
 
 	/**
 	 * 名称: getmeetingMemberList 描述: 获取参会人列表
-	 * 
-	 * @param request请求
-	 * @param response响应
+	 *
+	 * @param request 请求
+	 * @param response 响应
 	 * @return model
 	 */
 	@ResponseBody
@@ -1053,9 +1053,9 @@ public class MeetingMemberController extends BaseController {
 
 	/**
 	 * 名称: getmeetingVisitantListGet 描述: 获取参会嘉宾
-	 * 
-	 * @param request请求
-	 * @param response响应
+	 *
+	 * @param request 请求
+	 * @param response 响应
 	 * @return model
 	 */
 	@ResponseBody
@@ -1069,9 +1069,9 @@ public class MeetingMemberController extends BaseController {
 
 	/**
 	 * 名称: getmeetingVisitantList 描述: 获取参会嘉宾
-	 * 
-	 * @param request请求
-	 * @param response响应
+	 *
+	 * @param request 请求
+	 * @param response 响应
 	 * @return model
 	 */
 	@ResponseBody
@@ -1128,9 +1128,9 @@ public class MeetingMemberController extends BaseController {
 
 	/**
 	 * 名称: getRequiredSignupInfoGet 描述: 获取用户报名会议必填信息
-	 * 
-	 * @param request请求
-	 * @param response响应
+	 *
+	 * @param request 请求
+	 * @param response 响应
 	 * @return model
 	 */
 	@ResponseBody
@@ -1145,8 +1145,8 @@ public class MeetingMemberController extends BaseController {
 	/**
 	 * 名称: getRequiredSignupInfo 描述: 获取用户报名会议必填信息
 	 * 
-	 * @param request请求
-	 * @param response响应
+	 * @param request 请求
+	 * @param response 响应
 	 * @return model
 	 */
 	@ResponseBody
@@ -1362,9 +1362,9 @@ public class MeetingMemberController extends BaseController {
 
 	/**
 	 * 名称: improveSignInformation 描述: 完善报名信息
-	 * 
-	 * @param request请求
-	 * @param response响应
+	 *
+	 * @param request 请求
+	 * @param response 响应
 	 * @return model
 	 */
 	@ResponseBody
@@ -1378,9 +1378,9 @@ public class MeetingMemberController extends BaseController {
 
 	/**
 	 * 名称: improveSignInformation 描述: 完善报名信息
-	 * 
-	 * @param request请求
-	 * @param response响应
+	 *
+	 * @param request 请求
+	 * @param response 响应
 	 * @return model
 	 */
 	@ResponseBody

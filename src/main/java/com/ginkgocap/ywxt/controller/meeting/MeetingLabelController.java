@@ -43,10 +43,8 @@ public class MeetingLabelController extends BaseController {
 	/**
 	 * 名称: addMeetingLabelGet
      * 描述: 新增自定义标签
-	 * @param request
-	 *            请求
-	 * @param response
-	 *            响应
+	 * @param request  请求
+	 * @param response 响应
 	 * @return model
 	 * @throws IOException
 	 */
@@ -61,10 +59,8 @@ public class MeetingLabelController extends BaseController {
 	/**
 	 * 名称: addMetting
      * 描述: 新增自定义标签
-	 * @param request
-	 *            请求
-	 * @param response
-	 *            响应
+	 * @param request  请求
+	 * @param response 响应
 	 * @return model
 	 * @throws IOException
 	 */
@@ -121,10 +117,8 @@ public class MeetingLabelController extends BaseController {
 	/**
 	 * 名称: getMeetingLabelByCreateIdGet
      * 描述: 根据用户Id获取所有自定义标签
-	 * @param request
-	 *            请求
-	 * @param response
-	 *            响应
+	 * @param request  请求
+	 * @param response 响应
 	 * @return model
 	 * @throws IOException
 	 */
@@ -139,10 +133,8 @@ public class MeetingLabelController extends BaseController {
 	/**
 	 * 名称: getMeetingLabelByCreateId
      * 描述: 根据用户Id获取所有自定义标签
-	 * @param request
-	 *            请求
-	 * @param response
-	 *            响应
+	 * @param request  请求
+	 * @param response 响应
 	 * @return model
 	 * @throws IOException
 	 */
