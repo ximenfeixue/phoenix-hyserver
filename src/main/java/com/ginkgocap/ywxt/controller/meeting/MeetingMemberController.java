@@ -68,7 +68,7 @@ import com.ginkgocap.ywxt.utils.type.NoticeType;
 import com.ginkgocap.ywxt.utils.type.SexType;
 import com.ginkgocap.ywxt.vo.query.meeting.MeetingSignLabelDataQuery;
 import com.ginkgocap.ywxt.vo.query.meeting.UserBean;
-import com.gintong.easemob.server.httpclient.api.EasemobChatGroupsHandler;
+//import com.gintong.easemob.server.httpclient.api.EasemobChatGroupsHandler;
 
 /**
  * @Description: Controller
@@ -289,7 +289,8 @@ public class MeetingMemberController extends BaseController {
 		model.put("notification", notificationMap);
 		return model;
 	}
-	
+
+	/*
 	private void addUsersToChatGroups(String chatGroupId,Long memeberId){
 		ArrayNode usernames = JsonNodeFactory.instance.arrayNode();
 		if(null != memeberId && memeberId > 0){
@@ -298,7 +299,7 @@ public class MeetingMemberController extends BaseController {
 		ObjectNode usernamesNode = JsonNodeFactory.instance.objectNode();
 		usernamesNode.put("usernames", usernames);
 		EasemobChatGroupsHandler.addUsersToGroupBatch(chatGroupId,usernamesNode);
-	}
+	}*/
 	
 	//增加动态
 	private void insertNewsAndRelation(Meeting meeting, String homePage, User user, List<Long> listUserId) {
@@ -1144,7 +1145,7 @@ public class MeetingMemberController extends BaseController {
 
 	/**
 	 * 名称: getRequiredSignupInfo 描述: 获取用户报名会议必填信息
-	 * 
+	 *
 	 * @param request 请求
 	 * @param response 响应
 	 * @return model

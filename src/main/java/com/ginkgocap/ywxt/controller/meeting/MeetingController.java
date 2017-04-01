@@ -1449,8 +1449,7 @@ public class MeetingController extends BaseController {
 						.getCompereId().longValue())
 				&& (source.getCompereName() == null ? "" : source.getCompereName()) == (target.getCompereName() == null ? "" : target
 						.getCompereName())
-				&& (source.getNewCount() == null ? 0 : source.getNewCount().intValue()) == (target.getNewCount() == null ? 0 : target.getNewCount()
-						.intValue())) {
+				&& source.getNewCount() == target.getNewCount()) {
 			return true;
 		} else {
 			return false;
@@ -1471,6 +1470,19 @@ public class MeetingController extends BaseController {
 		}*/
 		logger.info("exclued size: " + (execludeResult != null ? execludeResult.size() : 0));
 		return listFilter(listResult, execludeResult);
+	}
+
+	List<Social> socialListFilterNew(List<Social> listResult) {
+		List<Social> listResultNew = new ArrayList<Social>();
+		final int count = listResult.size();
+		for (int index = 0; index < count; index ++) {
+			Social social = listResult.get(index);
+			if (social.getNewCount() > 0) {
+				listResultNew.add(social);
+				listResult.remove(index);
+			}
+		}
+		return listResultNew;
 	}
 
 	/**
@@ -1500,56 +1512,15 @@ public class MeetingController extends BaseController {
 		if (null == execludeResult || execludeResult.size() == 0) {
 			return listResult;
 		}
-		int size = execludeResult.size();
+		//int size = execludeResult.size();
+		return removeClientDeletedSocial(execludeResult, listResult);
+		/*
 		int end = 0;
 		if (size > 90) {
-			// end = size / 3;
-			// final List<Social> list1 = listResult.subList(0, end);
-			// final List<Social> list2 = listResult.subList(end, end * 2);
-			// final List<Social> list3 = listResult.subList(end * 2, size);
-			// CompletionService<List<Social>> completionService = new
-			// ExecutorCompletionService<List<Social>>(
-			// ThreadPoolUtils.getExecutor());
-			// List<Future<List<Social>>> futureList = new
-			// ArrayList<Future<List<Social>>>(3);
-			// Future<List<Social>> future1 = completionService.submit(new
-			// Callable<List<Social>>() {
-			// @Override
-			// public List<Social> call() throws Exception {
-			// return removeClientDeletedSocial(execludeResult, list1);
-			// }
-			// });
-			// futureList.add(future1);
-			// Future<List<Social>> future2 = completionService.submit(new
-			// Callable<List<Social>>() {
-			// @Override
-			// public List<Social> call() throws Exception {
-			// return removeClientDeletedSocial(execludeResult, list2);
-			// }
-			// });
-			// futureList.add(future2);
-			// Future<List<Social>> future3 = completionService.submit(new
-			// Callable<List<Social>>() {
-			// @Override
-			// public List<Social> call() throws Exception {
-			// return removeClientDeletedSocial(execludeResult, list3);
-			// }
-			// });
-			// futureList.add(future3);
-			// listResult.clear();
-			// for (Future<List<Social>> flist : futureList) {
-			// try {
-			// List<Social> tempList = flist.get();
-			// listResult.addAll(tempList);
-			// } catch (Exception e) {
-			// e.printStackTrace();
-			// }
-			// }
-			// return listResult;
 			return removeClientDeletedSocial(execludeResult, listResult);
 		} else {
 			return removeClientDeletedSocial(execludeResult, listResult);
-		}
+		}*/
 	}
 
 	/**
@@ -1626,8 +1597,8 @@ public class MeetingController extends BaseController {
 			int meetingCount = 0;
 			if (!Utils.isNullOrEmpty(listMeeting)) {
 				for (Social social : listMeeting) {
-					if (social.getNewCount() != null && social.getNewCount().intValue() > 0) {
-						meetingCount += social.getNewCount().intValue();
+					if (social.getNewCount() > 0) {
+						meetingCount += social.getNewCount();
 					}
 				}
 			}
@@ -1769,8 +1740,8 @@ public class MeetingController extends BaseController {
 				int meetingCount = 0;
 				if (!Utils.isNullOrEmpty(listMeeting)) {
 					for (Social social : listMeeting) {
-						if (social.getNewCount() != null && social.getNewCount().intValue() > 0) {
-							meetingCount += social.getNewCount().intValue();
+						if (social.getNewCount() > 0) {
+							meetingCount += social.getNewCount();
 						}
 					}
 				}
@@ -1797,8 +1768,8 @@ public class MeetingController extends BaseController {
 			for (Social social : listResult) {
 				// logger.info("retToClient ===>" +
 				// ReflectionToStringBuilder.toString(social));
-				if (!Utils.isNullOrEmpty(social.getNewCount()) && social.getNewCount().intValue() != 0) {
-					count += social.getNewCount().intValue();
+				if (social.getNewCount() > 0) {
+					count += social.getNewCount();
 				}
 			}
 
@@ -1872,8 +1843,8 @@ public class MeetingController extends BaseController {
 			});
 			int count = 0;
 			for (Social social : listResult) {
-				if (!Utils.isNullOrEmpty(social.getNewCount()) && social.getNewCount().intValue() != 0) {
-					count += social.getNewCount().intValue();
+				if (social.getNewCount() > 0) {
+					count += social.getNewCount();
 				}
 			}
 			responseDataMap.put("count", count);
@@ -2310,8 +2281,8 @@ public class MeetingController extends BaseController {
 	static int count(List<Social> listResult) {
 		int count = 0;
 		for (Social social : listResult) {
-			if (!Utils.isNullOrEmpty(social.getNewCount()) && social.getNewCount().intValue() != 0) {
-				count += social.getNewCount().intValue();
+			if (social.getNewCount() > 0) {
+				count += social.getNewCount();
 			}
 		}
 		return count;

@@ -90,7 +90,7 @@ import com.ginkgocap.ywxt.vo.query.meeting.MeetingTopicQuery;
 import com.ginkgocap.ywxt.vo.query.meeting.TopicChatQuery;
 import com.ginkgocap.ywxt.vo.query.meeting.UserBean;
 import com.ginkgocap.ywxt.vo.query.social.Social;
-import com.gintong.easemob.server.httpclient.api.EasemobChatGroupsHandler;
+//import com.gintong.easemob.server.httpclient.api.EasemobChatGroupsHandler;
 
 @Service
 @Transactional
@@ -613,7 +613,8 @@ public class MeetingServiceImpl extends BaseServiceImpl<Meeting, Long> implement
 		}
 		return GinTongInterface.createMUC(meetingId, meetingName, meetingDesc, roomsize, ownerId, memberIds);
 	}
-	
+
+	/*
 	private String createChatGroup(MeetingQuery entity, List<Long> memberIds, Long ownerId) {
 		com.fasterxml.jackson.databind.node.ObjectNode dataObjectNode = com.fasterxml.jackson.databind.node.JsonNodeFactory.instance.objectNode();
 		String meetingName = entity.getMeetingName();
@@ -632,7 +633,7 @@ public class MeetingServiceImpl extends BaseServiceImpl<Meeting, Long> implement
 		com.fasterxml.jackson.databind.node.ObjectNode creatChatGroupNode = EasemobChatGroupsHandler.creatChatGroups(dataObjectNode);
 		logger.info(" Meeting created result from huanxin server : " + creatChatGroupNode);
 		return creatChatGroupNode.get("data").get("groupid").asText();
-	}
+	}*/
 
 	private void insertNewsAndRelation(Meeting meeting, String homePage, User user, List<Long> listUserId) {
 		Map<String, Object> param = new HashMap<String, Object>();
@@ -2238,8 +2239,7 @@ public class MeetingServiceImpl extends BaseServiceImpl<Meeting, Long> implement
 				&& (source.getMucId() == null ? 0 : source.getMucId().intValue()) == (target.getMucId() == null ? 0 : target.getMucId().intValue())
 				&& (source.getMucMessageId() == null ? 0 : source.getMucMessageId().intValue()) == (target.getMucMessageId() == null ? 0 : target
 						.getMucMessageId().intValue())
-				&& (source.getNewCount() == null ? 0 : source.getNewCount().intValue()) == (target.getNewCount() == null ? 0 : target.getNewCount()
-						.intValue())
+				&& (source.getNewCount() == target.getNewCount())
 				&& (source.getMucCreateUserId() == null ? 0 : source.getMucCreateUserId().intValue()) == (target.getMucCreateUserId() == null
 						? 0
 						: target.getMucCreateUserId().intValue())

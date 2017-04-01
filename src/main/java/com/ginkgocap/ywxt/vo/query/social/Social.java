@@ -38,7 +38,7 @@ public class Social implements Serializable {
 	private String path;
 	
 	/**未读消息条数,默认为0*/
-	private Integer newCount = 0;
+	private int newCount = 0;
 	
 	/**
 	 * 最后@我的人的名称
@@ -145,10 +145,10 @@ public class Social implements Serializable {
 	public void setUserType(Integer userType) {
 		this.userType = userType;
 	}
-	public Integer getNewCount() {
+	public int getNewCount() {
 		return newCount;
 	}
-	public void setNewCount(Integer newCount) {
+	public void setNewCount(int newCount) {
 		this.newCount = newCount;
 	}
 }

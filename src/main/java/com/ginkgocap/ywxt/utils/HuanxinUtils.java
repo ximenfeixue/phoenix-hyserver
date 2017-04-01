@@ -8,10 +8,11 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.gintong.easemob.server.comm.Constants;
-import com.gintong.easemob.server.httpclient.api.EasemobChatGroupsHandler;
+//import com.gintong.easemob.server.httpclient.api.EasemobChatGroupsHandler;
 
 public final class HuanxinUtils {
-	
+
+	/*
 	static ResourceBundle resource =  ResourceBundle.getBundle("gintongService");
 	static String url = ""; 
 	static String interfaceName = ""; 
@@ -84,5 +85,5 @@ public final class HuanxinUtils {
 			EasemobChatGroupsHandler.deleteUserFromGroup(chatGroupId, String.valueOf(userId));
 		}
 	}
-
+	*/
 }

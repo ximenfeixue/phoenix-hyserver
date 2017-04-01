@@ -1054,8 +1054,7 @@ public class ImRecordmessageServiceImpl implements ImRecordmessageService {
 				&& (source.getMucId() == null ? 0 : source.getMucId().intValue()) == (target.getMucId() == null ? 0 : target.getMucId().intValue())
 				&& (source.getMucMessageId() == null ? 0 : source.getMucMessageId().intValue()) == (target.getMucMessageId() == null ? 0 : target
 						.getMucMessageId().intValue())
-				&& (source.getNewCount() == null ? 0 : source.getNewCount().intValue()) == (target.getNewCount() == null ? 0 : target.getNewCount()
-						.intValue())
+				&& (source.getNewCount() == target.getNewCount())
 				&& (source.getMucCreateUserId() == null ? 0 : source.getMucCreateUserId().intValue()) == (target.getMucCreateUserId() == null ? 0
 						: target.getMucCreateUserId().intValue())
 				&& (source.getType() == null ? 0 : source.getType().intValue()) == (target.getType() == null ? 0 : target.getType().intValue())
