@@ -1649,18 +1649,18 @@ public class MeetingController extends BaseController {
 			final long userId = user.getId();
 			socialListReq = socialListReq == null ? new SocialListReq() : socialListReq;
 			socialListReq.setUserId(user.getId());
-			List<Social> listResult = new ArrayList<Social>();
+			//List<Social> listResult = new ArrayList<Social>();
 			// 获取私聊和群聊列表
-			List<Social> chat = imRecordmessageService.getPrivateChatAndGroupChat(socialListReq); // 消息
-			if (CollectionUtils.isNotEmpty(chat)) {
-				this.setChatListToCache(chat, userId);
+			List<Social> listResult = imRecordmessageService.getPrivateChatAndGroupChat(socialListReq); // 消息
+			if (CollectionUtils.isNotEmpty(listResult)) {
+				this.setChatListToCache(listResult, userId);
 			} else {
-				chat = this.getChatListFromCache(userId);
+				listResult = this.getChatListFromCache(userId);
 			}
 
-			if (CollectionUtils.isNotEmpty(chat)) {
-				logger.info("chat-size:" + chat.size() + " userId: " + userId);
-				listResult.addAll(chat);
+			if (CollectionUtils.isNotEmpty(listResult)) {
+				logger.info("chat-size:" + listResult.size() + " userId: " + userId);
+				//listResult.addAll(chat);
 			}
 			/*
 			for (Social s : chat) {
@@ -1670,21 +1670,16 @@ public class MeetingController extends BaseController {
 			// 过滤客户端删除的畅聊
 			// 2016-03-10 tanmin getPrivateChatAndGroupChat直接获取畅聊提供的数据,无需再过滤
 			// logger.debug("singeAndGroupChat ====> " + listResult.size());
-			socialListFilter(listResult, user.getId());
+			List<Social> readedListResult = socialListFilter(listResult, user.getId());
+			List<Social> unReadlistResult = socialListFilterNew(listResult);
 			// logger.debug("singeAndGroupChat after filter====> " +
 			// listResult.size());
 
-			Collections.sort(listResult, new Comparator<Social>() {
-				public int compare(Social o1, Social o2) {
-					if (null == o1.getOrderTime()) {
-						return 1;
-					}
-					if (null == o2.getOrderTime()) {
-						return -1;
-					}
-					return o2.getOrderTime().compareTo(o1.getOrderTime());
-				}
-			});
+			Collections.sort(readedListResult, chatTimeOrder);
+			Collections.sort(unReadlistResult, chatTimeOrder);
+			listResult = unReadlistResult;
+			listResult.addAll(readedListResult);
+
 			// 获取最新的通知
 			MeetingNotice meetingNotice = meetingNoticeService.getNewNotice(user.getId());
 			if (!isNullOrEmpty(meetingNotice)) {
@@ -2874,4 +2869,16 @@ public class MeetingController extends BaseController {
 	private String chatListKey(long userId)	{
 		return "chat_list_" + userId + "_";
 	}
+
+	private static Comparator chatTimeOrder = new Comparator<Social>() {
+		public int compare(Social o1, Social o2) {
+			if (null == o1.getOrderTime()) {
+				return 1;
+			}
+			if (null == o2.getOrderTime()) {
+				return -1;
+			}
+			return o2.getOrderTime().compareTo(o1.getOrderTime());
+		}
+	};
 }
