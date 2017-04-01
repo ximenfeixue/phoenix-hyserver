@@ -984,7 +984,7 @@
 				<!-- phoenix-ui项目的发布地址，只要替换ip和端口即可 -->
 				<log4j.level>debug</log4j.level>
 				<!-- 日志存储路径，多个项目可以用同一个路径，在该路径下每个项目会自动创建以项目名称命名的子文件夹 -->
-				<log4j.path>d:/log</log4j.path>
+				<log4j.path>./logs</log4j.path>
 				<qatest.schema.skip>false</qatest.schema.skip>
 				<dubbo.application.name>phoenix-web</dubbo.application.name>
 				<dubbo.protocol.name>dubbo</dubbo.protocol.name>

@@ -12,10 +12,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
-import java.util.concurrent.Callable;
-import java.util.concurrent.CompletionService;
-import java.util.concurrent.ExecutorCompletionService;
-import java.util.concurrent.Future;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -28,7 +24,6 @@ import net.sf.json.util.JSONUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
-import org.eclipse.jetty.util.log.Log;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -1462,7 +1457,7 @@ public class MeetingController extends BaseController {
 	 * @param listResult
 	 * @param userId
 	 */
-	List<Social> socialListFilter(List<Social> listResult, Long userId) {
+    private List<Social> filterDeletedChatList(List<Social> listResult, Long userId) {
 		List<SocialStatus> execludeResult = socialStatusService.queryListWithoutMeetingByUserId(userId);
 		/*
 		for (SocialStatus ss : execludeResult) {
@@ -1472,16 +1467,17 @@ public class MeetingController extends BaseController {
 		return listFilter(listResult, execludeResult);
 	}
 
-	List<Social> socialListFilterNew(List<Social> listResult) {
+	private List<Social> getUnReadChatList(List<Social> listResult) {
 		List<Social> listResultNew = new ArrayList<Social>();
-		final int count = listResult.size();
-		for (int index = 0; index < count; index ++) {
-			Social social = listResult.get(index);
-			if (social.getNewCount() > 0) {
-				listResultNew.add(social);
-				listResult.remove(index);
-			}
-		}
+        if (CollectionUtils.isNotEmpty(listResult)) {
+            for (int index = 0; index < listResult.size(); index++) {
+                Social social = listResult.get(index);
+                if (social.getNewCount() > 0) {
+                    listResultNew.add(social);
+                    listResult.remove(index);
+                }
+            }
+        }
 		return listResultNew;
 	}
 
@@ -1649,36 +1645,37 @@ public class MeetingController extends BaseController {
 			final long userId = user.getId();
 			socialListReq = socialListReq == null ? new SocialListReq() : socialListReq;
 			socialListReq.setUserId(user.getId());
-			//List<Social> listResult = new ArrayList<Social>();
+			List<Social> listResult = new ArrayList<Social>();
 			// 获取私聊和群聊列表
-			List<Social> listResult = imRecordmessageService.getPrivateChatAndGroupChat(socialListReq); // 消息
-			if (CollectionUtils.isNotEmpty(listResult)) {
-				this.setChatListToCache(listResult, userId);
+			List<Social> chatListResult = imRecordmessageService.getPrivateChatAndGroupChat(socialListReq); // 消息
+			if (CollectionUtils.isNotEmpty(chatListResult)) {
+				this.setChatListToCache(chatListResult, userId);
 			} else {
-				listResult = this.getChatListFromCache(userId);
+                chatListResult = this.getChatListFromCache(userId);
 			}
 
-			if (CollectionUtils.isNotEmpty(listResult)) {
-				logger.info("chat-size:" + listResult.size() + " userId: " + userId);
-				//listResult.addAll(chat);
-			}
-			/*
-			for (Social s : chat) {
-				logger.info("SocialList ===>" + ReflectionToStringBuilder.toString(s));
-			}*/
+			if (CollectionUtils.isNotEmpty(chatListResult)) {
+                logger.info("total chat-size:" + chatListResult.size() + " userId: " + userId);
 
-			// 过滤客户端删除的畅聊
-			// 2016-03-10 tanmin getPrivateChatAndGroupChat直接获取畅聊提供的数据,无需再过滤
-			// logger.debug("singeAndGroupChat ====> " + listResult.size());
-			List<Social> readedListResult = socialListFilter(listResult, user.getId());
-			List<Social> unReadlistResult = socialListFilterNew(listResult);
-			// logger.debug("singeAndGroupChat after filter====> " +
-			// listResult.size());
+                filterDeletedChatList(chatListResult, user.getId());
+                logger.info("after filter, total chat-size:" + chatListResult.size() + " userId: " + userId);
 
-			Collections.sort(readedListResult, chatTimeOrder);
-			Collections.sort(unReadlistResult, chatTimeOrder);
-			listResult = unReadlistResult;
-			listResult.addAll(readedListResult);
+                List<Social> unReadlistResult = getUnReadChatList(chatListResult);
+
+                if (CollectionUtils.isNotEmpty(unReadlistResult)) {
+                    Collections.sort(unReadlistResult, chatTimeOrder);
+                    listResult = unReadlistResult;
+                }
+
+                if (CollectionUtils.isNotEmpty(chatListResult)) {
+                    Collections.sort(chatListResult, chatTimeOrder);
+                    if (CollectionUtils.isNotEmpty(listResult)) {
+                        listResult.addAll(chatListResult);
+                    } else {
+                        listResult = chatListResult;
+                    }
+                }
+            }
 
 			// 获取最新的通知
 			MeetingNotice meetingNotice = meetingNoticeService.getNewNotice(user.getId());
@@ -1823,7 +1820,7 @@ public class MeetingController extends BaseController {
 				listResult.addAll(chat);
 			}
 			// 过滤客户端删除的畅聊
-			socialListFilter(listResult, user.getId());
+			filterDeletedChatList(listResult, user.getId());
 
 			Collections.sort(listResult, new Comparator<Social>() {
 				public int compare(Social o1, Social o2) {
@@ -1897,7 +1894,7 @@ public class MeetingController extends BaseController {
 				listResult.addAll(chat);
 			}
 			// 过滤客户端删除的畅聊
-			socialListFilter(listResult, user.getId());
+			filterDeletedChatList(listResult, user.getId());
 
 			Collections.sort(listResult, new Comparator<Social>() {
 				public int compare(Social o1, Social o2) {
@@ -2381,7 +2378,7 @@ public class MeetingController extends BaseController {
 			List<Social> chat = imRecordmessageService.getPrivateChatAndGroupChat(socialListReq);// 消息
 			if (!isNullOrEmpty(chat)) {
 				// 过滤客户端删除的畅聊
-				socialListFilter(chat, user.getId());
+				filterDeletedChatList(chat, user.getId());
 				// 畅聊排序
 				Collections.sort(chat, new Comparator<Social>() {
 					public int compare(Social o1, Social o2) {
@@ -2415,8 +2412,8 @@ public class MeetingController extends BaseController {
 					}
 				}
 			}
-			System.out.println("排序完成时间：：：：：：" + Utils.DateFormat(sortDate));
-			System.out.println("排序完耗时：：：：：：" + (sortDate.getTime() - searchDate.getTime()) / (1000 * 60) + "分"
+			logger.info("排序完成时间：：：：：：" + Utils.DateFormat(sortDate));
+            logger.info("排序完耗时：：：：：：" + (sortDate.getTime() - searchDate.getTime()) / (1000 * 60) + "分"
 					+ ((sortDate.getTime() - searchDate.getTime()) % (1000 * 60)) / 1000 + "秒");
 			responseDataMap.put("listSocial", listResult);
 			notificationMap.put("notifCode", "0001");
