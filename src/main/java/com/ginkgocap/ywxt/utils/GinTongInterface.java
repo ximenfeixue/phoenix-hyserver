@@ -381,7 +381,9 @@ public class GinTongInterface {
 								}
 							}
 						}
-					}
+					} else {
+                        logger.error("image url lis is null.");
+                    }
 					socialDetail.setListImageUrl(listImageUrl);
 
 					socialDetail.setSenderID(getLong(node,"senderId",0L));
