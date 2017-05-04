@@ -2869,11 +2869,20 @@ public class MeetingController extends BaseController {
 
 	private static Comparator chatTimeOrder = new Comparator<Social>() {
 		public int compare(Social o1, Social o2) {
-			if (null == o1.getOrderTime()) {
-				return 1;
+            if (null == o1 && null == o2) {
+                return 0;
+            }
+
+			if (null == o1.getOrderTime() && null == o2.getOrderTime()) {
+				return 0;
 			}
-			if (null == o2.getOrderTime()) {
+
+			if (null == o1 ||null == o1.getOrderTime()) {
 				return -1;
+			}
+
+			if (o2 == null || null == o2.getOrderTime()) {
+				return 1;
 			}
 			return o2.getOrderTime().compareTo(o1.getOrderTime());
 		}
