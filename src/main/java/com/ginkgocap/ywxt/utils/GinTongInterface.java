@@ -369,8 +369,18 @@ public class GinTongInterface {
 					socail.setUserType(getInt(node, "userType", 0));
 					SocialDetail socialDetail = new SocialDetail();
 					List<String> listImageUrl = new ArrayList<String>();
-					for (JsonNode n : node.get("listImageUrl")) {
-						listImageUrl.add(n.asText());
+					JsonNode imgNodeList = node.get("listImageUrl");
+					if (imgNodeList != null) {
+						for (JsonNode imgNode : imgNodeList) {
+							if (imgNode != null) {
+								final String imgUrl = imgNode.asText();
+								if (imgUrl != null && imgUrl.trim().length() > 0) {
+									listImageUrl.add(imgUrl);
+								} else {
+									logger.error("image url is null, so skip add to list.");
+								}
+							}
+						}
 					}
 					socialDetail.setListImageUrl(listImageUrl);
 
