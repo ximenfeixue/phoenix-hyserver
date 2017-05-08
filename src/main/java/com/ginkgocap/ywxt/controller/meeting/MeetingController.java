@@ -2878,11 +2878,11 @@ public class MeetingController extends BaseController {
 			}
 
 			if (null == o1 ||null == o1.getOrderTime()) {
-				return -1;
+				return 1;
 			}
 
 			if (o2 == null || null == o2.getOrderTime()) {
-				return 1;
+				return -1;
 			}
 			return o2.getOrderTime().compareTo(o1.getOrderTime());
 		}
