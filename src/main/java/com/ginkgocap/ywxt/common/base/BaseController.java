@@ -5,6 +5,9 @@ import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import net.sf.json.JSONObject;
 
 import org.apache.commons.lang.StringUtils;
@@ -175,5 +178,51 @@ public abstract class BaseController {
 			return null;
 		}
 		return json;
+	}
+
+	public JsonNode ObjectToJsonNode(final String content) throws IOException {
+		if(StringUtils.isEmpty(content) || "null".equals(content)) {
+			return null;
+		}
+		try {
+			ObjectMapper objectMapper = new ObjectMapper();
+			objectMapper.configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true);
+			return objectMapper.readTree(content);
+		}
+		catch(Exception e) {
+			getLogger().warn("convert json exception: " + e.getMessage());
+			return null;
+		}
+	}
+
+	public String StringToString(final Object object) throws IOException {
+		if(object != null) {
+			return null;
+		}
+		try {
+			ObjectMapper objectMapper = new ObjectMapper();
+			objectMapper.configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true);
+			return objectMapper.writeValueAsString(object);
+		}
+		catch(Exception e) {
+			getLogger().warn("convert json exception: " + e.getMessage());
+			return null;
+		}
+	}
+
+
+	public <T> T StringToObject(java.lang.Class<T> aClass, final String content) throws IOException {
+		if(StringUtils.isEmpty(content) || "null".equals(content)) {
+			return null;
+		}
+		try {
+			ObjectMapper objectMapper = new ObjectMapper();
+			objectMapper.configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true);
+			return objectMapper.readValue(content, aClass);
+		}
+		catch(Exception e) {
+			getLogger().warn("convert json exception: " + e.getMessage());
+			return null;
+		}
 	}
 }

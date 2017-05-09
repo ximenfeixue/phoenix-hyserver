@@ -16,6 +16,9 @@ import java.util.ResourceBundle;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.ginkgocap.ywxt.utils.*;
+import com.gintong.ywxt.im.model.SocialStatus;
+import com.gintong.ywxt.im.service.SocialStatusService;
 import net.sf.ezmorph.object.DateMorpher;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -52,7 +55,6 @@ import com.ginkgocap.ywxt.model.meeting.MeetingTime;
 import com.ginkgocap.ywxt.model.meeting.MeetingTopic;
 import com.ginkgocap.ywxt.model.meeting.MeetingVo;
 import com.ginkgocap.ywxt.model.meeting.SocialListReq;
-import com.ginkgocap.ywxt.model.meeting.SocialStatus;
 import com.ginkgocap.ywxt.model.meeting.TopicChat;
 import com.ginkgocap.ywxt.service.meeting.ImRecordmessageService;
 import com.ginkgocap.ywxt.service.meeting.MeetingCountService;
@@ -62,16 +64,10 @@ import com.ginkgocap.ywxt.service.meeting.MeetingNoticeService;
 import com.ginkgocap.ywxt.service.meeting.MeetingPicService;
 import com.ginkgocap.ywxt.service.meeting.MeetingService;
 import com.ginkgocap.ywxt.service.meeting.MeetingTopicService;
-import com.ginkgocap.ywxt.service.meeting.SocialStatusService;
 import com.ginkgocap.ywxt.service.meeting.TopicChatService;
 import com.ginkgocap.ywxt.user.model.User;
 import com.ginkgocap.ywxt.user.service.UserService;
 import com.ginkgocap.ywxt.util.HttpClientHelper;
-import com.ginkgocap.ywxt.utils.GinTongInterface;
-import com.ginkgocap.ywxt.utils.MeetingDict;
-import com.ginkgocap.ywxt.utils.ResultBean;
-import com.ginkgocap.ywxt.utils.ThreadPoolUtils;
-import com.ginkgocap.ywxt.utils.Utils;
 import com.ginkgocap.ywxt.utils.type.SocialType;
 import com.ginkgocap.ywxt.vo.query.community.Community;
 import com.ginkgocap.ywxt.vo.query.meeting.BigDataQuery;
@@ -83,7 +79,6 @@ import com.ginkgocap.ywxt.vo.query.meeting.UserBean;
 import com.ginkgocap.ywxt.vo.query.social.CommunityNewCount;
 import com.ginkgocap.ywxt.vo.query.social.Social;
 import com.ginkgocap.ywxt.vo.query.social.SocialDetail;
-import com.gintong.easemob.server.comm.GsonUtils;
 import com.gintong.rocketmq.api.DefaultMessageService;
 import com.gintong.rocketmq.api.enums.TopicType;
 import com.gintong.rocketmq.api.model.RocketSendResult;
@@ -154,11 +149,11 @@ public class MeetingController extends BaseController {
 			logger.error("parse request parameters error", e);
 			return rebuildResponseResult(false, "0002", "请求参数错误");
 		}
-		SocialStatus message = com.ginkgocap.ywxt.utils.GsonUtils.StringToObject(SocialStatus.class, requestJson);
+		SocialStatus message = GsonUtils.StringToObject(SocialStatus.class, requestJson);
 		if (null == message) {
 			return rebuildResponseResult(false, "0002", "请求参数错误");
 		} else {
-			List<SocialStatus> list = socialStatusService.queryList(message);
+			List<SocialStatus> list = socialStatusService.query(message);
 			if (list == null || list.size() == 0) {
 				try {
 					socialStatusService.save(message);
@@ -1458,7 +1453,7 @@ public class MeetingController extends BaseController {
 	 * @param userId
 	 */
     private List<Social> filterDeletedChatList(List<Social> listResult, Long userId) {
-		List<SocialStatus> execludeResult = socialStatusService.queryListWithoutMeetingByUserId(userId);
+		List<SocialStatus> execludeResult = socialStatusService.queryWithoutMeetingByUserId(userId);
 		/*
 		for (SocialStatus ss : execludeResult) {
 			logger.debug("exclued ====> " + ReflectionToStringBuilder.toString(ss));
@@ -1491,7 +1486,7 @@ public class MeetingController extends BaseController {
 	 * @return
 	 */
 	List<Social> meetingListFilter(final List<Social> listResult, Long userId) {
-		List<SocialStatus> execludeResult = socialStatusService.queryMeetingListByUserId(userId);
+		List<SocialStatus> execludeResult = socialStatusService.queryMeetingByUserId(userId);
 		return listFilter(listResult, execludeResult);
 	}
 
@@ -1555,13 +1550,10 @@ public class MeetingController extends BaseController {
 	public int fetchNewCount(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		int totalNewCount = 0;
 		// 获取json参数串
-		String requestJson = "";
-		SocialListReq socialListReq = null;
-		try {
-			requestJson = getJsonParamStr(request);
-			socialListReq = GsonUtils.StringToObject(SocialListReq.class, requestJson);
-		} catch (IOException e) {
-			logger.error("请求参数错误requestJson=" + requestJson, e);
+		String requestJson = getJsonParamStr(request);
+		SocialListReq socialListReq = StringToObject(SocialListReq.class, requestJson);
+		if (socialListReq == null) {
+			logger.error("请求参数错误requestJson=" + requestJson);
 			return 0;
 		}
 
@@ -1629,7 +1621,7 @@ public class MeetingController extends BaseController {
 		SocialListReq socialListReq = null;
 		try {
 			requestJson = getJsonParamStr(request);
-			socialListReq = GsonUtils.StringToObject(SocialListReq.class, requestJson);
+			socialListReq = StringToObject(SocialListReq.class, requestJson);
 		} catch (IOException e) {// 兼容老版本
 			socialListReq = new SocialListReq();
 		}
@@ -1793,14 +1785,13 @@ public class MeetingController extends BaseController {
 		model.put("responseData", responseDataMap);
 		model.put("notification", notificationMap);
 		// 获取json参数串
-		String requestJson = "";
-		SocialListReq socialListReq = null;
-		try {
-			requestJson = getJsonParamStr(request);
-			socialListReq = GsonUtils.StringToObject(SocialListReq.class, requestJson);
-		} catch (IOException e) {// 兼容老版本
+		String requestJson = getJsonParamStr(request);
+		SocialListReq socialListReq = StringToObject(SocialListReq.class, requestJson);
+		if (socialListReq == null) {
+			logger.error("请求参数错误requestJson=" + requestJson);
 			socialListReq = new SocialListReq();
 		}
+
 		try {
 			User user = getUser(request);
 			socialListReq = socialListReq == null ? new SocialListReq() : socialListReq;
@@ -1871,7 +1862,7 @@ public class MeetingController extends BaseController {
 		SocialListReq socialListReq = null;
 		try {
 			requestJson = getJsonParamStr(request);
-			socialListReq = GsonUtils.StringToObject(SocialListReq.class, requestJson);
+			socialListReq = StringToObject(SocialListReq.class, requestJson);
 		} catch (IOException e) {// 兼容老版本
 			socialListReq = new SocialListReq();
 		}
@@ -2176,11 +2167,9 @@ public class MeetingController extends BaseController {
 		model.put("responseData", responseDataMap);
 		model.put("notification", notificationMap);
 
-		String requestJson = "";
-		SocialListReq socialListReq = null;
 		try {
-			requestJson = getJsonParamStr(request);
-			socialListReq = GsonUtils.StringToObject(SocialListReq.class, requestJson);
+			String requestJson = getJsonParamStr(request);
+			SocialListReq socialListReq = StringToObject(SocialListReq.class, requestJson);
 			// 获取当前登录用户
 			if (null == socialListReq || socialListReq.getUserId() < 1) {
 				responseDataMap.put("listSocial", null);

@@ -68,7 +68,6 @@ import com.ginkgocap.ywxt.user.service.UserService;
 import com.ginkgocap.ywxt.utils.DateUtil;
 import com.ginkgocap.ywxt.utils.EmojiUtil;
 import com.ginkgocap.ywxt.utils.GinTongInterface;
-import com.ginkgocap.ywxt.utils.HuanxinUtils;
 import com.ginkgocap.ywxt.utils.JsonToBean;
 import com.ginkgocap.ywxt.utils.MeetingDict;
 import com.ginkgocap.ywxt.utils.ThreadPoolUtils;
@@ -606,7 +605,7 @@ public class MeetingServiceImpl extends BaseServiceImpl<Meeting, Long> implement
 	protected String createFreeChatGroup(Long meetingId, MeetingQuery entity, List<Long> memberIds, Long ownerId) {
 		String meetingName = entity.getMeetingName();
 		String meetingDesc = StringUtils.isNullOrEmpty(entity.getMeetingDesc()) ? meetingName : entity.getMeetingDesc().trim();
-		int roomsize = com.gintong.easemob.server.comm.Constants.MAXUSERS_SIZE;
+		int roomsize = 1000;
 
 		if (memberIds == null) {
 			memberIds = Collections.emptyList();

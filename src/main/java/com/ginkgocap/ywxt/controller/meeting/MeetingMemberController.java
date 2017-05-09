@@ -24,9 +24,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ginkgocap.ywxt.common.base.BaseController;
 import com.ginkgocap.ywxt.model.meeting.ImRecordmessage;
 import com.ginkgocap.ywxt.model.meeting.Meeting;
@@ -55,7 +52,6 @@ import com.ginkgocap.ywxt.user.service.DynamicNewsService;
 import com.ginkgocap.ywxt.user.service.UserService;
 import com.ginkgocap.ywxt.utils.DateUtil;
 import com.ginkgocap.ywxt.utils.GinTongInterface;
-import com.ginkgocap.ywxt.utils.HuanxinUtils;
 import com.ginkgocap.ywxt.utils.ThreadPoolUtils;
 import com.ginkgocap.ywxt.utils.Utils;
 import com.ginkgocap.ywxt.utils.type.AttendMeetStatusType;
