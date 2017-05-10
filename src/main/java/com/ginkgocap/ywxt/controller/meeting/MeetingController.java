@@ -1770,6 +1770,175 @@ public class MeetingController extends BaseController {
 		return model;
 	}
 
+    /**
+     * socialList 最新的社交列表
+     *
+     * @return
+     * @throws IOException
+     */
+    @ResponseBody
+    @RequestMapping(value = "/socialListNew.json", method = RequestMethod.POST)
+    public Map<String, Object> socialListNew(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        Map<String, Object> model = new HashMap<String, Object>();
+        Map<String, Object> responseDataMap = new HashMap<String, Object>();
+        Map<String, Object> notificationMap = new HashMap<String, Object>();
+        model.put("responseData", responseDataMap);
+        model.put("notification", notificationMap);
+        // 获取json参数串
+        String requestJson = "";
+        SocialListReq socialListReq = null;
+        try {
+            requestJson = getJsonParamStr(request);
+            socialListReq = StringToObject(SocialListReq.class, requestJson);
+        } catch (IOException e) {// 兼容老版本
+            socialListReq = new SocialListReq();
+        }
+        try {
+            User user = getUser(request);
+            // 获取当前登录用户
+            if (null == user || user.getId() < 1) {
+                responseDataMap.put("listSocial", null);
+                notificationMap.put("notifCode", "0002");
+                notificationMap.put("notifInfo", "请先登录");
+                return model;
+            }
+            final long userId = user.getId();
+            socialListReq = socialListReq == null ? new SocialListReq() : socialListReq;
+            socialListReq.setUserId(user.getId());
+
+            // 获取私聊和群聊列表
+            Map<Integer,List<Social>> chatListMap = imRecordmessageService.getPrivateChatAndGroupChatMap(socialListReq); // 消息
+
+            List<Social> topchatListResult = chatListMap.get(1);
+            List<Social> unReadlistResult = chatListMap.get(2);
+
+            List<Social> listResult = null;
+            if (CollectionUtils.isNotEmpty(topchatListResult)) {
+                logger.info("total chat-size:" + topchatListResult.size() + " userId: " + userId);
+                listResult = topchatListResult;
+            }
+
+            if (CollectionUtils.isNotEmpty(unReadlistResult)) {
+                Collections.sort(unReadlistResult, chatTimeOrder);
+                if (CollectionUtils.isNotEmpty(listResult)) {
+                    listResult.addAll(unReadlistResult);
+                } else {
+                    listResult = unReadlistResult;
+                }
+            }
+
+            List<Social> restlistResult = chatListMap.get(3);
+            if (CollectionUtils.isNotEmpty(restlistResult)) {
+                Collections.sort(restlistResult, chatTimeOrder);
+                if (CollectionUtils.isNotEmpty(listResult)) {
+                    listResult.addAll(unReadlistResult);
+                } else {
+                    listResult = restlistResult;
+                }
+            }
+
+
+            // 获取最新的通知
+            MeetingNotice meetingNotice = meetingNoticeService.getNewNotice(user.getId());
+            if (!isNullOrEmpty(meetingNotice)) {
+                Integer noticeCount = meetingNoticeService.getUnReadNoticeCount(user.getId());
+                if (Utils.isNullOrEmpty(noticeCount)) {
+                    noticeCount = 0;
+                }
+                // 封装通知
+                Social socialNotice = new Social();
+                socialNotice.setId(meetingNotice.getId());
+                socialNotice.setTitle("通知");
+                socialNotice.setType(SocialType.NOTICE.code());
+                SocialDetail socialDetail = new SocialDetail();
+                socialDetail.setContent(meetingNotice.getNoticeContent());
+                socialNotice.setTime(meetingNotice.getUpdateTime());
+                socialNotice.setOrderTime(meetingNotice.getUpdateTime());
+                socialNotice.setSocialDetail(socialDetail);
+                socialNotice.setNewCount(noticeCount);
+                listResult.add(0, socialNotice);
+            }
+            // 获取邀请函
+            Social invitation = meetingService.getLatestInvitation(user.getId());
+            if (null != invitation) {
+                SocialDetail socialDetail = invitation.getSocialDetail();
+                if (isNullOrEmpty(socialDetail)) {
+                    socialDetail = new SocialDetail();
+                }
+                String content = invitation.getCompereName() + "邀请您参加";
+                socialDetail.setContent(content);
+                String path = invitation.getPath();// 指的是会议的封面图片
+                if (!isNullOrEmpty(path)) {// 数据库里面的路径就是带ip和端口的
+                    List<String> listImage = new ArrayList<String>();
+                    listImage.add(path);
+                    socialDetail.setListImageUrl(listImage);
+                }
+                invitation.setSocialDetail(socialDetail);
+                listResult.add(0, invitation);
+            }
+
+            Social meetingSocial = new Social();
+            // meetingSocial.setNewCount(imRecordmessageService.getAllMeetingNewCount(user.getId()));
+            meetingSocial.setId(-1L);
+            List<Social> listMeeting = getMeetingList(user.getId());
+            String title = "会议暂无消息";
+            meetingSocial.setTitle(title);
+            if (!Utils.isNullOrEmpty(listMeeting)) {
+                Social meeting = listMeeting.get(0);
+                meetingSocial.setTitle(meeting.getTitle());// 标题
+                meetingSocial.setCompereName(getCompereName(userService, meeting.getCompereId()));// 发起人
+                meetingSocial.setTime(meeting.getOrderTime());// 右侧时间
+                meetingSocial.setType(meeting.getType());// 会议状态:3-进行中的会议，4-未开始的会议
+                // 5-已结束的会议
+                int meetingCount = 0;
+                if (!Utils.isNullOrEmpty(listMeeting)) {
+                    for (Social social : listMeeting) {
+                        if (social.getNewCount() > 0) {
+                            meetingCount += social.getNewCount();
+                        }
+                    }
+                }
+                meetingSocial.setNewCount(meetingCount);
+            }
+            listResult.add(0, meetingSocial);
+            // String requestJson = getJsonParamStr(request);
+            // if(!Utils.isNullOrEmpty(requestJson)) {
+            // JSONObject j = JSONObject.fromObject(requestJson);
+            String withNewRelation = socialListReq.getWithNewRelation();
+            if (!Utils.isNullOrEmpty(withNewRelation) && withNewRelation.equals("true")) {
+                int relationCount = GinTongInterface.getNewConnectionsCount("" + user.getId());
+                Social socialRelation = new Social();
+                socialRelation.setId(-2L);
+                socialRelation.setTitle("新的关系");
+                socialRelation.setType(SocialType.RELATION.code());
+                SocialDetail socialDetail = new SocialDetail();
+                socialRelation.setSocialDetail(socialDetail);
+                socialRelation.setNewCount(relationCount);
+                listResult.add(0, socialRelation);
+            }
+            // }
+            int count = 0;
+            for (Social social : listResult) {
+                // logger.info("retToClient ===>" +
+                // ReflectionToStringBuilder.toString(social));
+                if (social.getNewCount() > 0) {
+                    count += social.getNewCount();
+                }
+            }
+
+            responseDataMap.put("count", count);
+            responseDataMap.put("listSocial", listResult);
+            notificationMap.put("notifCode", "0001");
+            notificationMap.put("notifInfo", "hello App");
+        } catch (Exception e) {
+            logger.error("", e);
+            responseDataMap.put("listSocial", null);
+            notificationMap.put("notifCode", "0002");
+            notificationMap.put("notifInfo", e.getMessage());
+        }
+        return model;
+    }
+
 	/**
 	 * 获取社群的社交列表-一般用在“消息”-“社群消息”中
 	 *
