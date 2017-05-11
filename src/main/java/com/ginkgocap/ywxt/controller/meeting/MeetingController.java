@@ -1796,7 +1796,7 @@ public class MeetingController extends BaseController {
         try {
             User user = getUser(request);
             // 获取当前登录用户
-            if (null == user || user.getId() < 1) {
+            if (null == user || user.getId() <= 0) {
                 responseDataMap.put("listSocial", null);
                 notificationMap.put("notifCode", "0002");
                 notificationMap.put("notifInfo", "请先登录");
@@ -1805,38 +1805,39 @@ public class MeetingController extends BaseController {
             final long userId = user.getId();
             socialListReq = socialListReq == null ? new SocialListReq() : socialListReq;
             socialListReq.setUserId(user.getId());
+            List<Social> listResult = new ArrayList<Social>();
 
             // 获取私聊和群聊列表
             Map<Integer,List<Social>> chatListMap = imRecordmessageService.getPrivateChatAndGroupChatMap(socialListReq); // 消息
+            if (chatListMap != null) {
 
-            List<Social> topchatListResult = chatListMap.get(1);
-            List<Social> unReadlistResult = chatListMap.get(2);
+                List<Social> topchatListResult = chatListMap.get(1);
+                List<Social> unReadlistResult = chatListMap.get(2);
 
-            List<Social> listResult = null;
-            if (CollectionUtils.isNotEmpty(topchatListResult)) {
-                logger.info("total chat-size:" + topchatListResult.size() + " userId: " + userId);
-                listResult = topchatListResult;
-            }
+                if (CollectionUtils.isNotEmpty(topchatListResult)) {
+                    logger.info("total chat-size:" + topchatListResult.size() + " userId: " + userId);
+                    listResult = topchatListResult;
+                }
 
-            if (CollectionUtils.isNotEmpty(unReadlistResult)) {
-                Collections.sort(unReadlistResult, chatTimeOrder);
-                if (CollectionUtils.isNotEmpty(listResult)) {
-                    listResult.addAll(unReadlistResult);
-                } else {
-                    listResult = unReadlistResult;
+                if (CollectionUtils.isNotEmpty(unReadlistResult)) {
+                    Collections.sort(unReadlistResult, chatTimeOrder);
+                    if (CollectionUtils.isNotEmpty(listResult)) {
+                        listResult.addAll(unReadlistResult);
+                    } else {
+                        listResult = unReadlistResult;
+                    }
+                }
+
+                List<Social> restlistResult = chatListMap.get(3);
+                if (CollectionUtils.isNotEmpty(restlistResult)) {
+                    Collections.sort(restlistResult, chatTimeOrder);
+                    if (CollectionUtils.isNotEmpty(listResult)) {
+                        listResult.addAll(unReadlistResult);
+                    } else {
+                        listResult = restlistResult;
+                    }
                 }
             }
-
-            List<Social> restlistResult = chatListMap.get(3);
-            if (CollectionUtils.isNotEmpty(restlistResult)) {
-                Collections.sort(restlistResult, chatTimeOrder);
-                if (CollectionUtils.isNotEmpty(listResult)) {
-                    listResult.addAll(unReadlistResult);
-                } else {
-                    listResult = restlistResult;
-                }
-            }
-
 
             // 获取最新的通知
             MeetingNotice meetingNotice = meetingNoticeService.getNewNotice(user.getId());

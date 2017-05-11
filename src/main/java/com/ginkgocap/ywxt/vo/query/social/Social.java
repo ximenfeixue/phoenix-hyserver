@@ -53,6 +53,8 @@ public class Social implements Serializable {
 	private Integer userType;//1个人好友 2组织好友
 	
 	private String groupId;
+
+	private short top = 0;
 	
 	public String getGroupId() {
 		return groupId;
@@ -150,5 +152,13 @@ public class Social implements Serializable {
 	}
 	public void setNewCount(int newCount) {
 		this.newCount = newCount;
+	}
+
+	public short getTop() {
+		return top;
+	}
+
+	public void setTop(short top) {
+		this.top = top;
 	}
 }

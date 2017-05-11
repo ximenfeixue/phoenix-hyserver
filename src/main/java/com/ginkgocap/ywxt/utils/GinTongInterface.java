@@ -423,7 +423,7 @@ public class GinTongInterface {
 						if (listIMRecordNode != null) {
 							List<Social> listSocial = new ArrayList<Social>(listIMRecordNode.size());
 							for (JsonNode node : listIMRecordNode) {
-								Social socail = convertNodeToSocial(node);
+								Social socail = convertNodeToSocial(node, (short)(index ==1 ? 1 : 0));
 								listSocial.add(socail);
 							}
 							map.put(index, listSocial);
@@ -438,12 +438,13 @@ public class GinTongInterface {
 		return null;
 	}
 
-	private static Social convertNodeToSocial(JsonNode node) {
+	private static Social convertNodeToSocial(JsonNode node, final short top) {
 		if (node == null) {
 			logger.error("node is null, so skip.");
 			return null;
 		}
 		Social socail = new Social();
+		socail.setTop(top);
 		socail.setId(getLong(node,"id",0L));
 		socail.setNewCount(getInt(node,"newCount",0));
 		socail.setTime(DateConvertUtils.parse(getString(node, "startTime", "")));
