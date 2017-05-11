@@ -1812,15 +1812,15 @@ public class MeetingController extends BaseController {
             if (chatListMap != null) {
 
                 List<Social> topchatListResult = chatListMap.get(1);
-                List<Social> unReadlistResult = chatListMap.get(2);
-
                 if (CollectionUtils.isNotEmpty(topchatListResult)) {
-                    logger.info("total chat-size:" + topchatListResult.size() + " userId: " + userId);
+                    logger.info("top chat-size:" + topchatListResult.size() + " userId: " + userId);
                     listResult = topchatListResult;
                 }
 
+                List<Social> unReadlistResult = chatListMap.get(2);
                 if (CollectionUtils.isNotEmpty(unReadlistResult)) {
                     Collections.sort(unReadlistResult, chatTimeOrder);
+                    logger.info("unread chat-size:" + unReadlistResult.size() + " userId: " + userId);
                     if (CollectionUtils.isNotEmpty(listResult)) {
                         listResult.addAll(unReadlistResult);
                     } else {
@@ -1830,9 +1830,10 @@ public class MeetingController extends BaseController {
 
                 List<Social> restlistResult = chatListMap.get(3);
                 if (CollectionUtils.isNotEmpty(restlistResult)) {
+                    logger.info("rest chat-size:" + restlistResult.size() + " userId: " + userId);
                     Collections.sort(restlistResult, chatTimeOrder);
                     if (CollectionUtils.isNotEmpty(listResult)) {
-                        listResult.addAll(unReadlistResult);
+                        listResult.addAll(restlistResult);
                     } else {
                         listResult = restlistResult;
                     }
