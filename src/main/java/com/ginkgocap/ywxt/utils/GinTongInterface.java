@@ -445,7 +445,7 @@ public class GinTongInterface {
 		}
 		Social socail = new Social();
 		socail.setTop(top);
-		socail.setId(getLong(node,"id",0L));
+		socail.setId(getLong(node,"mucId",0L));
 		socail.setNewCount(getInt(node,"newCount",0));
 		socail.setTime(DateConvertUtils.parse(getString(node, "startTime", "")));
 		socail.setOrderTime(DateConvertUtils.parse(getString(node, "startTime", "")));
