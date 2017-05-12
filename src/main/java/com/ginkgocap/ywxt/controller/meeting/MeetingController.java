@@ -1804,7 +1804,7 @@ public class MeetingController extends BaseController {
             }
             final long userId = user.getId();
             socialListReq = socialListReq == null ? new SocialListReq() : socialListReq;
-            socialListReq.setUserId(user.getId());
+            socialListReq.setUserId(userId);
             List<Social> listResult = new ArrayList<Social>();
 
             // 获取私聊和群聊列表
@@ -1839,6 +1839,7 @@ public class MeetingController extends BaseController {
                     }
                 }
             }
+            filterDeletedChatList(listResult, user.getId());
 
             // 获取最新的通知
             MeetingNotice meetingNotice = meetingNoticeService.getNewNotice(user.getId());
