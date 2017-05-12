@@ -99,6 +99,9 @@ import com.google.gson.GsonBuilder;
 @Controller
 @RequestMapping("/meeting")
 public class MeetingController extends BaseController {
+	private final Logger logger = LoggerFactory.getLogger(MeetingController.class);
+	private static final String CLASS_NAME = MeetingController.class.getName();
+
 	private static ResourceBundle resource = ResourceBundle.getBundle("gintongService");
 	private static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	@Autowired
@@ -132,9 +135,6 @@ public class MeetingController extends BaseController {
 	@Autowired
 	private Cache cache;
 	private static int  expiredTime = 60 * 60 * 24 * 7;
-
-	private final Logger logger = LoggerFactory.getLogger(MeetingController.class);
-	private static final String CLASS_NAME = MeetingController.class.getName();
 
 	/*
 	 * 在社交列表中移除单聊、群聊、会议

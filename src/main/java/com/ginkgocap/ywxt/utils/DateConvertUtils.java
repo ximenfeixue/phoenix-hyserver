@@ -6,13 +6,17 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * @author qingc email:qingc(a)gintong.com
  * @version 1.0
  * @since 1.0
  */
 public class DateConvertUtils {
-	
+	private final static Logger logger = LoggerFactory.getLogger(DateConvertUtils.class);
+
 	public static java.util.Date parse(String dateString,String dateFormat) {
 		return parse(dateString, dateFormat,java.util.Date.class);
 	}
@@ -39,8 +43,9 @@ public class DateConvertUtils {
 	 * @return
 	 */
 	public static String format(java.util.Date date,String dateFormat) {
-		 if(date == null)
+		 if(date == null) {
 			 return null;
+		 }
 		 return new SimpleDateFormat(dateFormat).format(date);
 	}
 	/**
@@ -64,8 +69,8 @@ public class DateConvertUtils {
 		}
 		 try {
 			return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(dateStr);
-		} catch (Exception e) {
-			e.printStackTrace();
+		} catch (ParseException e) {
+			 logger.error("Parse date failed. dateStr: " + dateStr + " error: " + e.getMessage());
 		}
 		 return null;
 	}
