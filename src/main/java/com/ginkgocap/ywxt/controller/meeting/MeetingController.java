@@ -3037,12 +3037,12 @@ public class MeetingController extends BaseController {
 	}
 
     private void setChatMapListToCache(final Map<Integer,List<Social>> chatListMap,final long userId) {
-        logger.info("set chat list to cached. userId: " + userId);
+        logger.info("set chat map list to cached. userId: " + userId);
         cache.setByRedis(chatMapListKey(userId), chatListMap, expiredTime);
     }
 
     private Map<Integer,List<Social>> getChatMapListFromCache(final long userId) {
-        logger.info("get chat list from cached. userId: " + userId);
+        logger.info("get chat map list from cached. userId: " + userId);
         return (Map<Integer,List<Social>>)cache.getByRedis(chatMapListKey(userId));
     }
 
