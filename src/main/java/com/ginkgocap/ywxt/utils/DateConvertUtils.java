@@ -59,7 +59,7 @@ public class DateConvertUtils {
 	 * @throws ParseException
 	 */
 	public static Date parse(String dateStr)  {
-		if(Utils.isNullOrEmpty(dateStr)){
+		if(Utils.isNullOrEmpty(dateStr) || "null".equals(dateStr)){
 			return null;
 		}
 		 try {

@@ -25,6 +25,7 @@ import net.sf.json.JSONObject;
 import net.sf.json.util.JSONUtils;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 import org.slf4j.Logger;
@@ -1809,8 +1810,12 @@ public class MeetingController extends BaseController {
 
             // 获取私聊和群聊列表
             Map<Integer,List<Social>> chatListMap = imRecordmessageService.getPrivateChatAndGroupChatMap(socialListReq); // 消息
+            if (MapUtils.isNotEmpty(chatListMap)) {
+                this.setChatMapListToCache(chatListMap, userId);
+            } else {
+                chatListMap = this.getChatMapListFromCache(userId);
+            }
             if (chatListMap != null) {
-
                 List<Social> topchatListResult = chatListMap.get(1);
                 if (CollectionUtils.isNotEmpty(topchatListResult)) {
                     logger.info("top chat-size:" + topchatListResult.size() + " userId: " + userId);
@@ -2542,6 +2547,8 @@ public class MeetingController extends BaseController {
 				// 过滤客户端删除的畅聊
 				filterDeletedChatList(chat, user.getId());
 				// 畅聊排序
+				Collections.sort(chat, chatTimeOrder);
+				/*
 				Collections.sort(chat, new Comparator<Social>() {
 					public int compare(Social o1, Social o2) {
 						if (null == o1.getOrderTime()) {
@@ -2552,7 +2559,7 @@ public class MeetingController extends BaseController {
 						}
 						return o2.getOrderTime().compareTo(o1.getOrderTime());
 					}
-				});
+				});*/
 				// 封装私聊和群聊
 				listResult.addAll(chat);
 			}
@@ -3028,6 +3035,20 @@ public class MeetingController extends BaseController {
 	private String chatListKey(long userId)	{
 		return "chat_list_" + userId + "_";
 	}
+
+    private void setChatMapListToCache(final Map<Integer,List<Social>> chatListMap,final long userId) {
+        logger.info("set chat list to cached. userId: " + userId);
+        cache.setByRedis(chatMapListKey(userId), chatListMap, expiredTime);
+    }
+
+    private Map<Integer,List<Social>> getChatMapListFromCache(final long userId) {
+        logger.info("get chat list from cached. userId: " + userId);
+        return (Map<Integer,List<Social>>)cache.getByRedis(chatMapListKey(userId));
+    }
+
+    private String chatMapListKey(long userId)	{
+        return "chat_map_list_" + userId + "_";
+    }
 
 	private static Comparator chatTimeOrder = new Comparator<Social>() {
 		public int compare(Social o1, Social o2) {
