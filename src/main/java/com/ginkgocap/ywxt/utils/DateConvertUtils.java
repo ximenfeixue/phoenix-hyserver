@@ -59,12 +59,12 @@ public class DateConvertUtils {
 	 * @throws ParseException
 	 */
 	public static Date parse(String dateStr)  {
-		if(Utils.isNullOrEmpty(dateStr) || "null".equals(dateStr)){
+		if(Utils.isNullOrEmpty(dateStr)){
 			return null;
 		}
 		 try {
 			return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(dateStr);
-		} catch (ParseException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		 return null;
