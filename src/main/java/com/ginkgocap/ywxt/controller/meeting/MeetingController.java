@@ -1814,6 +1814,7 @@ public class MeetingController extends BaseController {
                 List<Social> topchatListResult = chatListMap.get(1);
                 if (CollectionUtils.isNotEmpty(topchatListResult)) {
                     logger.info("top chat-size:" + topchatListResult.size() + " userId: " + userId);
+                    Collections.sort(topchatListResult, chatTimeOrder);
                     listResult = topchatListResult;
                 }
 
