@@ -1641,15 +1641,9 @@ public class MeetingController extends BaseController {
 			List<Social> listResult = new ArrayList<Social>();
 			// 获取私聊和群聊列表
 			List<Social> chatListResult = imRecordmessageService.getPrivateChatAndGroupChat(socialListReq); // 消息
-			if (CollectionUtils.isNotEmpty(chatListResult)) {
-				this.setChatListToCache(chatListResult, userId);
-			} else {
-                chatListResult = this.getChatListFromCache(userId);
-			}
 
 			if (CollectionUtils.isNotEmpty(chatListResult)) {
                 logger.info("total chat-size:" + chatListResult.size() + " userId: " + userId);
-
                 filterDeletedChatList(chatListResult, user.getId());
                 logger.info("after filter, total chat-size:" + chatListResult.size() + " userId: " + userId);
 
@@ -1668,6 +1662,11 @@ public class MeetingController extends BaseController {
                         listResult = chatListResult;
                     }
                 }
+            }
+            if (CollectionUtils.isNotEmpty(listResult)) {
+                this.setChatListToCache(listResult, userId);
+            } else {
+                listResult = this.getChatListFromCache(userId);
             }
 
 			// 获取最新的通知
@@ -1811,18 +1810,13 @@ public class MeetingController extends BaseController {
             // 获取私聊和群聊列表
             Map<Integer,List<Social>> chatListMap = imRecordmessageService.getPrivateChatAndGroupChatMap(socialListReq); // 消息
             if (MapUtils.isNotEmpty(chatListMap)) {
-                this.setChatMapListToCache(chatListMap, userId);
-            } else {
-                chatListMap = this.getChatMapListFromCache(userId);
-            }
-            if (chatListMap != null) {
                 List<Social> topchatListResult = chatListMap.get(1);
                 if (CollectionUtils.isNotEmpty(topchatListResult)) {
                     logger.info("top chat-size:" + topchatListResult.size() + " userId: " + userId);
                     Collections.sort(topchatListResult, chatTimeOrder);
                     listResult = topchatListResult;
                 }
-
+                /*
                 List<Social> unReadlistResult = chatListMap.get(2);
                 if (CollectionUtils.isNotEmpty(unReadlistResult)) {
                     Collections.sort(unReadlistResult, chatTimeOrder);
@@ -1832,9 +1826,9 @@ public class MeetingController extends BaseController {
                     } else {
                         listResult = unReadlistResult;
                     }
-                }
+                }*/
 
-                List<Social> restlistResult = chatListMap.get(3);
+                List<Social> restlistResult = chatListMap.get(2);
                 if (CollectionUtils.isNotEmpty(restlistResult)) {
                     logger.info("rest chat-size:" + restlistResult.size() + " userId: " + userId);
                     Collections.sort(restlistResult, chatTimeOrder);
@@ -1845,6 +1839,13 @@ public class MeetingController extends BaseController {
                     }
                 }
             }
+
+            if (CollectionUtils.isNotEmpty(listResult)) {
+                this.setChatListToCache(listResult, userId);
+            } else {
+                listResult = this.getChatListFromCache(userId);
+            }
+
             filterDeletedChatList(listResult, user.getId());
 
             // 获取最新的通知
