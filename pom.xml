@@ -938,7 +938,7 @@
 			</activation>
 			<build>
 				<filters>
-					<filter>sa-testOnline.properties</filter>
+					<filter>sa-fz.properties</filter>
 				</filters>
 			</build>
 		</profile>
