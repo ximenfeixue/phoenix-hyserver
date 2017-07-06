@@ -417,8 +417,8 @@ public class GinTongInterface {
 			if ("0".equals(jsonNode.get("notification").get("notifCode").asText())) {
 				JsonNode mapNode = jsonNode.get("responseData");
 				if (mapNode != null) {
-					Map<Integer, List<Social>> map = new HashMap<Integer, List<Social>>(3);
-					for (int index = 1; index <= 3; index++) {
+					Map<Integer, List<Social>> map = new HashMap<Integer, List<Social>>(2);
+					for (int index = 1; index <= 2; index++) {
 						JsonNode listIMRecordNode = mapNode.get(String.valueOf(index));
 						if (listIMRecordNode != null) {
 							List<Social> listSocial = new ArrayList<Social>(listIMRecordNode.size());
