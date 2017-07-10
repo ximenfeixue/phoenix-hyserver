@@ -24,13 +24,10 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<eclipse.useProjectReferences>false</eclipse.useProjectReferences>
 		<skip_maven_deploy>false</skip_maven_deploy>
-		
+        <fastxml.version>2.3.2</fastxml.version>
 		<person.version>1.0.0</person.version>
 		<entire.dependencied>5.6.3</entire.dependencied>
-		<!-- 测试版本 -->
-		<huanxin.version>1.1.1-SNAPSHOT</huanxin.version>
-		<!-- 线上版本 -->
-		<!-- <huanxin.version>1.1.1</huanxin.version> -->
+		<im.version>2.0-SNAPSHOT</im.version>
 	</properties>
 
     <repositories>
@@ -95,6 +92,11 @@
 			<groupId>com.ginkgocap.ywxt</groupId>
 			<artifactId>phoenix-entire-api</artifactId>
 			<version>${entire.dependencied}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.gintong.ywxt</groupId>
+			<artifactId>phoenix-im-api</artifactId>
+			<version>${im.version}</version>
 		</dependency>
 		<!-- security begin -->
 		<dependency>
@@ -250,6 +252,11 @@
 			<artifactId>fastjson</artifactId>
 			<version>1.1.30</version>
 		</dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>${fastxml.version}</version>
+        </dependency>
 		<!-- mybatis end -->
 
 
@@ -569,11 +576,6 @@
 			</exclusions>
 		</dependency>
 
-		<dependency>
-			<groupId>com.ginkgocap.ywxt</groupId>
-			<artifactId>phoenix-huanxin</artifactId>
-			<version>${huanxin.version}</version>
-		</dependency>
 	</dependencies>
 	<build>
 		<finalName>phoenix-hyserver</finalName>
@@ -758,26 +760,6 @@
 				</configuration>
 			</plugin>
 
-			<!-- jetty插件,设定重载模式 <plugin> <groupId>org.mortbay.jetty</groupId> <artifactId>jetty-maven-plugin</artifactId> 
-				<version>${jetty.version}</version> <configuration> <reload>manual</reload> 
-				</configuration> </plugin> -->
-
-			<!-- dependency插件 -->
-			<!-- <plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-dependency-plugin</artifactId>
-				<version>2.2.1</version>
-				<executions>
-					<execution>
-						<id>install</id>
-						<phase>install</phase>
-						<goals>
-							<goal>sources</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin> -->
-
 			<!-- assembly插件 -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -939,158 +921,6 @@
 			</properties>
 		</profile>
 		<profile>
-			<id>person</id>
-			<activation>
-				<activeByDefault>false</activeByDefault>
-			</activation>
-			<properties>
-				<!-- 数据库连接地址和数据库名 -->
-				<jdbc.url>
-					jdbc:mysql://192.168.120.234:3306/im?createDatabaseIfNotExist=true&amp;amp;useUnicode=true&amp;amp;characterEncoding=utf8
-				</jdbc.url>
-				<!-- 数据库访问帐号 -->
-				<jdbc.username>root</jdbc.username>
-				<jdbc.password>111111</jdbc.password>
-				<!-- phoenix-ui项目的发布地址，只要替换ip和端口即可 -->
-				<!-- nfs地址 -->
-				<user.cache.expiredTime>86400</user.cache.expiredTime>
-				<user.cache.validationInterval>1800000</user.cache.validationInterval>
-				<user.session.timeout>28800000</user.session.timeout>
-				<!-- 网站发送邮件用的smtp以及帐号密码，一般不用修改 -->
-				<email.SMTP>smtp.263xmail.com</email.SMTP>
-				<!-- 帐号 -->
-				<email.userName>yinxing5@ginkgocap.cn</email.userName>
-				<!-- 密码 -->
-				<email.pwd>sun1307737</email.pwd>
-				<email.port>25</email.port>
-				<!-- 是否使用ssl连接 -->
-				<email.SSL>0</email.SSL>
-				<!-- smtp是否需要登录 -->
-				<email.auth>1</email.auth>
-				<!-- memcache地址 -->
-				<user.cache.address>192.168.101.131:11211</user.cache.address>
-				<!-- redis地址 -->
-				<redis.host>192.168.120.234</redis.host>
-				<!-- redis端口 -->
-				<redis.port>6379</redis.port>
-				<!-- mongo地址 -->
-				<mongodb.address>192.168.120.234:27017</mongodb.address>
-				<!-- mongo中数据库 -->
-				<mongodb.database>ywxt</mongodb.database>
-				<!-- 数据库连接地址和数据库名 -->
-				<!-- 数据库访问帐号 -->
-				<!-- 文件上传存储路径，与phoenix-web项目中配置的upload.path应该相同 -->
-				<upload.path>e:/tmp/upload</upload.path>
-				<!-- phoenix-ui项目的发布地址，只要替换ip和端口即可 -->
-				<log4j.level>debug</log4j.level>
-				<!-- 日志存储路径，多个项目可以用同一个路径，在该路径下每个项目会自动创建以项目名称命名的子文件夹 -->
-				<log4j.path>d:/log</log4j.path>
-				<qatest.schema.skip>false</qatest.schema.skip>
-				<dubbo.application.name>phoenix-web</dubbo.application.name>
-				<dubbo.protocol.name>dubbo</dubbo.protocol.name>
-				<dubbo.registry.address>zookeeper://192.168.120.234:2181?client=zkclient</dubbo.registry.address>
-
-				<nfs.home>/webserver/upload/</nfs.home>
-				<!-- nginx上传的地址 -->
-				<nginx.root>http://192.168.101.22/</nginx.root>
-				<!-- nfs的mount目录 -->
-				<upload.path>/webserver/upload/meeting/</upload.path>
-
-				<!-- 知识系统的地址 -->
-				<knowledge.host>http://knowledge.dev.gintong.com:8890</knowledge.host>
-				<!-- web项目地址 -->
-				<gintongweb.host>http://dev.gintong.com:2222</gintongweb.host>
-				<!-- 云项目地址 -->
-				<cloud.host>http://cloud.server.gintong.com:2222/</cloud.host>
-				<!-- jtMobileApp项目地址 -->
-				<gintongservice.url>http://192.168.101.41:4445/</gintongservice.url>
-				<!-- 本地项目地址 -->
-				<!-- <gintongIm.url>http://192.168.150.79:3333/ImServer/</gintongIm.url> -->
-				<gintongIm.url>http://192.168.120.99:5555/</gintongIm.url>
-				<bigData.url>http://192.168.130.221:8090/</bigData.url>
-			</properties>
-		</profile>
-		<profile>
-			<id>qa</id>
-			<activation>
-				<activeByDefault>true</activeByDefault>
-			</activation>
-			<properties>
-				<!-- 数据库连接地址和数据库名 -->
-				<jdbc.url>
-					jdbc:mysql://192.168.101.42:3306/im?createDatabaseIfNotExist=true&amp;amp;useUnicode=true&amp;amp;characterEncoding=utf8
-				</jdbc.url>
-				<!-- 数据库访问帐号 -->
-				<jdbc.username>dev_im</jdbc.username>
-				<jdbc.password>unwo3bLI</jdbc.password>
-				<!-- 用户数据库连接地址和数据库名 -->
-				<user.jdbc.url>
-					jdbc:mysql://192.168.101.42:3306/phoenix_user?createDatabaseIfNotExist=true&amp;amp;useUnicode=true&amp;amp;characterEncoding=utf8
-				</user.jdbc.url>
-				<!-- 用户数据库访问帐号 -->
-				<user.jdbc.username>dev</user.jdbc.username>
-				<user.jdbc.password>dev</user.jdbc.password>
-				<!-- phoenix-ui项目的发布地址，只要替换ip和端口即可 -->
-				<!-- nfs地址 -->
-				<user.cache.expiredTime>86400</user.cache.expiredTime>
-				<user.cache.validationInterval>1800000</user.cache.validationInterval>
-				<user.session.timeout>28800000</user.session.timeout>
-				<!-- 网站发送邮件用的smtp以及帐号密码，一般不用修改 -->
-				<email.SMTP>smtp.263xmail.com</email.SMTP>
-				<!-- 帐号 -->
-				<email.userName>yinxing5@ginkgocap.cn</email.userName>
-				<!-- 密码 -->
-				<email.pwd>sun1307737</email.pwd>
-				<email.port>25</email.port>
-				<!-- 是否使用ssl连接 -->
-				<email.SSL>0</email.SSL>
-				<!-- smtp是否需要登录 -->
-				<email.auth>1</email.auth>
-				<!-- memcache地址 -->
-				<user.cache.address>192.168.101.90:11211</user.cache.address>
-				<!-- redis地址 -->
-				<redis.host>192.168.101.90</redis.host>
-				<!-- redis端口 -->
-				<redis.port>6379</redis.port>
-				<!-- mongo地址 -->
-				<mongodb.address>192.168.120.133:27017</mongodb.address>
-				<!-- mongo中数据库 -->
-				<mongodb.database>ywxt</mongodb.database>
-				<!-- 数据库连接地址和数据库名 -->
-				<!-- 数据库访问帐号 -->
-				<!-- 文件上传存储路径，与phoenix-web项目中配置的upload.path应该相同 -->
-				<upload.path>e:/tmp/upload</upload.path>
-				<!-- phoenix-ui项目的发布地址，只要替换ip和端口即可 -->
-				<log4j.level>debug</log4j.level>
-				<!-- 日志存储路径，多个项目可以用同一个路径，在该路径下每个项目会自动创建以项目名称命名的子文件夹 -->
-				<log4j.path>/webserver/tomcat/phoenix-freechat/logs</log4j.path>
-				<qatest.schema.skip>false</qatest.schema.skip>
-				<dubbo.application.name>phoenix-web</dubbo.application.name>
-				<dubbo.protocol.name>dubbo</dubbo.protocol.name>
-				<dubbo.registry.address>zookeeper://192.168.101.15:2181?client=zkclient</dubbo.registry.address>
-
-				<nfs.home>/webserver/upload/</nfs.home>
-				<!-- nginx上传的地址 -->
-				<nginx.root>http://192.168.101.22/</nginx.root>
-				<!-- nfs的mount目录 -->
-				<upload.path>/webserver/upload/meeting/</upload.path>
-
-				<!-- 知识系统的地址 -->
-				<knowledge.host>http://knowledge.dev.gintong.com:8890</knowledge.host>
-				<!-- web项目地址 -->
-				<gintongweb.host>http://dev.gintong.com:2222</gintongweb.host>
-				<!-- 云项目地址 -->
-				<cloud.host>http://cloud.server.gintong.com:2222/</cloud.host>
-				<!-- jtMobileApp项目地址 -->
-				<gintongservice.url>http://192.168.101.90:5555/</gintongservice.url>
-				<!-- 本地项目地址 -->
-				<!-- <gintongIm.url>http://192.168.150.79:3333/ImServer/</gintongIm.url> -->
-				<!--  <gintongIm.url>http://192.168.101.203:8081/</gintongIm.url>-->
-				<gintongIm.url>http://test.online.gintong.com/crossServerNIM/</gintongIm.url>
-				<bigData.url>http://192.168.101.9:8090/</bigData.url>
-			</properties>
-		</profile>
-		<profile>
 			<id>testOnline</id>
 			<activation>
 				<activeByDefault>false</activeByDefault>
@@ -1098,6 +928,17 @@
 			<build>
 				<filters>
 					<filter>sa-testOnline.properties</filter>
+				</filters>
+			</build>
+		</profile>
+		<profile>
+			<id>fz</id>
+			<activation>
+				<activeByDefault>false</activeByDefault>
+			</activation>
+			<build>
+				<filters>
+					<filter>sa-fz.properties</filter>
 				</filters>
 			</build>
 		</profile>

@@ -24,9 +24,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ginkgocap.ywxt.common.base.BaseController;
 import com.ginkgocap.ywxt.model.meeting.ImRecordmessage;
 import com.ginkgocap.ywxt.model.meeting.Meeting;
@@ -55,7 +52,6 @@ import com.ginkgocap.ywxt.user.service.DynamicNewsService;
 import com.ginkgocap.ywxt.user.service.UserService;
 import com.ginkgocap.ywxt.utils.DateUtil;
 import com.ginkgocap.ywxt.utils.GinTongInterface;
-import com.ginkgocap.ywxt.utils.HuanxinUtils;
 import com.ginkgocap.ywxt.utils.ThreadPoolUtils;
 import com.ginkgocap.ywxt.utils.Utils;
 import com.ginkgocap.ywxt.utils.type.AttendMeetStatusType;
@@ -68,7 +64,7 @@ import com.ginkgocap.ywxt.utils.type.NoticeType;
 import com.ginkgocap.ywxt.utils.type.SexType;
 import com.ginkgocap.ywxt.vo.query.meeting.MeetingSignLabelDataQuery;
 import com.ginkgocap.ywxt.vo.query.meeting.UserBean;
-import com.gintong.easemob.server.httpclient.api.EasemobChatGroupsHandler;
+//import com.gintong.easemob.server.httpclient.api.EasemobChatGroupsHandler;
 
 /**
  * @Description: Controller
@@ -109,8 +105,8 @@ public class MeetingMemberController extends BaseController {
 	/**
 	 * 名称: addMettingMemberGet 描述: 当面邀请
 	 * 
-	 * @param request请求
-	 * @param response响应
+	 * @param request 请求
+	 * @param response 响应
 	 * @return model
 	 */
 	@ResponseBody
@@ -124,8 +120,8 @@ public class MeetingMemberController extends BaseController {
 	/**
 	 * 名称: addMettingMember 描述: 当面邀请
 	 * 
-	 * @param request请求
-	 * @param response响应
+	 * @param request 请求
+	 * @param response 响应
 	 * @return model
 	 */
 	@ResponseBody
@@ -289,7 +285,8 @@ public class MeetingMemberController extends BaseController {
 		model.put("notification", notificationMap);
 		return model;
 	}
-	
+
+	/*
 	private void addUsersToChatGroups(String chatGroupId,Long memeberId){
 		ArrayNode usernames = JsonNodeFactory.instance.arrayNode();
 		if(null != memeberId && memeberId > 0){
@@ -298,7 +295,7 @@ public class MeetingMemberController extends BaseController {
 		ObjectNode usernamesNode = JsonNodeFactory.instance.objectNode();
 		usernamesNode.put("usernames", usernames);
 		EasemobChatGroupsHandler.addUsersToGroupBatch(chatGroupId,usernamesNode);
-	}
+	}*/
 	
 	//增加动态
 	private void insertNewsAndRelation(Meeting meeting, String homePage, User user, List<Long> listUserId) {
@@ -326,8 +323,8 @@ public class MeetingMemberController extends BaseController {
 	/**
 	 * 名称: signInMeetingGet 描述: 签到
 	 * 
-	 * @param request请求
-	 * @param response响应
+	 * @param request 请求
+	 * @param response 响应
 	 * @return model
 	 */
 	@ResponseBody
@@ -341,8 +338,8 @@ public class MeetingMemberController extends BaseController {
 	/**
 	 * 名称: signInMeeting 描述: 签到
 	 * 
-	 * @param request请求
-	 * @param response响应
+	 * @param request 请求
+	 * @param response 响应
 	 * @return model
 	 */
 	@ResponseBody
@@ -457,8 +454,8 @@ public class MeetingMemberController extends BaseController {
 	/**
 	 * 名称: signUpReviewGet 描述: 报名审核
 	 * 
-	 * @param request请求
-	 * @param response响应
+	 * @param request 请求
+	 * @param response 响应
 	 * @return model
 	 */
 	@ResponseBody
@@ -472,8 +469,8 @@ public class MeetingMemberController extends BaseController {
 	/**
 	 * 名称: signUpReview 描述: 报名审核
 	 * 
-	 * @param request请求
-	 * @param response响应
+	 * @param request 请求
+	 * @param response 响应
 	 * @return model
 	 */
 	@ResponseBody
@@ -651,9 +648,9 @@ public class MeetingMemberController extends BaseController {
 	
 	/**
 	 * 名称: signUpMeetingGet 描述: 报名会议
-	 * 
-	 * @param request请求
-	 * @param response响应
+	 *
+	 * @param request 请求
+	 * @param response 响应
 	 * @return model
 	 */
 	@ResponseBody
@@ -666,9 +663,9 @@ public class MeetingMemberController extends BaseController {
 
 	/**
 	 * 名称: signUpMeeting 描述: 报名会议
-	 * 
-	 * @param request请求
-	 * @param response响应
+	 *
+	 * @param request 请求
+	 * @param response 响应
 	 * @return model
 	 */
 	@ResponseBody
@@ -837,9 +834,9 @@ public class MeetingMemberController extends BaseController {
 
 	/**
 	 * 名称: changeAttendMeetStatusGet 描述: 改变成员参会状态: 0未答复1接受邀请（取消报名）2拒绝邀请，5取消报名
-	 * 
-	 * @param request请求
-	 * @param response响应
+	 *
+	 * @param request 请求
+	 * @param response 响应
 	 * @return model
 	 */
 	@ResponseBody
@@ -853,9 +850,9 @@ public class MeetingMemberController extends BaseController {
 
 	/**
 	 * 名称: changeAttendMeetStatusGet 描述: 改变成员参会状态 :0未答复1接受邀请2拒绝邀请，5取消报名
-	 * 
-	 * @param request请求
-	 * @param response响应
+	 *
+	 * @param request 请求
+	 * @param response 响应
 	 * @return model
 	 */
 	@ResponseBody
@@ -979,9 +976,9 @@ public class MeetingMemberController extends BaseController {
 
 	/**
 	 * 名称: getmeetingMemberListGet 描述: 获取参会人列表
-	 * 
-	 * @param request请求
-	 * @param response响应
+	 *
+	 * @param request 请求
+	 * @param response 响应
 	 * @return model
 	 */
 	@ResponseBody
@@ -995,9 +992,9 @@ public class MeetingMemberController extends BaseController {
 
 	/**
 	 * 名称: getmeetingMemberList 描述: 获取参会人列表
-	 * 
-	 * @param request请求
-	 * @param response响应
+	 *
+	 * @param request 请求
+	 * @param response 响应
 	 * @return model
 	 */
 	@ResponseBody
@@ -1053,9 +1050,9 @@ public class MeetingMemberController extends BaseController {
 
 	/**
 	 * 名称: getmeetingVisitantListGet 描述: 获取参会嘉宾
-	 * 
-	 * @param request请求
-	 * @param response响应
+	 *
+	 * @param request 请求
+	 * @param response 响应
 	 * @return model
 	 */
 	@ResponseBody
@@ -1069,9 +1066,9 @@ public class MeetingMemberController extends BaseController {
 
 	/**
 	 * 名称: getmeetingVisitantList 描述: 获取参会嘉宾
-	 * 
-	 * @param request请求
-	 * @param response响应
+	 *
+	 * @param request 请求
+	 * @param response 响应
 	 * @return model
 	 */
 	@ResponseBody
@@ -1128,9 +1125,9 @@ public class MeetingMemberController extends BaseController {
 
 	/**
 	 * 名称: getRequiredSignupInfoGet 描述: 获取用户报名会议必填信息
-	 * 
-	 * @param request请求
-	 * @param response响应
+	 *
+	 * @param request 请求
+	 * @param response 响应
 	 * @return model
 	 */
 	@ResponseBody
@@ -1144,9 +1141,9 @@ public class MeetingMemberController extends BaseController {
 
 	/**
 	 * 名称: getRequiredSignupInfo 描述: 获取用户报名会议必填信息
-	 * 
-	 * @param request请求
-	 * @param response响应
+	 *
+	 * @param request 请求
+	 * @param response 响应
 	 * @return model
 	 */
 	@ResponseBody
@@ -1362,9 +1359,9 @@ public class MeetingMemberController extends BaseController {
 
 	/**
 	 * 名称: improveSignInformation 描述: 完善报名信息
-	 * 
-	 * @param request请求
-	 * @param response响应
+	 *
+	 * @param request 请求
+	 * @param response 响应
 	 * @return model
 	 */
 	@ResponseBody
@@ -1378,9 +1375,9 @@ public class MeetingMemberController extends BaseController {
 
 	/**
 	 * 名称: improveSignInformation 描述: 完善报名信息
-	 * 
-	 * @param request请求
-	 * @param response响应
+	 *
+	 * @param request 请求
+	 * @param response 响应
 	 * @return model
 	 */
 	@ResponseBody

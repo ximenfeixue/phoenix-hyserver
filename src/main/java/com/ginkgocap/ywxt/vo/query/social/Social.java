@@ -38,7 +38,7 @@ public class Social implements Serializable {
 	private String path;
 	
 	/**未读消息条数,默认为0*/
-	private Integer newCount = 0;
+	private int newCount = 0;
 	
 	/**
 	 * 最后@我的人的名称
@@ -53,6 +53,8 @@ public class Social implements Serializable {
 	private Integer userType;//1个人好友 2组织好友
 	
 	private String groupId;
+
+	private short top = 0;
 	
 	public String getGroupId() {
 		return groupId;
@@ -145,10 +147,18 @@ public class Social implements Serializable {
 	public void setUserType(Integer userType) {
 		this.userType = userType;
 	}
-	public Integer getNewCount() {
+	public int getNewCount() {
 		return newCount;
 	}
-	public void setNewCount(Integer newCount) {
+	public void setNewCount(int newCount) {
 		this.newCount = newCount;
+	}
+
+	public short getTop() {
+		return top;
+	}
+
+	public void setTop(short top) {
+		this.top = top;
 	}
 }

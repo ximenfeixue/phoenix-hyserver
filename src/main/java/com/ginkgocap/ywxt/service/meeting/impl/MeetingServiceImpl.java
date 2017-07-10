@@ -68,7 +68,6 @@ import com.ginkgocap.ywxt.user.service.UserService;
 import com.ginkgocap.ywxt.utils.DateUtil;
 import com.ginkgocap.ywxt.utils.EmojiUtil;
 import com.ginkgocap.ywxt.utils.GinTongInterface;
-import com.ginkgocap.ywxt.utils.HuanxinUtils;
 import com.ginkgocap.ywxt.utils.JsonToBean;
 import com.ginkgocap.ywxt.utils.MeetingDict;
 import com.ginkgocap.ywxt.utils.ThreadPoolUtils;
@@ -90,7 +89,7 @@ import com.ginkgocap.ywxt.vo.query.meeting.MeetingTopicQuery;
 import com.ginkgocap.ywxt.vo.query.meeting.TopicChatQuery;
 import com.ginkgocap.ywxt.vo.query.meeting.UserBean;
 import com.ginkgocap.ywxt.vo.query.social.Social;
-import com.gintong.easemob.server.httpclient.api.EasemobChatGroupsHandler;
+//import com.gintong.easemob.server.httpclient.api.EasemobChatGroupsHandler;
 
 @Service
 @Transactional
@@ -606,14 +605,15 @@ public class MeetingServiceImpl extends BaseServiceImpl<Meeting, Long> implement
 	protected String createFreeChatGroup(Long meetingId, MeetingQuery entity, List<Long> memberIds, Long ownerId) {
 		String meetingName = entity.getMeetingName();
 		String meetingDesc = StringUtils.isNullOrEmpty(entity.getMeetingDesc()) ? meetingName : entity.getMeetingDesc().trim();
-		int roomsize = com.gintong.easemob.server.comm.Constants.MAXUSERS_SIZE;
+		int roomsize = 1000;
 
 		if (memberIds == null) {
 			memberIds = Collections.emptyList();
 		}
 		return GinTongInterface.createMUC(meetingId, meetingName, meetingDesc, roomsize, ownerId, memberIds);
 	}
-	
+
+	/*
 	private String createChatGroup(MeetingQuery entity, List<Long> memberIds, Long ownerId) {
 		com.fasterxml.jackson.databind.node.ObjectNode dataObjectNode = com.fasterxml.jackson.databind.node.JsonNodeFactory.instance.objectNode();
 		String meetingName = entity.getMeetingName();
@@ -632,7 +632,7 @@ public class MeetingServiceImpl extends BaseServiceImpl<Meeting, Long> implement
 		com.fasterxml.jackson.databind.node.ObjectNode creatChatGroupNode = EasemobChatGroupsHandler.creatChatGroups(dataObjectNode);
 		logger.info(" Meeting created result from huanxin server : " + creatChatGroupNode);
 		return creatChatGroupNode.get("data").get("groupid").asText();
-	}
+	}*/
 
 	private void insertNewsAndRelation(Meeting meeting, String homePage, User user, List<Long> listUserId) {
 		Map<String, Object> param = new HashMap<String, Object>();
@@ -2238,8 +2238,7 @@ public class MeetingServiceImpl extends BaseServiceImpl<Meeting, Long> implement
 				&& (source.getMucId() == null ? 0 : source.getMucId().intValue()) == (target.getMucId() == null ? 0 : target.getMucId().intValue())
 				&& (source.getMucMessageId() == null ? 0 : source.getMucMessageId().intValue()) == (target.getMucMessageId() == null ? 0 : target
 						.getMucMessageId().intValue())
-				&& (source.getNewCount() == null ? 0 : source.getNewCount().intValue()) == (target.getNewCount() == null ? 0 : target.getNewCount()
-						.intValue())
+				&& (source.getNewCount() == target.getNewCount())
 				&& (source.getMucCreateUserId() == null ? 0 : source.getMucCreateUserId().intValue()) == (target.getMucCreateUserId() == null
 						? 0
 						: target.getMucCreateUserId().intValue())

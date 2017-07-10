@@ -12,23 +12,22 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
-import java.util.concurrent.Callable;
-import java.util.concurrent.CompletionService;
-import java.util.concurrent.ExecutorCompletionService;
-import java.util.concurrent.Future;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.ginkgocap.ywxt.utils.*;
+import com.gintong.ywxt.im.model.SocialStatus;
+import com.gintong.ywxt.im.service.SocialStatusService;
 import net.sf.ezmorph.object.DateMorpher;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import net.sf.json.util.JSONUtils;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
-import org.eclipse.jetty.util.log.Log;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,7 +56,6 @@ import com.ginkgocap.ywxt.model.meeting.MeetingTime;
 import com.ginkgocap.ywxt.model.meeting.MeetingTopic;
 import com.ginkgocap.ywxt.model.meeting.MeetingVo;
 import com.ginkgocap.ywxt.model.meeting.SocialListReq;
-import com.ginkgocap.ywxt.model.meeting.SocialStatus;
 import com.ginkgocap.ywxt.model.meeting.TopicChat;
 import com.ginkgocap.ywxt.service.meeting.ImRecordmessageService;
 import com.ginkgocap.ywxt.service.meeting.MeetingCountService;
@@ -67,16 +65,10 @@ import com.ginkgocap.ywxt.service.meeting.MeetingNoticeService;
 import com.ginkgocap.ywxt.service.meeting.MeetingPicService;
 import com.ginkgocap.ywxt.service.meeting.MeetingService;
 import com.ginkgocap.ywxt.service.meeting.MeetingTopicService;
-import com.ginkgocap.ywxt.service.meeting.SocialStatusService;
 import com.ginkgocap.ywxt.service.meeting.TopicChatService;
 import com.ginkgocap.ywxt.user.model.User;
 import com.ginkgocap.ywxt.user.service.UserService;
 import com.ginkgocap.ywxt.util.HttpClientHelper;
-import com.ginkgocap.ywxt.utils.GinTongInterface;
-import com.ginkgocap.ywxt.utils.MeetingDict;
-import com.ginkgocap.ywxt.utils.ResultBean;
-import com.ginkgocap.ywxt.utils.ThreadPoolUtils;
-import com.ginkgocap.ywxt.utils.Utils;
 import com.ginkgocap.ywxt.utils.type.SocialType;
 import com.ginkgocap.ywxt.vo.query.community.Community;
 import com.ginkgocap.ywxt.vo.query.meeting.BigDataQuery;
@@ -88,7 +80,6 @@ import com.ginkgocap.ywxt.vo.query.meeting.UserBean;
 import com.ginkgocap.ywxt.vo.query.social.CommunityNewCount;
 import com.ginkgocap.ywxt.vo.query.social.Social;
 import com.ginkgocap.ywxt.vo.query.social.SocialDetail;
-import com.gintong.easemob.server.comm.GsonUtils;
 import com.gintong.rocketmq.api.DefaultMessageService;
 import com.gintong.rocketmq.api.enums.TopicType;
 import com.gintong.rocketmq.api.model.RocketSendResult;
@@ -108,6 +99,9 @@ import com.google.gson.GsonBuilder;
 @Controller
 @RequestMapping("/meeting")
 public class MeetingController extends BaseController {
+	private final Logger logger = LoggerFactory.getLogger(MeetingController.class);
+	private static final String CLASS_NAME = MeetingController.class.getName();
+
 	private static ResourceBundle resource = ResourceBundle.getBundle("gintongService");
 	private static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	@Autowired
@@ -142,9 +136,6 @@ public class MeetingController extends BaseController {
 	private Cache cache;
 	private static int  expiredTime = 60 * 60 * 24 * 7;
 
-	private final Logger logger = LoggerFactory.getLogger(MeetingController.class);
-	private static final String CLASS_NAME = MeetingController.class.getName();
-
 	/*
 	 * 在社交列表中移除单聊、群聊、会议
 	 */
@@ -159,11 +150,11 @@ public class MeetingController extends BaseController {
 			logger.error("parse request parameters error", e);
 			return rebuildResponseResult(false, "0002", "请求参数错误");
 		}
-		SocialStatus message = com.ginkgocap.ywxt.utils.GsonUtils.StringToObject(SocialStatus.class, requestJson);
+		SocialStatus message = GsonUtils.StringToObject(SocialStatus.class, requestJson);
 		if (null == message) {
 			return rebuildResponseResult(false, "0002", "请求参数错误");
 		} else {
-			List<SocialStatus> list = socialStatusService.queryList(message);
+			List<SocialStatus> list = socialStatusService.query(message);
 			if (list == null || list.size() == 0) {
 				try {
 					socialStatusService.save(message);
@@ -1457,8 +1448,7 @@ public class MeetingController extends BaseController {
 						.getCompereId().longValue())
 				&& (source.getCompereName() == null ? "" : source.getCompereName()) == (target.getCompereName() == null ? "" : target
 						.getCompereName())
-				&& (source.getNewCount() == null ? 0 : source.getNewCount().intValue()) == (target.getNewCount() == null ? 0 : target.getNewCount()
-						.intValue())) {
+				&& source.getNewCount() == target.getNewCount()) {
 			return true;
 		} else {
 			return false;
@@ -1471,12 +1461,28 @@ public class MeetingController extends BaseController {
 	 * @param listResult
 	 * @param userId
 	 */
-	List<Social> socialListFilter(List<Social> listResult, Long userId) {
-		List<SocialStatus> execludeResult = socialStatusService.queryListWithoutMeetingByUserId(userId);
+    private List<Social> filterDeletedChatList(List<Social> listResult, Long userId) {
+		List<SocialStatus> execludeResult = socialStatusService.queryWithoutMeetingByUserId(userId);
+		/*
 		for (SocialStatus ss : execludeResult) {
 			logger.debug("exclued ====> " + ReflectionToStringBuilder.toString(ss));
-		}
+		}*/
+		logger.info("exclued size: " + (execludeResult != null ? execludeResult.size() : 0));
 		return listFilter(listResult, execludeResult);
+	}
+
+	private List<Social> getUnReadChatList(List<Social> listResult) {
+		List<Social> listResultNew = new ArrayList<Social>();
+        if (CollectionUtils.isNotEmpty(listResult)) {
+            for (int index = 0; index < listResult.size(); index++) {
+                Social social = listResult.get(index);
+                if (social.getNewCount() > 0) {
+                    listResultNew.add(social);
+                    listResult.remove(index);
+                }
+            }
+        }
+		return listResultNew;
 	}
 
 	/**
@@ -1489,7 +1495,7 @@ public class MeetingController extends BaseController {
 	 * @return
 	 */
 	List<Social> meetingListFilter(final List<Social> listResult, Long userId) {
-		List<SocialStatus> execludeResult = socialStatusService.queryMeetingListByUserId(userId);
+		List<SocialStatus> execludeResult = socialStatusService.queryMeetingByUserId(userId);
 		return listFilter(listResult, execludeResult);
 	}
 
@@ -1506,56 +1512,15 @@ public class MeetingController extends BaseController {
 		if (null == execludeResult || execludeResult.size() == 0) {
 			return listResult;
 		}
-		int size = execludeResult.size();
+		//int size = execludeResult.size();
+		return removeClientDeletedSocial(execludeResult, listResult);
+		/*
 		int end = 0;
 		if (size > 90) {
-			// end = size / 3;
-			// final List<Social> list1 = listResult.subList(0, end);
-			// final List<Social> list2 = listResult.subList(end, end * 2);
-			// final List<Social> list3 = listResult.subList(end * 2, size);
-			// CompletionService<List<Social>> completionService = new
-			// ExecutorCompletionService<List<Social>>(
-			// ThreadPoolUtils.getExecutor());
-			// List<Future<List<Social>>> futureList = new
-			// ArrayList<Future<List<Social>>>(3);
-			// Future<List<Social>> future1 = completionService.submit(new
-			// Callable<List<Social>>() {
-			// @Override
-			// public List<Social> call() throws Exception {
-			// return removeClientDeletedSocial(execludeResult, list1);
-			// }
-			// });
-			// futureList.add(future1);
-			// Future<List<Social>> future2 = completionService.submit(new
-			// Callable<List<Social>>() {
-			// @Override
-			// public List<Social> call() throws Exception {
-			// return removeClientDeletedSocial(execludeResult, list2);
-			// }
-			// });
-			// futureList.add(future2);
-			// Future<List<Social>> future3 = completionService.submit(new
-			// Callable<List<Social>>() {
-			// @Override
-			// public List<Social> call() throws Exception {
-			// return removeClientDeletedSocial(execludeResult, list3);
-			// }
-			// });
-			// futureList.add(future3);
-			// listResult.clear();
-			// for (Future<List<Social>> flist : futureList) {
-			// try {
-			// List<Social> tempList = flist.get();
-			// listResult.addAll(tempList);
-			// } catch (Exception e) {
-			// e.printStackTrace();
-			// }
-			// }
-			// return listResult;
 			return removeClientDeletedSocial(execludeResult, listResult);
 		} else {
 			return removeClientDeletedSocial(execludeResult, listResult);
-		}
+		}*/
 	}
 
 	/**
@@ -1594,13 +1559,10 @@ public class MeetingController extends BaseController {
 	public int fetchNewCount(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		int totalNewCount = 0;
 		// 获取json参数串
-		String requestJson = "";
-		SocialListReq socialListReq = null;
-		try {
-			requestJson = getJsonParamStr(request);
-			socialListReq = GsonUtils.StringToObject(SocialListReq.class, requestJson);
-		} catch (IOException e) {
-			logger.error("请求参数错误requestJson=" + requestJson, e);
+		String requestJson = getJsonParamStr(request);
+		SocialListReq socialListReq = StringToObject(SocialListReq.class, requestJson);
+		if (socialListReq == null) {
+			logger.error("请求参数错误requestJson=" + requestJson);
 			return 0;
 		}
 
@@ -1632,8 +1594,8 @@ public class MeetingController extends BaseController {
 			int meetingCount = 0;
 			if (!Utils.isNullOrEmpty(listMeeting)) {
 				for (Social social : listMeeting) {
-					if (social.getNewCount() != null && social.getNewCount().intValue() > 0) {
-						meetingCount += social.getNewCount().intValue();
+					if (social.getNewCount() > 0) {
+						meetingCount += social.getNewCount();
 					}
 				}
 			}
@@ -1668,7 +1630,7 @@ public class MeetingController extends BaseController {
 		SocialListReq socialListReq = null;
 		try {
 			requestJson = getJsonParamStr(request);
-			socialListReq = GsonUtils.StringToObject(SocialListReq.class, requestJson);
+			socialListReq = StringToObject(SocialListReq.class, requestJson);
 		} catch (IOException e) {// 兼容老版本
 			socialListReq = new SocialListReq();
 		}
@@ -1686,38 +1648,35 @@ public class MeetingController extends BaseController {
 			socialListReq.setUserId(user.getId());
 			List<Social> listResult = new ArrayList<Social>();
 			// 获取私聊和群聊列表
-			List<Social> chat = imRecordmessageService.getPrivateChatAndGroupChat(socialListReq); // 消息
-			 if (CollectionUtils.isNotEmpty(chat)) {
-				 this.setChatListToCache(chat, userId);
-			 } else {
-				 chat = this.getChatListFromCache(userId);
-			 }
+			List<Social> chatListResult = imRecordmessageService.getPrivateChatAndGroupChat(socialListReq); // 消息
 
-			logger.info("chat-size:" + chat.size() + " userId: " + userId);
-			listResult.addAll(chat);
+			if (CollectionUtils.isNotEmpty(chatListResult)) {
+                logger.info("total chat-size:" + chatListResult.size() + " userId: " + userId);
+                filterDeletedChatList(chatListResult, user.getId());
+                logger.info("after filter, total chat-size:" + chatListResult.size() + " userId: " + userId);
 
-			for (Social s : chat) {
-				logger.info("SocialList ===>" + ReflectionToStringBuilder.toString(s));
-			}
+                List<Social> unReadlistResult = getUnReadChatList(chatListResult);
 
-			// 过滤客户端删除的畅聊
-			// 2016-03-10 tanmin getPrivateChatAndGroupChat直接获取畅聊提供的数据,无需再过滤
-			// logger.debug("singeAndGroupChat ====> " + listResult.size());
-			socialListFilter(listResult, user.getId());
-			// logger.debug("singeAndGroupChat after filter====> " +
-			// listResult.size());
+                if (CollectionUtils.isNotEmpty(unReadlistResult)) {
+                    Collections.sort(unReadlistResult, chatTimeOrder);
+                    listResult = unReadlistResult;
+                }
 
-			Collections.sort(listResult, new Comparator<Social>() {
-				public int compare(Social o1, Social o2) {
-					if (null == o1.getOrderTime()) {
-						return 1;
-					}
-					if (null == o2.getOrderTime()) {
-						return -1;
-					}
-					return o2.getOrderTime().compareTo(o1.getOrderTime());
-				}
-			});
+                if (CollectionUtils.isNotEmpty(chatListResult)) {
+                    Collections.sort(chatListResult, chatTimeOrder);
+                    if (CollectionUtils.isNotEmpty(listResult)) {
+                        listResult.addAll(chatListResult);
+                    } else {
+                        listResult = chatListResult;
+                    }
+                }
+            }
+            if (CollectionUtils.isNotEmpty(listResult)) {
+                this.setChatListToCache(listResult, userId);
+            } else {
+                listResult = this.getChatListFromCache(userId);
+            }
+
 			// 获取最新的通知
 			MeetingNotice meetingNotice = meetingNoticeService.getNewNotice(user.getId());
 			if (!isNullOrEmpty(meetingNotice)) {
@@ -1730,11 +1689,11 @@ public class MeetingController extends BaseController {
 				socialNotice.setId(meetingNotice.getId());
 				socialNotice.setTitle("通知");
 				socialNotice.setType(SocialType.NOTICE.code());
-				SocialDetail socialDetailNotice = new SocialDetail();
-				socialDetailNotice.setContent(meetingNotice.getNoticeContent());
+				SocialDetail socialDetail = new SocialDetail();
+				socialDetail.setContent(meetingNotice.getNoticeContent());
 				socialNotice.setTime(meetingNotice.getUpdateTime());
 				socialNotice.setOrderTime(meetingNotice.getUpdateTime());
-				socialNotice.setSocialDetail(socialDetailNotice);
+				socialNotice.setSocialDetail(socialDetail);
 				socialNotice.setNewCount(noticeCount);
 				listResult.add(0, socialNotice);
 			}
@@ -1773,8 +1732,8 @@ public class MeetingController extends BaseController {
 				int meetingCount = 0;
 				if (!Utils.isNullOrEmpty(listMeeting)) {
 					for (Social social : listMeeting) {
-						if (social.getNewCount() != null && social.getNewCount().intValue() > 0) {
-							meetingCount += social.getNewCount().intValue();
+						if (social.getNewCount() > 0) {
+							meetingCount += social.getNewCount();
 						}
 					}
 				}
@@ -1791,8 +1750,8 @@ public class MeetingController extends BaseController {
 				socialRelation.setId(-2L);
 				socialRelation.setTitle("新的关系");
 				socialRelation.setType(SocialType.RELATION.code());
-				SocialDetail socialDetailNotice = new SocialDetail();
-				socialRelation.setSocialDetail(socialDetailNotice);
+				SocialDetail socialDetail = new SocialDetail();
+				socialRelation.setSocialDetail(socialDetail);
 				socialRelation.setNewCount(relationCount);
 				listResult.add(0, socialRelation);
 			}
@@ -1801,8 +1760,8 @@ public class MeetingController extends BaseController {
 			for (Social social : listResult) {
 				// logger.info("retToClient ===>" +
 				// ReflectionToStringBuilder.toString(social));
-				if (!Utils.isNullOrEmpty(social.getNewCount()) && social.getNewCount().intValue() != 0) {
-					count += social.getNewCount().intValue();
+				if (social.getNewCount() > 0) {
+					count += social.getNewCount();
 				}
 			}
 
@@ -1819,6 +1778,185 @@ public class MeetingController extends BaseController {
 		return model;
 	}
 
+    /**
+     * socialList 最新的社交列表
+     *
+     * @return
+     * @throws IOException
+     */
+    @ResponseBody
+    @RequestMapping(value = "/socialListNew.json", method = RequestMethod.POST)
+    public Map<String, Object> socialListNew(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        Map<String, Object> model = new HashMap<String, Object>();
+        Map<String, Object> responseDataMap = new HashMap<String, Object>();
+        Map<String, Object> notificationMap = new HashMap<String, Object>();
+        model.put("responseData", responseDataMap);
+        model.put("notification", notificationMap);
+        // 获取json参数串
+        String requestJson = "";
+        SocialListReq socialListReq = null;
+        try {
+            requestJson = getJsonParamStr(request);
+            socialListReq = StringToObject(SocialListReq.class, requestJson);
+        } catch (IOException e) {// 兼容老版本
+            socialListReq = new SocialListReq();
+        }
+        try {
+            User user = getUser(request);
+            // 获取当前登录用户
+            if (null == user || user.getId() <= 0) {
+                responseDataMap.put("listSocial", null);
+                notificationMap.put("notifCode", "0002");
+                notificationMap.put("notifInfo", "请先登录");
+                return model;
+            }
+            final long userId = user.getId();
+            socialListReq = socialListReq == null ? new SocialListReq() : socialListReq;
+            socialListReq.setUserId(userId);
+            List<Social> listResult = new ArrayList<Social>();
+
+            // 获取私聊和群聊列表
+            Map<Integer,List<Social>> chatListMap = imRecordmessageService.getPrivateChatAndGroupChatMap(socialListReq); // 消息
+            if (MapUtils.isNotEmpty(chatListMap)) {
+                List<Social> topchatListResult = chatListMap.get(1);
+                if (CollectionUtils.isNotEmpty(topchatListResult)) {
+                    logger.info("top chat-size:" + topchatListResult.size() + " userId: " + userId);
+                    Collections.sort(topchatListResult, chatTimeOrder);
+                    listResult = topchatListResult;
+                }
+                /*
+                List<Social> unReadlistResult = chatListMap.get(2);
+                if (CollectionUtils.isNotEmpty(unReadlistResult)) {
+                    Collections.sort(unReadlistResult, chatTimeOrder);
+                    logger.info("unread chat-size:" + unReadlistResult.size() + " userId: " + userId);
+                    if (CollectionUtils.isNotEmpty(listResult)) {
+                        listResult.addAll(unReadlistResult);
+                    } else {
+                        listResult = unReadlistResult;
+                    }
+                }*/
+
+                List<Social> restlistResult = chatListMap.get(2);
+                if (CollectionUtils.isNotEmpty(restlistResult)) {
+                    logger.info("rest chat-size:" + restlistResult.size() + " userId: " + userId);
+                    Collections.sort(restlistResult, chatTimeOrder);
+                    if (CollectionUtils.isNotEmpty(listResult)) {
+                        listResult.addAll(restlistResult);
+                    } else {
+                        listResult = restlistResult;
+                    }
+                }
+            }
+
+            if (CollectionUtils.isNotEmpty(listResult)) {
+                this.setChatListToCache(listResult, userId);
+            } else {
+                listResult = this.getChatListFromCache(userId);
+            }
+
+            filterDeletedChatList(listResult, user.getId());
+
+            // 获取最新的通知
+            MeetingNotice meetingNotice = meetingNoticeService.getNewNotice(user.getId());
+            if (!isNullOrEmpty(meetingNotice)) {
+                Integer noticeCount = meetingNoticeService.getUnReadNoticeCount(user.getId());
+                if (Utils.isNullOrEmpty(noticeCount)) {
+                    noticeCount = 0;
+                }
+                // 封装通知
+                Social socialNotice = new Social();
+                socialNotice.setId(meetingNotice.getId());
+                socialNotice.setTitle("通知");
+                socialNotice.setType(SocialType.NOTICE.code());
+                SocialDetail socialDetail = new SocialDetail();
+                socialDetail.setContent(meetingNotice.getNoticeContent());
+                socialNotice.setTime(meetingNotice.getUpdateTime());
+                socialNotice.setOrderTime(meetingNotice.getUpdateTime());
+                socialNotice.setSocialDetail(socialDetail);
+                socialNotice.setNewCount(noticeCount);
+                listResult.add(0, socialNotice);
+            }
+            // 获取邀请函
+            Social invitation = meetingService.getLatestInvitation(user.getId());
+            if (null != invitation) {
+                SocialDetail socialDetail = invitation.getSocialDetail();
+                if (isNullOrEmpty(socialDetail)) {
+                    socialDetail = new SocialDetail();
+                }
+                String content = invitation.getCompereName() + "邀请您参加";
+                socialDetail.setContent(content);
+                String path = invitation.getPath();// 指的是会议的封面图片
+                if (!isNullOrEmpty(path)) {// 数据库里面的路径就是带ip和端口的
+                    List<String> listImage = new ArrayList<String>();
+                    listImage.add(path);
+                    socialDetail.setListImageUrl(listImage);
+                }
+                invitation.setSocialDetail(socialDetail);
+                listResult.add(0, invitation);
+            }
+
+            Social meetingSocial = new Social();
+            // meetingSocial.setNewCount(imRecordmessageService.getAllMeetingNewCount(user.getId()));
+            meetingSocial.setId(-1L);
+            List<Social> listMeeting = getMeetingList(user.getId());
+            String title = "会议暂无消息";
+            meetingSocial.setTitle(title);
+            if (!Utils.isNullOrEmpty(listMeeting)) {
+                Social meeting = listMeeting.get(0);
+                meetingSocial.setTitle(meeting.getTitle());// 标题
+                meetingSocial.setCompereName(getCompereName(userService, meeting.getCompereId()));// 发起人
+                meetingSocial.setTime(meeting.getOrderTime());// 右侧时间
+                meetingSocial.setType(meeting.getType());// 会议状态:3-进行中的会议，4-未开始的会议
+                // 5-已结束的会议
+                int meetingCount = 0;
+                if (!Utils.isNullOrEmpty(listMeeting)) {
+                    for (Social social : listMeeting) {
+                        if (social.getNewCount() > 0) {
+                            meetingCount += social.getNewCount();
+                        }
+                    }
+                }
+                meetingSocial.setNewCount(meetingCount);
+            }
+            listResult.add(0, meetingSocial);
+            // String requestJson = getJsonParamStr(request);
+            // if(!Utils.isNullOrEmpty(requestJson)) {
+            // JSONObject j = JSONObject.fromObject(requestJson);
+            String withNewRelation = socialListReq.getWithNewRelation();
+            if (!Utils.isNullOrEmpty(withNewRelation) && withNewRelation.equals("true")) {
+                int relationCount = GinTongInterface.getNewConnectionsCount("" + user.getId());
+                Social socialRelation = new Social();
+                socialRelation.setId(-2L);
+                socialRelation.setTitle("新的关系");
+                socialRelation.setType(SocialType.RELATION.code());
+                SocialDetail socialDetail = new SocialDetail();
+                socialRelation.setSocialDetail(socialDetail);
+                socialRelation.setNewCount(relationCount);
+                listResult.add(0, socialRelation);
+            }
+            // }
+            int count = 0;
+            for (Social social : listResult) {
+                // logger.info("retToClient ===>" +
+                // ReflectionToStringBuilder.toString(social));
+                if (social.getNewCount() > 0) {
+                    count += social.getNewCount();
+                }
+            }
+
+            responseDataMap.put("count", count);
+            responseDataMap.put("listSocial", listResult);
+            notificationMap.put("notifCode", "0001");
+            notificationMap.put("notifInfo", "hello App");
+        } catch (Exception e) {
+            logger.error("", e);
+            responseDataMap.put("listSocial", null);
+            notificationMap.put("notifCode", "0002");
+            notificationMap.put("notifInfo", e.getMessage());
+        }
+        return model;
+    }
+
 	/**
 	 * 获取社群的社交列表-一般用在“消息”-“社群消息”中
 	 *
@@ -1834,14 +1972,13 @@ public class MeetingController extends BaseController {
 		model.put("responseData", responseDataMap);
 		model.put("notification", notificationMap);
 		// 获取json参数串
-		String requestJson = "";
-		SocialListReq socialListReq = null;
-		try {
-			requestJson = getJsonParamStr(request);
-			socialListReq = GsonUtils.StringToObject(SocialListReq.class, requestJson);
-		} catch (IOException e) {// 兼容老版本
+		String requestJson = getJsonParamStr(request);
+		SocialListReq socialListReq = StringToObject(SocialListReq.class, requestJson);
+		if (socialListReq == null) {
+			logger.error("请求参数错误requestJson=" + requestJson);
 			socialListReq = new SocialListReq();
 		}
+
 		try {
 			User user = getUser(request);
 			socialListReq = socialListReq == null ? new SocialListReq() : socialListReq;
@@ -1861,7 +1998,7 @@ public class MeetingController extends BaseController {
 				listResult.addAll(chat);
 			}
 			// 过滤客户端删除的畅聊
-			socialListFilter(listResult, user.getId());
+			filterDeletedChatList(listResult, user.getId());
 
 			Collections.sort(listResult, new Comparator<Social>() {
 				public int compare(Social o1, Social o2) {
@@ -1876,8 +2013,8 @@ public class MeetingController extends BaseController {
 			});
 			int count = 0;
 			for (Social social : listResult) {
-				if (!Utils.isNullOrEmpty(social.getNewCount()) && social.getNewCount().intValue() != 0) {
-					count += social.getNewCount().intValue();
+				if (social.getNewCount() > 0) {
+					count += social.getNewCount();
 				}
 			}
 			responseDataMap.put("count", count);
@@ -1912,7 +2049,7 @@ public class MeetingController extends BaseController {
 		SocialListReq socialListReq = null;
 		try {
 			requestJson = getJsonParamStr(request);
-			socialListReq = GsonUtils.StringToObject(SocialListReq.class, requestJson);
+			socialListReq = StringToObject(SocialListReq.class, requestJson);
 		} catch (IOException e) {// 兼容老版本
 			socialListReq = new SocialListReq();
 		}
@@ -1935,7 +2072,7 @@ public class MeetingController extends BaseController {
 				listResult.addAll(chat);
 			}
 			// 过滤客户端删除的畅聊
-			socialListFilter(listResult, user.getId());
+			filterDeletedChatList(listResult, user.getId());
 
 			Collections.sort(listResult, new Comparator<Social>() {
 				public int compare(Social o1, Social o2) {
@@ -2217,11 +2354,9 @@ public class MeetingController extends BaseController {
 		model.put("responseData", responseDataMap);
 		model.put("notification", notificationMap);
 
-		String requestJson = "";
-		SocialListReq socialListReq = null;
 		try {
-			requestJson = getJsonParamStr(request);
-			socialListReq = GsonUtils.StringToObject(SocialListReq.class, requestJson);
+			String requestJson = getJsonParamStr(request);
+			SocialListReq socialListReq = StringToObject(SocialListReq.class, requestJson);
 			// 获取当前登录用户
 			if (null == socialListReq || socialListReq.getUserId() < 1) {
 				responseDataMap.put("listSocial", null);
@@ -2314,8 +2449,8 @@ public class MeetingController extends BaseController {
 	static int count(List<Social> listResult) {
 		int count = 0;
 		for (Social social : listResult) {
-			if (!Utils.isNullOrEmpty(social.getNewCount()) && social.getNewCount().intValue() != 0) {
-				count += social.getNewCount().intValue();
+			if (social.getNewCount() > 0) {
+				count += social.getNewCount();
 			}
 		}
 		return count;
@@ -2419,8 +2554,10 @@ public class MeetingController extends BaseController {
 			List<Social> chat = imRecordmessageService.getPrivateChatAndGroupChat(socialListReq);// 消息
 			if (!isNullOrEmpty(chat)) {
 				// 过滤客户端删除的畅聊
-				socialListFilter(chat, user.getId());
+				filterDeletedChatList(chat, user.getId());
 				// 畅聊排序
+				Collections.sort(chat, chatTimeOrder);
+				/*
 				Collections.sort(chat, new Comparator<Social>() {
 					public int compare(Social o1, Social o2) {
 						if (null == o1.getOrderTime()) {
@@ -2431,7 +2568,7 @@ public class MeetingController extends BaseController {
 						}
 						return o2.getOrderTime().compareTo(o1.getOrderTime());
 					}
-				});
+				});*/
 				// 封装私聊和群聊
 				listResult.addAll(chat);
 			}
@@ -2453,8 +2590,8 @@ public class MeetingController extends BaseController {
 					}
 				}
 			}
-			System.out.println("排序完成时间：：：：：：" + Utils.DateFormat(sortDate));
-			System.out.println("排序完耗时：：：：：：" + (sortDate.getTime() - searchDate.getTime()) / (1000 * 60) + "分"
+			logger.info("排序完成时间：：：：：：" + Utils.DateFormat(sortDate));
+            logger.info("排序完耗时：：：：：：" + (sortDate.getTime() - searchDate.getTime()) / (1000 * 60) + "分"
 					+ ((sortDate.getTime() - searchDate.getTime()) % (1000 * 60)) / 1000 + "秒");
 			responseDataMap.put("listSocial", listResult);
 			notificationMap.put("notifCode", "0001");
@@ -2895,16 +3032,51 @@ public class MeetingController extends BaseController {
 	}
 	
 	private void setChatListToCache(final List<Social> chat,final long userId) {
-		logger.info("set chat list for userId: " + userId);
+		logger.info("set chat list to cached. userId: " + userId);
 		cache.setByRedis(chatListKey(userId), chat, expiredTime);
 	}
 	
 	private List<Social> getChatListFromCache(final long userId) {
-		logger.info("get chat list for userId: " + userId);
+		logger.info("get chat list from cached. userId: " + userId);
 		return (List<Social>)cache.getByRedis(chatListKey(userId));
 	}
 	
 	private String chatListKey(long userId)	{
 		return "chat_list_" + userId + "_";
 	}
+
+    private void setChatMapListToCache(final Map<Integer,List<Social>> chatListMap,final long userId) {
+        logger.info("set chat map list to cached. userId: " + userId);
+        cache.setByRedis(chatMapListKey(userId), chatListMap, expiredTime);
+    }
+
+    private Map<Integer,List<Social>> getChatMapListFromCache(final long userId) {
+        logger.info("get chat map list from cached. userId: " + userId);
+        return (Map<Integer,List<Social>>)cache.getByRedis(chatMapListKey(userId));
+    }
+
+    private String chatMapListKey(long userId)	{
+        return "chat_map_list_" + userId + "_";
+    }
+
+	private static Comparator chatTimeOrder = new Comparator<Social>() {
+		public int compare(Social o1, Social o2) {
+            if (null == o1 && null == o2) {
+                return 0;
+            }
+
+			if (null == o1.getOrderTime() && null == o2.getOrderTime()) {
+				return 0;
+			}
+
+			if (null == o1 ||null == o1.getOrderTime()) {
+				return 1;
+			}
+
+			if (o2 == null || null == o2.getOrderTime()) {
+				return -1;
+			}
+			return o2.getOrderTime().compareTo(o1.getOrderTime());
+		}
+	};
 }

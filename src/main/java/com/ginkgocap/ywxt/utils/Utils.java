@@ -249,7 +249,7 @@ public class Utils {
 		}else{
 			Class classes=obj.getClass();
 			try {
-				Method methodGet=classes.getMethod("getId", null);
+				Method methodGet=classes.getMethod("getId");
 				try {
 					Long resutlt=(Long) methodGet.invoke(obj);
 					if(!isNullOrEmpty(resutlt)&&0==resutlt){

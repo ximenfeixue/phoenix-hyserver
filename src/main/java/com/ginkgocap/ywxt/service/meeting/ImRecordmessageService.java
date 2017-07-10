@@ -7,6 +7,7 @@
 package com.ginkgocap.ywxt.service.meeting;
 
 import java.util.List;
+import java.util.Map;
 
 import com.ginkgocap.ywxt.model.meeting.ChatMini;
 import com.ginkgocap.ywxt.model.meeting.ImRecordmessage;
@@ -148,6 +149,8 @@ public interface ImRecordmessageService {
 	 * @author qingc
 	 */
 	public List<Social> getPrivateChatAndGroupChat(SocialListReq property);
+
+	public Map<Integer,List<Social>> getPrivateChatAndGroupChatMap(SocialListReq property);
 	
 	/**
 	 * 获取社群

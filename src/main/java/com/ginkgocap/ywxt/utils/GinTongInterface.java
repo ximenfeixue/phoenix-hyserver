@@ -335,11 +335,6 @@ public class GinTongInterface {
 
 	/**
 	 * 获取用户个人单聊与畅聊的会话列表
-	 * 
-	 * @param groupName
-	 * @param roomsize
-	 * @param ownerId
-	 * @param memberIds
 	 * @return
 	 */
 	public static List<Social> getListIMRecord(SocialListReq property) {
@@ -357,7 +352,10 @@ public class GinTongInterface {
 			if ("0000".equals(jsonNode.get("notification").get("notifCode").asText())) {
 				JsonNode listIMRecordNode = jsonNode.get("responseData").get("page").get("listIMRecord");
 				for (JsonNode node : listIMRecordNode) {
-					logger.debug("imrecord ==> " + node.toString());
+					if (node == null) {
+						logger.error("node is null, so skip.");
+						continue;
+					}
 					Social socail = new Social();
 					socail.setId(getLong(node,"id",0L));
 					socail.setNewCount(getInt(node,"newCount",0));
@@ -371,9 +369,21 @@ public class GinTongInterface {
 					socail.setUserType(getInt(node, "userType", 0));
 					SocialDetail socialDetail = new SocialDetail();
 					List<String> listImageUrl = new ArrayList<String>();
-					for (JsonNode n : node.get("listImageUrl")) {
-						listImageUrl.add(n.asText());
-					}
+					JsonNode imgNodeList = node.get("listImageUrl");
+					if (imgNodeList != null) {
+						for (JsonNode imgNode : imgNodeList) {
+							if (imgNode != null) {
+								final String imgUrl = imgNode.asText();
+								if (imgUrl != null && imgUrl.trim().length() > 0) {
+									listImageUrl.add(imgUrl);
+								} else {
+									logger.error("image url is null, so skip add to list.");
+								}
+							}
+						}
+					} else {
+                        logger.error("image url lis is null.");
+                    }
 					socialDetail.setListImageUrl(listImageUrl);
 
 					socialDetail.setSenderID(getLong(node,"senderId",0L));
@@ -381,24 +391,103 @@ public class GinTongInterface {
 					socialDetail.setContent(getString(node, "content", ""));
 					socialDetail.setModal(getInt(node, "modal", 0));
 					socail.setSocialDetail(socialDetail);
-					logger.debug("socail ==> " + ReflectionToStringBuilder.toString(socail));
+					logger.debug("socail info: id: " + socail.getId() + " title: " + socail.getTitle() +
+								" sendId: " + socialDetail.getSenderID() + " sendName: " + socialDetail.getSenderName());
 					listSocial.add(socail);
 				}
 			}
 		} catch (Exception e) {
 			logger.error("req frrechat.getListIMRecord failed!", e);
 		}
-		logger.info("socail list size ==> " + listSocial.size());
+		logger.info("socail list size ==> " + (listSocial != null ? listSocial.size() : 0));
 		return listSocial;
+	}
+
+	public static Map<Integer,List<Social>> getListIMRecordMap(SocialListReq property) {
+
+		ObjectMapper objectMap = new ObjectMapper();
+		String url = resource.getString("imUrl");
+		String interfaceName = "/mobile/im/getListIMRecordMap";
+		try {
+			UserBean userBean = new UserBean();
+			userBean.setId(property.getUserId());
+			String responseJson = HttpClientUtil.getGintongPost(url, interfaceName, "{}", userBean);
+			JsonNode jsonNode = objectMap.readTree(responseJson);
+
+			if ("0".equals(jsonNode.get("notification").get("notifCode").asText())) {
+				JsonNode mapNode = jsonNode.get("responseData");
+				if (mapNode != null) {
+					Map<Integer, List<Social>> map = new HashMap<Integer, List<Social>>(2);
+					for (int index = 1; index <= 2; index++) {
+						JsonNode listIMRecordNode = mapNode.get(String.valueOf(index));
+						if (listIMRecordNode != null) {
+							List<Social> listSocial = new ArrayList<Social>(listIMRecordNode.size());
+							for (JsonNode node : listIMRecordNode) {
+								Social socail = convertNodeToSocial(node, (short)(index ==1 ? 1 : 0));
+								listSocial.add(socail);
+							}
+							map.put(index, listSocial);
+						}
+					}
+					return map;
+				}
+			}
+		} catch (Exception e) {
+			logger.error("req frrechat.getListIMRecord failed!", e);
+		}
+		return null;
+	}
+
+	private static Social convertNodeToSocial(JsonNode node, final short top) {
+		if (node == null) {
+			logger.error("node is null, so skip.");
+			return null;
+		}
+		Social socail = new Social();
+		socail.setTop(top);
+		socail.setId(getLong(node,"mucId",0L));
+		socail.setNewCount(getInt(node,"newCount",0));
+		socail.setTime(DateConvertUtils.parse(getString(node, "startTime", "")));
+		socail.setOrderTime(DateConvertUtils.parse(getString(node, "startTime", "")));
+		socail.setTitle(getString(node, "title", ""));
+		socail.setType(getInt(node,"type",0));
+		socail.setAtMsgId(getString(node, "atMsgId", ""));
+		socail.setAtName(getString(node, "atName", ""));
+		socail.setCompereName(getString(node, "compereName", ""));
+		socail.setUserType(getInt(node, "userType", 0));
+		SocialDetail socialDetail = new SocialDetail();
+		List<String> listImageUrl = new ArrayList<String>();
+		JsonNode imgNodeList = node.get("listImageUrl");
+		if (imgNodeList != null) {
+			for (JsonNode imgNode : imgNodeList) {
+				if (imgNode != null) {
+					final String imgUrl = imgNode.asText();
+					if (imgUrl != null && imgUrl.trim().length() > 0 && !"null".equals(imgUrl)) {
+						listImageUrl.add(imgUrl);
+					} else {
+						logger.error("image url is null, so skip add to list.");
+					}
+				}
+			}
+		} else {
+			logger.error("image url lis is null.");
+		}
+		socialDetail.setListImageUrl(listImageUrl);
+
+		socialDetail.setSenderID(getLong(node,"senderId",0L));
+		socialDetail.setSenderName(getString(node, "senderName", ""));
+		socialDetail.setContent(getString(node, "content", ""));
+		socialDetail.setModal(getInt(node, "modal", 0));
+		socail.setSocialDetail(socialDetail);
+		logger.debug("socail info: id: " + socail.getId() + " title: " + socail.getTitle() +
+				" sendId: " + socialDetail.getSenderID() + " sendName: " + socialDetail.getSenderName());
+
+		return socail;
 	}
 
 	/**
 	 * 获取用户会议会话列表
-	 * 
-	 * @param groupName
-	 * @param roomsize
-	 * @param ownerId
-	 * @param memberIds
+	 *
 	 * @return
 	 */
 	public static List<Social> getListMeetingRecord(Long userId) {

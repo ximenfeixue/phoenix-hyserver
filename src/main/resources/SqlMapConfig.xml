@@ -36,7 +36,6 @@
           <typeAlias alias="meetingOrgan" type="com.ginkgocap.ywxt.model.meeting.MeetingOrgan" />
           <typeAlias alias="meetingTemplate" type="com.ginkgocap.ywxt.model.meeting.MeetingTemplate" />
           <typeAlias alias="meetingCount" type="com.ginkgocap.ywxt.model.meeting.MeetingCount" />
-          <typeAlias alias="socialStatus" type="com.ginkgocap.ywxt.model.meeting.SocialStatus" />
           <typeAlias alias="socialListReq" type="com.ginkgocap.ywxt.model.meeting.SocialListReq" />
     </typeAliases>
 </configuration>

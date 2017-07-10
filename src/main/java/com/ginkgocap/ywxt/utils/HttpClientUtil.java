@@ -153,13 +153,13 @@ public class HttpClientUtil {
 			HttpResponse response = httpClient.execute(postRequest);
 			HttpEntity entity = response.getEntity();
 			if (entity != null) {
-
 				// System.out.println(EntityUtils.toString(entity));
 				logger.info("REQEST => " + url + interfaceName);
 				logger.info("PARAMS => " + json);
-				String a = EntityUtils.toString(entity).toString();
-				logger.info("RETURN => " + a);
-				return a;
+				String result = EntityUtils.toString(entity).toString();
+				final String ret = (result != null && result.length() > 55) ? result.substring(0, 55) : result;
+				logger.info("RETURN => " + ret);
+				return result;
 			}
 
 		} catch (IOException e) {
