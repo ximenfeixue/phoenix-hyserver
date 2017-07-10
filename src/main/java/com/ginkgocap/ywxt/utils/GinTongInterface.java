@@ -462,7 +462,7 @@ public class GinTongInterface {
 			for (JsonNode imgNode : imgNodeList) {
 				if (imgNode != null) {
 					final String imgUrl = imgNode.asText();
-					if (imgUrl != null && imgUrl.trim().length() > 0) {
+					if (imgUrl != null && imgUrl.trim().length() > 0 && !"null".equals(imgUrl)) {
 						listImageUrl.add(imgUrl);
 					} else {
 						logger.error("image url is null, so skip add to list.");
