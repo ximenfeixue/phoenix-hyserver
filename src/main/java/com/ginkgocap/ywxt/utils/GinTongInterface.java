@@ -1,12 +1,7 @@
 package com.ginkgocap.ywxt.utils;
 
 import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.ResourceBundle;
+import java.util.*;
 
 import net.sf.json.JSONObject;
 
@@ -447,8 +442,9 @@ public class GinTongInterface {
 		socail.setTop(top);
 		socail.setId(getLong(node,"mucId",0L));
 		socail.setNewCount(getInt(node,"newCount",0));
-		socail.setTime(DateConvertUtils.parse(getString(node, "startTime", "")));
-		socail.setOrderTime(DateConvertUtils.parse(getString(node, "startTime", "")));
+		final Date dateTime = DateConvertUtils.parse(getString(node, "startTime", ""));
+		socail.setTime(dateTime);
+		socail.setOrderTime(dateTime);
 		socail.setTitle(getString(node, "title", ""));
 		socail.setType(getInt(node,"type",0));
 		socail.setAtMsgId(getString(node, "atMsgId", ""));
