@@ -31,6 +31,10 @@ PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
 		<result property="isDelete" column="is_delete" />
 		<result property="formatedDesc" column="formated_desc" />
 		<result property="createUserType" column="create_user_type" />
+		<result property="top" column="top"/>
+		<result property="disable" column="disable"/>
+		<result property="isPay" column="is_pay"/>
+		<result property="payMoney" column="pay_money"/>
 	</resultMap>
 	
 	<sql id="columns">
@@ -42,7 +46,7 @@ PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
 			is_secrecy AS isSecrecy,member_count AS memberCount,meeting_desc AS meetingDesc,
 			create_id AS createId,create_name AS createName,task_id AS taskId,create_time AS createTime,
 			update_time AS updateTime,group_id AS groupId,industry,is_delete AS isDelete,formated_desc AS formatedDesc,
-			create_user_type AS createUserType
+			create_user_type AS createUserType, top AS top, disable AS disable
 		]]>
 	</sql>
 
@@ -73,7 +77,11 @@ PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
         	update_time,
         	industry,
         	is_delete,
-        	formated_desc
+        	formated_desc,
+        	top,
+        	disable,
+        	is_pay,
+        	pay_money
         ) VALUES (
         	#{id},
         	#{meetingName},
@@ -99,7 +107,11 @@ PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
         	NOW(),
         	#{industry},
         	#{isDelete},
-        	#{formatedDesc}
+        	#{formatedDesc},
+        	#{top},
+        	#{disable},
+        	#{isPay},
+        	#{payMoney}
         )
         
     ]]>
@@ -130,7 +142,11 @@ PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
 	        update_time = NOW(),
 	        industry = #{industry},
 	        is_delete = #{isDelete},
-	        formated_desc = #{formatedDesc}
+	        formated_desc = #{formatedDesc},
+	        top = #{top},
+	        disable = #{disable},
+	        is_pay = #{isPay},
+	        pay_money = #{payMoney}
         WHERE id = #{id} 
     ]]>
 	</update>
@@ -310,6 +326,8 @@ PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
 			m.create_name AS createName,
 			m.end_time AS endTime,
 			m.group_id AS groupId,
+			m.top AS top,
+			m.disable AS disable,
 			p.pic_path AS path
 		FROM tb_meeting AS m 
 		INNER JOIN tb_meeting_member AS mm 
@@ -359,7 +377,7 @@ PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
 			) AND (
 			    (mm.attend_meet_type = 0 AND mm.attend_meet_status = 1)
 			    OR (mm.attend_meet_type = 1 AND mm.attend_meet_status = 4 AND mm.excute_meet_sign = 1)
-			) 
+			) AND m.disable = 0
 		ORDER BY startTime DESC 
 	</select>
 	
@@ -608,6 +626,7 @@ PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
 			OR m.meeting_status = 2) 
 			AND m.is_delete = 0
 			AND m.is_secrecy = 0
+			AND m.disable = 0
 		<if test="beginDate!=null">
 			AND m.start_time<![CDATA[>=]]> #{beginDate}
 		</if>
@@ -661,6 +680,7 @@ PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
 			OR m.meeting_status = 2) 
 			AND m.is_delete = 0
 			AND m.is_secrecy = 0
+			AND m.disable = 0
 		<if test="beginDate!=null">
 			AND m.start_time<![CDATA[>=]]> #{beginDate}
 		</if>
@@ -1489,5 +1509,29 @@ PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
     	    #{item}
     	</foreach>
 	</update>
-	
+
+	<update id="addTop" parameterType="long">
+		UPDATE tb_meeting
+		SET top = 1
+		WHERE id = #{id}
+	</update>
+
+	<update id="deleteTop" parameterType="long">
+		UPDATE tb_meeting
+		SET top = 0
+		WHERE id = #{id}
+	</update>
+
+	<update id="disable" parameterType="long">
+		UPDATE tb_meeting
+		SET disable = 1
+		WHERE id = #{id}
+	</update>
+
+	<update id="enable" parameterType="long">
+		UPDATE tb_meeting
+		SET disable = 0
+		WHERE id = #{id}
+	</update>
+
 </mapper>

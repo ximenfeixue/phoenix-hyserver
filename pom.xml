@@ -28,6 +28,7 @@
 		<person.version>1.0.0</person.version>
 		<entire.dependencied>5.6.3</entire.dependencied>
 		<im.version>2.0-SNAPSHOT</im.version>
+		<frame.util.version>1.0.1-SNAPSHOT</frame.util.version>
 	</properties>
 
     <repositories>
@@ -575,7 +576,12 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-
+		<!--  -->
+		<dependency>
+			<groupId>com.gintong.frame</groupId>
+			<artifactId>phoenix-frame-util</artifactId>
+			<version>${frame.util.version}</version>
+		</dependency>
 	</dependencies>
 	<build>
 		<finalName>phoenix-hyserver</finalName>

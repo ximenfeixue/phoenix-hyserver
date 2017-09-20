@@ -511,7 +511,27 @@ public class MeetingDaoImpl extends SqlSessionDaoSupport implements MeetingDao,A
 	public void deleteBatch(List<Long> meetingIdList) {
 		getSqlSession().update("Meeting.deleteBatch", meetingIdList);
 	}
-    
+
+	@Override
+	public void addTop(long id) {
+	 	getSqlSession().update("Meeting.addTop", id);
+	}
+
+	@Override
+	public void deleteTop(long id) {
+		getSqlSession().update("Meeting.deleteTop", id);
+	}
+
+	@Override
+	public void disable(long id) {
+		getSqlSession().update("Meeting.disable", id);
+	}
+
+	@Override
+	public void enable(long id) {
+		getSqlSession().update("Meeting.enable", id);
+	}
+
 	/**
 	 * 名称: getMyAttendAndCreateMeeting
 	 * 描述:  获取我参加的和我创建的会议列表

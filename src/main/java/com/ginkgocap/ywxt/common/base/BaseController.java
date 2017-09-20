@@ -145,10 +145,25 @@ public abstract class BaseController {
 	 * @return str
 	 */
 	public User getUser(HttpServletRequest request){
-		User user=(User) request.getAttribute("users");
+		User user = (User) request.getAttribute("users");
 		return user;
 	}
-	
+
+	/**
+	 * 获取用户
+	 *
+	 * @param request
+	 *            待处理对象
+	 * @return str
+	 */
+	public User getYINUser(HttpServletRequest request){
+		User user = getUser(request);
+		if (user.getId() == 1) {
+			return user;
+		}
+		return null;
+	}
+
 	 public void setSessionAndErr(HttpServletRequest request,HttpServletResponse response,String errCode,String errMessage){
 //	    String sessionId=request.getHeader("sessionID");
 	    response.setHeader("errorCode", errCode);

@@ -7,6 +7,7 @@
 package com.ginkgocap.ywxt.model.meeting;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
@@ -70,7 +71,15 @@ public class Meeting extends BaseEntity implements Serializable{
 	private String formatedDesc;
 	//创建者类型 1：用户 2：组织
 	private int createUserType = 1;
-	
+	//置顶 0：未置顶 1：已置顶
+	private byte top;
+	//禁用 0：未禁用 1：已禁用
+	private byte disable;
+	//付费 ：0：免费 1：付费
+	private byte isPay;
+	//支付金额
+	private BigDecimal payMoney;
+
 	public Meeting() {}
 
 	public Meeting(Long id) {
@@ -316,6 +325,10 @@ public class Meeting extends BaseEntity implements Serializable{
 			.append("IsDelete",getIsDelete())
 			.append("FormatedDesc",getFormatedDesc())
 			.append("CreateUserType",getCreateUserType())
+			.append("Top", getTop())
+			.append("Disable", getDisable())
+			.append("IsPay", getIsPay())
+			.append("PayMoney", getPayMoney())
 			.toString();
 	}
 	/**
@@ -346,6 +359,10 @@ public class Meeting extends BaseEntity implements Serializable{
 			.append("'isDelete':'"+getIsDelete()+"',")
 			.append("'formatedDesc':'"+getFormatedDesc()+"',")
 			.append("'createUserType':'"+getCreateUserType()+"',")
+			.append("'top':'" + getTop() + "',")
+			.append("'disable':'" + getDisable() + "',")
+			.append("'isPay':'" + getIsPay() + "',")
+			.append("'payMoney':'" + getPayMoney() + "',")
 			.append("}}")
 			.toString().replaceAll(",}", "}");
 	}
@@ -363,5 +380,37 @@ public class Meeting extends BaseEntity implements Serializable{
 		return new EqualsBuilder()
 			.append(getId(),other.getId())
 			.isEquals();
+	}
+
+	public byte getTop() {
+		return top;
+	}
+
+	public void setTop(byte top) {
+		this.top = top;
+	}
+
+	public byte getDisable() {
+		return disable;
+	}
+
+	public void setDisable(byte disable) {
+		this.disable = disable;
+	}
+
+	public byte getIsPay() {
+		return isPay;
+	}
+
+	public void setIsPay(byte isPay) {
+		this.isPay = isPay;
+	}
+
+	public BigDecimal getPayMoney() {
+		return payMoney;
+	}
+
+	public void setPayMoney(BigDecimal payMoney) {
+		this.payMoney = payMoney;
 	}
 }

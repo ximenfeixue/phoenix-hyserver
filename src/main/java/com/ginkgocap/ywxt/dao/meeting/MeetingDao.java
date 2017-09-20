@@ -322,4 +322,28 @@ public interface MeetingDao{
 	 * @param meetingIdList
 	 */
 	public void deleteBatch(List<Long> meetingIdList);
+
+	/**
+	 * 置顶 会议
+	 * @param id
+	 */
+	void addTop(long id);
+
+	/**
+	 * 取消置顶 会议
+	 * @param id
+	 */
+	void deleteTop(long id);
+
+	/**
+	 * 禁用 会议
+	 * @param id
+	 */
+	void disable(long id);
+
+	/**
+	 * 启用 会议
+	 * @param id
+	 */
+	void enable(long id);
 }

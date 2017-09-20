@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeSet;
 
+import com.gintong.frame.util.dto.InterfaceResult;
 import org.apache.commons.beanutils.BeanUtils;
 import org.h2.util.StringUtils;
 import org.slf4j.Logger;
@@ -89,6 +90,8 @@ import com.ginkgocap.ywxt.vo.query.meeting.MeetingTopicQuery;
 import com.ginkgocap.ywxt.vo.query.meeting.TopicChatQuery;
 import com.ginkgocap.ywxt.vo.query.meeting.UserBean;
 import com.ginkgocap.ywxt.vo.query.social.Social;
+
+import javax.persistence.Transient;
 //import com.gintong.easemob.server.httpclient.api.EasemobChatGroupsHandler;
 
 @Service
@@ -2362,7 +2365,7 @@ public class MeetingServiceImpl extends BaseServiceImpl<Meeting, Long> implement
 	}
 	/**
 	 * 批量删除我的会议
-	 * 
+	 *
 	 * @param meetingIdList
 	 * @throws Exception
 	 */
@@ -2413,6 +2416,37 @@ public class MeetingServiceImpl extends BaseServiceImpl<Meeting, Long> implement
 		}
 		meetingDao.deleteBatch(meetingIdList);
 	}
+
+	@Transactional(rollbackFor = Exception.class)
+	@Override
+	public InterfaceResult addTop(long id) throws Exception {
+
+		meetingDao.addTop(id);
+		return InterfaceResult.getSuccessInterfaceResultInstance(true);
+	}
+
+	@Transactional(rollbackFor = Exception.class)
+	@Override
+	public InterfaceResult deleteTop(long id) throws Exception {
+
+		meetingDao.deleteTop(id);
+		return InterfaceResult.getSuccessInterfaceResultInstance(true);
+	}
+
+	@Override
+	public InterfaceResult disable(long id) throws Exception {
+
+		meetingDao.disable(id);
+		return InterfaceResult.getSuccessInterfaceResultInstance(true);
+	}
+
+	@Override
+	public InterfaceResult enable(long id) throws Exception {
+
+		meetingDao.enable(id);
+		return InterfaceResult.getSuccessInterfaceResultInstance(true);
+	}
+
 	@Override
 	public Social getMeetingWithLatestMessage(Long userId) {
 		return meetingDao.getMeetingWithLatestMessage(userId);

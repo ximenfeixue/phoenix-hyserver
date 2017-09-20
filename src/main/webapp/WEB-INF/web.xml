@@ -48,10 +48,10 @@
 			</param-value>
 		</init-param>
 	</filter>
-	<filter-mapping>
+	<!--<filter-mapping>
 		<filter-name>AppFilter</filter-name>
 		<url-pattern>*.json</url-pattern>
-	</filter-mapping>
+	</filter-mapping>-->
 	<error-page>
 		<error-code>404</error-code>
 		<location>/WEB-INF/view/errors/404.jsp</location>

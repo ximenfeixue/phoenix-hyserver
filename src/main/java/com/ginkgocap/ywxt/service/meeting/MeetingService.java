@@ -18,6 +18,7 @@ import com.ginkgocap.ywxt.vo.query.meeting.BigDataQuery;
 import com.ginkgocap.ywxt.vo.query.meeting.MeetingMemberListQuery;
 import com.ginkgocap.ywxt.vo.query.meeting.MeetingQuery;
 import com.ginkgocap.ywxt.vo.query.social.Social;
+import com.gintong.frame.util.dto.InterfaceResult;
 
 public interface MeetingService {
 	/**
@@ -375,4 +376,34 @@ public interface MeetingService {
 	 * @param memberId
 	 */
 	public void deleteMyMeetingBatch(List<Long> meetingIdList, Long memberId) throws Exception;
+
+	/**
+	 * 置顶会议 （运营后台）
+	 * @param id
+	 * @return
+	 */
+	InterfaceResult addTop(long id) throws Exception;
+
+	/**
+	 * 取消置顶会议 （运营后台）
+	 * @param id
+	 * @return
+	 */
+	InterfaceResult deleteTop(long id) throws Exception;
+
+	/**
+	 * 禁用 会议 （运营后台）
+	 * @param id
+	 * @return
+	 * @throws Exception
+	 */
+	InterfaceResult disable(long id) throws Exception;
+
+	/**
+	 * 启用 会议 （运营后台）
+	 * @param id
+	 * @return
+	 * @throws Exception
+	 */
+	InterfaceResult enable(long id) throws Exception;
 }
