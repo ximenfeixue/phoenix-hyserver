@@ -7,6 +7,7 @@
 package com.ginkgocap.ywxt.vo.query.meeting;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -101,6 +102,14 @@ public class MeetingMemberListQuery implements Serializable {
 	 * 环信的群组id
 	 */
 	private String groupId;
+	//置顶 0：未置顶 1：已置顶
+	private byte top;
+	//禁用 0：未禁用 1：已禁用
+	private byte disable;
+	//付费 ：0：免费 1：付费
+	private byte isPay;
+	//支付金额
+	private BigDecimal payMoney;
 	
 	public java.lang.Long getId() {
 		return this.id;
@@ -475,5 +484,37 @@ public class MeetingMemberListQuery implements Serializable {
 			.append("'crateTime':'"+getCreateTime()+"',")
 			.append("}}")
 			.toString().replaceAll(",}", "}");
+	}
+
+	public byte getTop() {
+		return top;
+	}
+
+	public void setTop(byte top) {
+		this.top = top;
+	}
+
+	public byte getDisable() {
+		return disable;
+	}
+
+	public void setDisable(byte disable) {
+		this.disable = disable;
+	}
+
+	public byte getIsPay() {
+		return isPay;
+	}
+
+	public void setIsPay(byte isPay) {
+		this.isPay = isPay;
+	}
+
+	public BigDecimal getPayMoney() {
+		return payMoney;
+	}
+
+	public void setPayMoney(BigDecimal payMoney) {
+		this.payMoney = payMoney;
 	}
 }

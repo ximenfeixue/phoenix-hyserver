@@ -76,7 +76,7 @@ public class MeetingCommonController extends BaseController{
      * @return
      */
     @ResponseBody
-    @RequestMapping(value = "/deleteTop/{id}", method = RequestMethod.DELETE, produces = {"application/json;charset=UTF-8"})
+    @RequestMapping(value = "/deleteTop/{id}", method = {RequestMethod.POST,RequestMethod.DELETE}, produces = {"application/json;charset=UTF-8"})
     public InterfaceResult deleteTop(HttpServletRequest request, @PathVariable long id) {
 
         InterfaceResult result = null;
@@ -142,7 +142,7 @@ public class MeetingCommonController extends BaseController{
      * @return
      */
     @ResponseBody
-    @RequestMapping(value = "/enable/{id}", method = RequestMethod.POST, produces = {"application/json;charset=UTF-8"})
+    @RequestMapping(value = "/enable/{id}", method = {RequestMethod.POST,RequestMethod.DELETE}, produces = {"application/json;charset=UTF-8"})
     public InterfaceResult enable(HttpServletRequest request, @PathVariable long id) {
 
         InterfaceResult result = null;

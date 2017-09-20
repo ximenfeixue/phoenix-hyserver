@@ -46,7 +46,7 @@ PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
 			is_secrecy AS isSecrecy,member_count AS memberCount,meeting_desc AS meetingDesc,
 			create_id AS createId,create_name AS createName,task_id AS taskId,create_time AS createTime,
 			update_time AS updateTime,group_id AS groupId,industry,is_delete AS isDelete,formated_desc AS formatedDesc,
-			create_user_type AS createUserType, top AS top, disable AS disable
+			create_user_type AS createUserType, top AS top, disable AS disable, is_pay AS isPay, pay_money AS payMoney
 		]]>
 	</sql>
 
@@ -666,6 +666,10 @@ PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
 			m.end_time AS endTime,
 			m.member_count AS memberCount,
 			m.industry,
+			m.top,
+			m.disable,
+			m.is_pay AS isPay,
+			m.pay_money AS payMoney,
 		<if test="addressPosX!=null">
 			lat_long_distance(#{addressPosX},#{addressPosY},m.meeting_address_pos_x,m.meeting_address_pos_y) AS distance,
 		</if>
@@ -726,6 +730,10 @@ PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
 					m.meeting_status AS meetingStatus,
 					m.create_id AS createId,
 					m.create_name AS createName,
+					m.top,
+					m.disable,
+					m.is_pay AS isPay,
+					m.pay_money AS payMoney,
 					p.pic_path AS path,
 					CASE m.meeting_status WHEN 3 THEN -1 ELSE m.meeting_status END AS orderType
 				FROM tb_meeting m 
@@ -746,6 +754,10 @@ PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
 					m.meeting_status AS meetingStatus,
 					m.create_id AS createId,
 					m.create_name AS createName,
+					m.top,
+					m.disable,
+					m.is_pay AS isPay,
+					m.pay_money AS payMoney,
 					p.pic_path AS path,
 					CASE m.meeting_status WHEN 3 THEN -1 ELSE m.meeting_status END AS orderType
 				FROM tb_meeting m
@@ -780,6 +792,10 @@ PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
 					m.meeting_status AS meetingStatus,
 					m.create_id AS createId,
 					m.create_name AS createName,
+					m.top,
+					m.disable,
+					m.is_pay AS isPay,
+					m.pay_money AS payMoney,
 					p.pic_path AS path,
 					CASE m.meeting_status WHEN 3 THEN -1 ELSE m.meeting_status END AS orderType
 				FROM tb_meeting m
@@ -976,6 +992,10 @@ PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
 				m.meeting_desc AS meetingDesc,
 				m.meeting_type AS meetingType,
 				m.meeting_status AS meetingStatus,
+				m.top,
+				m.disable,
+				m.is_pay AS isPay,
+				m.pay_money AS payMoney,
 				p.pic_path AS path 
 			FROM tb_meeting m 
 			LEFT JOIN tb_meeting_pic AS p 
@@ -998,6 +1018,10 @@ PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
 				m.meeting_desc AS meetingDesc,
 				m.meeting_type  AS meetingType,
 				m.meeting_status AS meetingStatus,
+				m.top,
+				m.disable,
+				m.is_pay AS isPay,
+				m.pay_money AS payMoney,
 				p.pic_path AS path 
 			FROM tb_meeting m 
 			LEFT JOIN tb_meeting_pic AS p 
@@ -1020,6 +1044,10 @@ PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
 				m.meeting_desc AS meetingDesc,
 				m.meeting_type  AS meetingType,
 				m.meeting_status AS meetingStatus,
+				m.top,
+				m.disable,
+				m.is_pay AS isPay,
+				m.pay_money AS payMoney,
 				p.pic_path AS path 
 			FROM tb_meeting m 
 			LEFT JOIN tb_meeting_pic AS p 
@@ -1054,6 +1082,10 @@ PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
 			m.create_name AS createName,
 			m.end_time AS endTime,
 			m.group_id AS groupId,
+			m.top,
+			m.disable,
+			m.is_pay AS isPay,
+			m.pay_money AS payMoney,
 			p.pic_path AS path 
 		FROM tb_meeting m 
 		LEFT JOIN tb_meeting_pic AS p 
@@ -1081,6 +1113,10 @@ PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
 			mm.is_delete AS memberDeleteFlag,
 			m.create_id AS createId,
 			m.create_name AS createName,
+			m.top,
+			m.disable,
+			m.is_pay AS isPay,
+			m.pay_money AS payMoney,
 			mm.attend_meet_status AS attendMeetStatus
 		FROM tb_meeting m
 		LEFT JOIN tb_meeting_pic AS p
@@ -1137,6 +1173,10 @@ PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
 			m.meeting_type AS meetingType,
 			m.meeting_status AS meetingStatus,
 			m.meeting_desc AS meetingDesc,
+			m.top,
+			m.disable,
+			m.is_pay AS isPay,
+			m.pay_money AS payMoney,
 			mp.pic_path AS path
 		FROM tb_meeting m
 		LEFT JOIN tb_meeting_pic mp 
