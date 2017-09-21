@@ -31,9 +31,9 @@ public class MeetingMember extends BaseEntity implements java.io.Serializable,Co
 	private String memberName;
     //人员图片
 	private String memberPhoto;
-    //人员处理会议的状态 0.未答复 1接受邀请2拒绝邀请，3签到 4 报名 5取消报名
+    //人员处理会议的状态 0.未答复 1接受邀请 2拒绝邀请，3签到 4 报名 5取消报名
 	private Integer memberMeetStatus;
-    //参会状态 0.参会状态	0.未答复 1接受邀请2拒绝邀请， 4 报名 5取消报名
+    //参会状态 0.参会状态	0.未答复 1接受邀请 2拒绝邀请， 4 报名 5取消报名
 	private Integer attendMeetStatus;
 	//是否签到 0：未签，1：已签
 	private Integer isSign;
