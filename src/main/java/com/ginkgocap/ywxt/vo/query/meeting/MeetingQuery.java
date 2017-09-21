@@ -123,7 +123,7 @@ public class MeetingQuery implements Serializable {
 	//付费 ：0：免费 1：付费
 	private byte isPay;
 	//支付金额
-	private BigDecimal payMoney;
+	private BigDecimal payMoney = new BigDecimal(0);
 	
 	public Long getId() {
 		return this.id;
