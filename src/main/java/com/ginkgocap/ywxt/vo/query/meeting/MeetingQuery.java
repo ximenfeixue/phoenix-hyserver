@@ -12,18 +12,10 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import com.ginkgocap.ywxt.model.meeting.*;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
 
-import com.ginkgocap.ywxt.model.meeting.MeetingData;
-import com.ginkgocap.ywxt.model.meeting.MeetingFile;
-import com.ginkgocap.ywxt.model.meeting.MeetingMember;
-import com.ginkgocap.ywxt.model.meeting.MeetingOrgan;
-import com.ginkgocap.ywxt.model.meeting.MeetingPeople;
-import com.ginkgocap.ywxt.model.meeting.MeetingPic;
-import com.ginkgocap.ywxt.model.meeting.MeetingSignLabel;
-import com.ginkgocap.ywxt.model.meeting.MeetingTime;
-import com.ginkgocap.ywxt.model.meeting.MeetingTopic;
 public class MeetingQuery implements Serializable {
     private static final long serialVersionUID = 3148176768559230877L;
 	/** 会议序号 */
@@ -96,6 +88,8 @@ public class MeetingQuery implements Serializable {
 	private List<MeetingOrgan> listMeetingOrgan;
 	/**会议议题VO**/
 	private List<MeetingTopicQuery> listMeetingTopicQuery;
+	/**会议详情小模块**/
+	private List<MeetingDetail> listMeetingDetail;
 	/**用户报名会议必填字段**/
 	private List<MeetingSignLabel> listMeetingSignLabel;
 	/**参会总人数**/
@@ -616,5 +610,21 @@ public class MeetingQuery implements Serializable {
 
 	public void setPayMoney(BigDecimal payMoney) {
 		this.payMoney = payMoney;
+	}
+
+	public List<MeetingDetail> getListMeetingDetail() {
+		return listMeetingDetail;
+	}
+
+	public void setListMeetingDetail(List<MeetingDetail> listMeetingDetail) {
+		this.listMeetingDetail = listMeetingDetail;
+	}
+
+	public Boolean getSecrecy() {
+		return isSecrecy;
+	}
+
+	public void setSecrecy(Boolean secrecy) {
+		isSecrecy = secrecy;
 	}
 }

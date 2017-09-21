@@ -6,16 +6,11 @@
  */
 package com.ginkgocap.ywxt.service.meeting.impl;
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.TreeSet;
 
+import com.ginkgocap.ywxt.dao.meeting.*;
+import com.ginkgocap.ywxt.model.meeting.*;
 import com.gintong.frame.util.dto.InterfaceResult;
 import org.apache.commons.beanutils.BeanUtils;
 import org.h2.util.StringUtils;
@@ -26,38 +21,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.ginkgocap.ywxt.common.base.BaseServiceImpl;
-import com.ginkgocap.ywxt.dao.meeting.ImRecordmessageDao;
-import com.ginkgocap.ywxt.dao.meeting.MeetingDao;
-import com.ginkgocap.ywxt.dao.meeting.MeetingDataDao;
-import com.ginkgocap.ywxt.dao.meeting.MeetingMemberDao;
-import com.ginkgocap.ywxt.dao.meeting.MeetingNoticeDao;
-import com.ginkgocap.ywxt.dao.meeting.MeetingOrganDao;
-import com.ginkgocap.ywxt.dao.meeting.MeetingPeopleDao;
-import com.ginkgocap.ywxt.dao.meeting.MeetingPicDao;
-import com.ginkgocap.ywxt.dao.meeting.MeetingSignLabelDao;
-import com.ginkgocap.ywxt.dao.meeting.MeetingSignLabelDataDao;
-import com.ginkgocap.ywxt.dao.meeting.MeetingTimeDao;
-import com.ginkgocap.ywxt.dao.meeting.MeetingTopicDao;
-import com.ginkgocap.ywxt.dao.meeting.NoticeFieldDao;
-import com.ginkgocap.ywxt.dao.meeting.UserDao;
 import com.ginkgocap.ywxt.file.model.FileIndex;
 import com.ginkgocap.ywxt.file.service.FileIndexService;
-import com.ginkgocap.ywxt.model.meeting.ImRecordmessage;
-import com.ginkgocap.ywxt.model.meeting.Meeting;
-import com.ginkgocap.ywxt.model.meeting.MeetingData;
-import com.ginkgocap.ywxt.model.meeting.MeetingFile;
-import com.ginkgocap.ywxt.model.meeting.MeetingMember;
-import com.ginkgocap.ywxt.model.meeting.MeetingMini;
-import com.ginkgocap.ywxt.model.meeting.MeetingNotice;
-import com.ginkgocap.ywxt.model.meeting.MeetingOrgan;
-import com.ginkgocap.ywxt.model.meeting.MeetingPeople;
-import com.ginkgocap.ywxt.model.meeting.MeetingPic;
-import com.ginkgocap.ywxt.model.meeting.MeetingSignLabel;
-import com.ginkgocap.ywxt.model.meeting.MeetingTime;
-import com.ginkgocap.ywxt.model.meeting.MeetingTopic;
-import com.ginkgocap.ywxt.model.meeting.MeetingVo;
-import com.ginkgocap.ywxt.model.meeting.NoticeField;
-import com.ginkgocap.ywxt.model.meeting.TopicChat;
 import com.ginkgocap.ywxt.service.meeting.MeetingMemberService;
 import com.ginkgocap.ywxt.service.meeting.MeetingService;
 import com.ginkgocap.ywxt.service.meeting.TopicChatService;
@@ -97,6 +62,9 @@ import javax.persistence.Transient;
 @Service
 @Transactional
 public class MeetingServiceImpl extends BaseServiceImpl<Meeting, Long> implements MeetingService {
+
+	@Autowired
+	private MeetingDetailDao meetingDetailDao;
 	@Autowired
 	private MeetingDao meetingDao;
 	@Autowired
@@ -524,6 +492,16 @@ public class MeetingServiceImpl extends BaseServiceImpl<Meeting, Long> implement
 					}
 				}
 			}
+
+			/**保存会议详情小模块**/
+			Map<Integer,Long> meetingDetailMap = new HashMap<Integer, Long>();
+			if (!Utils.isNullOrEmpty(entity.getListMeetingDetail())) {
+				for (MeetingDetail md : entity.getListMeetingDetail()) {
+					long mdid= meetingDetailDao.save(md);
+					// 小模块Id要和对应的sequence做一次关联 供图片存储时关联用
+					meetingDetailMap.put(md.getSequence(),mdid);
+				}
+			}
 			// 保存会议图片
 			String homePage = "";
 			if (!Utils.isNullOrEmpty(entity.getListMeetingPic())) {
@@ -531,15 +509,16 @@ public class MeetingServiceImpl extends BaseServiceImpl<Meeting, Long> implement
 					MeetingPic meetingPic = entity.getListMeetingPic().get(i);
 					if (!Utils.isNullOrEmpty(meetingPic)) {
 						meetingPic.setMeetingId(meeting.getId());
-						meetingPic.setModuleId(meeting.getId());
 						meetingPic.setModuleType(MeetingPic.MODULE_TYPE_MEETING);
 						meetingPic.setCreateDate(new Date());
-						if (i == 0) {
-							homePage = meetingPic.getPicPath();
-							meetingPic.setIshomePage(1);
-						} else {
-							meetingPic.setIshomePage(0);
-						}
+//						if (i == 0) {
+//							homePage = meetingPic.getPicPath();
+//							meetingPic.setIshomePage(1);
+//						} else {
+//							meetingPic.setIshomePage(0);
+//						}
+						Long mudouleId = meetingDetailMap.get(meetingPic.getModuleId().intValue());
+						meetingPic.setModuleId(mudouleId);
 						meetingPicDao.saveOrUpdate(meetingPic);
 					}
 				}

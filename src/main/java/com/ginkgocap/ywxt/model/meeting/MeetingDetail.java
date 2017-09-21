@@ -13,6 +13,8 @@ public class MeetingDetail {
     private String meetingDetailTitle;
     // 详情介绍
     private String meetingDetail;
+    // 详情小模块序号
+    private int sequence;
 
     public Long getId() {
         return id;
@@ -44,5 +46,13 @@ public class MeetingDetail {
 
     public void setMeetingDetail(String meetingDetail) {
         this.meetingDetail = meetingDetail;
+    }
+
+    public int getSequence() {
+        return sequence;
+    }
+
+    public void setSequence(int sequence) {
+        this.sequence = sequence;
     }
 }
