@@ -517,7 +517,9 @@ public class MeetingServiceImpl extends BaseServiceImpl<Meeting, Long> implement
 //						} else {
 //							meetingPic.setIshomePage(0);
 //						}
-						Long mudouleId = meetingDetailMap.get(meetingPic.getModuleId().intValue());
+						Long mudouleId = 0l;
+						if (meetingDetailMap.size() > 0)
+							mudouleId = meetingDetailMap.get(meetingPic.getModuleId().intValue());
 						meetingPic.setModuleId(mudouleId);
 						meetingPicDao.saveOrUpdate(meetingPic);
 					}
