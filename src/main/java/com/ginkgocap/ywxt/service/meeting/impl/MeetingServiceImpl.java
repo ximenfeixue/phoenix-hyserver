@@ -909,6 +909,7 @@ public class MeetingServiceImpl extends BaseServiceImpl<Meeting, Long> implement
 				meetingObj.setListMeetingTopic(listTopic);
 				// 封装会议详情小模块
 				List<MeetingDetail> listMeetingDetail = meetingDetailDao.getMeetingDetailByMeetingId(id);
+				meetingObj.setListMeetingDetail(listMeetingDetail);
 				// 封装会议时间信息
 				List<MeetingTime> listTime = meetingTimeDao.getByMeetingId(id);
 				meetingObj.setListMeetingTime(listTime);
