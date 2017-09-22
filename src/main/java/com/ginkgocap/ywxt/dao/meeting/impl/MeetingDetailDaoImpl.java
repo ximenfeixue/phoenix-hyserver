@@ -7,10 +7,14 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
 
 /**
  * Created by xutlong on 2017/9/21.
  */
+@Repository
 public class MeetingDetailDaoImpl extends SqlSessionDaoSupport implements MeetingDetailDao,ApplicationContextAware {
 
     @Autowired
@@ -43,5 +47,8 @@ public class MeetingDetailDaoImpl extends SqlSessionDaoSupport implements Meetin
         return false;
     }
 
-
+    @Override
+    public List<MeetingDetail> getMeetingDetailByMeetingId(Long id) {
+        return getSqlSession().selectList("MeetingDetail.getByMeetingId",id);
+    }
 }

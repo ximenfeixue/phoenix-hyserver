@@ -3,6 +3,8 @@ package com.ginkgocap.ywxt.dao.meeting;
 import com.ginkgocap.ywxt.model.meeting.MeetingDetail;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 /**
  * Created by xutlong on 2017/9/21.
  */
@@ -36,4 +38,11 @@ public interface MeetingDetailDao {
      * @return
      */
     public boolean deleteByMeetingId(Long meetingId);
+
+    /**
+     * 根据会议Id获取各个小模块的数据
+     * @param id
+     * @return
+     */
+    public List<MeetingDetail> getMeetingDetailByMeetingId(Long id);
 }
