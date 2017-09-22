@@ -8,13 +8,15 @@ package com.ginkgocap.ywxt.service.meeting.impl;
 
 import java.util.List;
 
+import com.ginkgocap.parasol.file.model.FileIndex;
+import com.ginkgocap.parasol.file.service.FileIndexService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.ginkgocap.ywxt.dao.meeting.MeetingPicDao;
-import com.ginkgocap.ywxt.file.model.FileIndex;
-import com.ginkgocap.ywxt.file.service.FileIndexService;
+// import com.ginkgocap.ywxt.file.model.FileIndex;
+// import com.ginkgocap.ywxt.file.service.FileIndexService;
 import com.ginkgocap.ywxt.model.meeting.MeetingPic;
 import com.ginkgocap.ywxt.service.meeting.MeetingPicService;
 import com.ginkgocap.ywxt.utils.Utils;
@@ -232,7 +234,7 @@ public void delete(Long property){
 				}
 			}
 			if(!Utils.isNullOrEmpty(fileIndex)&&!Utils.isNullOrEmpty(fileIndex.getId())){
-				fileIndexService.delete(Long.valueOf(fileIndex.getId()));
+				fileIndexService.deleteFileIndexById(meetingPic.getCreateUserId(),fileIndex.getId());
 			}
 			flag=true;
 		} catch (Exception e) {

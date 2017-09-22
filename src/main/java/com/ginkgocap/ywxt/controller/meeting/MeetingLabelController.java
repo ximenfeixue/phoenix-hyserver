@@ -37,8 +37,8 @@ import com.ginkgocap.ywxt.user.model.User;
 public class MeetingLabelController extends BaseController {
 	@Autowired
 	private MeetingLabelService meetingLabelService;
-	@Autowired
-	private FileIndexService fileIndexService;
+//	@Autowired
+//	private FileIndexService fileIndexService;
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 	/**
 	 * 名称: addMeetingLabelGet

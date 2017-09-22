@@ -8,7 +8,8 @@ package com.ginkgocap.ywxt.service.meeting;
 
 import java.util.List;
 
-import com.ginkgocap.ywxt.file.model.FileIndex;
+// import com.ginkgocap.ywxt.file.model.FileIndex;
+import com.ginkgocap.parasol.file.model.FileIndex;
 import com.ginkgocap.ywxt.model.meeting.MeetingPic;
 
 public interface MeetingPicService {

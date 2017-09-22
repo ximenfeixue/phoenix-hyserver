@@ -13,6 +13,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.ginkgocap.parasol.file.model.FileIndex;
+import com.ginkgocap.parasol.file.service.FileIndexService;
 import org.apache.commons.beanutils.BeanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,8 +28,8 @@ import com.ginkgocap.ywxt.dao.meeting.MeetingPicDao;
 import com.ginkgocap.ywxt.dao.meeting.MeetingTopicDao;
 import com.ginkgocap.ywxt.dao.meeting.TopicChatDao;
 import com.ginkgocap.ywxt.dao.meeting.UserDao;
-import com.ginkgocap.ywxt.file.model.FileIndex;
-import com.ginkgocap.ywxt.file.service.FileIndexService;
+// import com.ginkgocap.ywxt.file.model.FileIndex;
+// import com.ginkgocap.ywxt.file.service.FileIndexService;
 import com.ginkgocap.ywxt.model.meeting.Meeting;
 import com.ginkgocap.ywxt.model.meeting.MeetingFile;
 import com.ginkgocap.ywxt.model.meeting.MeetingPic;
@@ -278,13 +280,13 @@ public class MeetingTopicServiceImpl implements MeetingTopicService{
 					}
 					// 获取附件列表
 					if(!Utils.isNullOrEmpty(meetingTopic.getTaskId())){
-						List<FileIndex> listFileIndex=fileIndexService.selectByTaskId(meetingTopic.getTaskId(), "1");
+						List<FileIndex> listFileIndex=fileIndexService.getFileIndexesByTaskId(meetingTopic.getTaskId());
 						List<MeetingFile> listMeetingFile = new ArrayList<MeetingFile>();
 						if(!Utils.isNullOrEmpty(listFileIndex)){
 							for(FileIndex fileIndex:listFileIndex){
 								if(!Utils.isNullOrEmpty(fileIndex)
 										&& !listFileIndexId.contains(fileIndex.getId())){
-									MeetingFile meetingFile = JsonToBean.fileIndexToMeetingFile(fileIndex);
+									MeetingFile meetingFile = JsonToBean.apiFileIndexToMeetingFile(fileIndex);
 									listMeetingFile.add(meetingFile);
 								}
 							}

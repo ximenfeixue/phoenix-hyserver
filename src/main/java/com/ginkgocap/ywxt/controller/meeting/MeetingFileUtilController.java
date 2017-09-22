@@ -14,6 +14,8 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.ginkgocap.parasol.file.model.FileIndex;
+import com.ginkgocap.parasol.file.service.FileIndexService;
 import org.apache.commons.lang3.StringUtils;
 import org.h2.util.IOUtils;
 import org.slf4j.Logger;
@@ -26,8 +28,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.ginkgocap.ywxt.file.model.FileIndex;
-import com.ginkgocap.ywxt.file.service.FileIndexService;
+// import com.ginkgocap.ywxt.file.model.FileIndex;
+// import com.ginkgocap.ywxt.file.service.FileIndexService;
 import com.ginkgocap.ywxt.model.meeting.MeetingFile;
 import com.ginkgocap.ywxt.model.meeting.MeetingPic;
 import com.ginkgocap.ywxt.service.meeting.MeetingPicService;
@@ -116,25 +118,25 @@ public class MeetingFileUtilController  {
         String fileId = MeetingFilePrimaryKey.getPrimaryKey();
         // 文件上传后在数据库中记录相应记录
         FileIndex fileIndex = new FileIndex();
-        fileIndex.setId(fileId);
+        fileIndex.setId(Long.parseLong(fileId));
         fileIndex.setFilePath(filePath);
         fileIndex.setFileTitle(StringUtils.isNotBlank(setFileName)?setFileName:fileRealName);	
         fileIndex.setTaskId(taskId);
         fileIndex.setFileSize(Long.valueOf(size));
         fileIndex.setModuleType(Integer.parseInt(moduleType));
     	if(!Utils.isNullOrEmpty(userId)){
-    		fileIndex.setAuthor(Long.valueOf(userId));
+    		fileIndex.setCreaterId(Long.parseLong(userId));
     	}
     	if(!Utils.isNullOrEmpty(name)){
- 	        fileIndex.setAuthorName(name);
+ 	        //fileIndex.set(name);
     	}
         fileIndex.setMd5(md5);
         fileIndex.setCrc32(crc32);
-        fileIndex.setStatus(true);
-        fileIndexService.insert(fileIndex);        
+        // fileIndex.setStatus(true);
+        // fileIndexService.insert(fileIndex);
         MeetingFile meetingFile = null;
 		try {
-			meetingFile = JsonToBean.fileIndexToMeetingFile(fileIndex);
+			// meetingFile = JsonToBean.fileIndexToMeetingFile(fileIndex);
 //			String path = request.getContextPath();  
 //	        String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+path; 
 			String nginxRoot = (String) request.getSession().getServletContext().getAttribute("nginxRoot");
@@ -201,10 +203,10 @@ public class MeetingFileUtilController  {
 				id=Utils.isNullOrEmpty(meetingPic.getFileIndexId())?"0":String.valueOf(meetingPic.getFileIndexId());
 			}
 			//FileIndex fileIndex = meetingFileIndexServiceImpl.getById(Long.parseLong(id));
-			FileIndex fileIndex = fileIndexService.selectByPrimaryKey(Long.parseLong(id));
-			if(fileIndex != null) {
-				setDownload(request, response,fileIndex);
-			}
+			// FileIndex fileIndex = fileIndexService.selectByPrimaryKey(Long.parseLong(id));
+//			if(fileIndex != null) {
+//				setDownload(request, response,fileIndex);
+//			}
 		}
 	}
 	
@@ -228,27 +230,27 @@ public class MeetingFileUtilController  {
     	String notifCode="0002";
     	String notifInfo="删除失败";
 		if(StringUtils.isNotBlank(id)){
-			if(!Utils.isNullOrEmpty(isMettingPic)&&"T".equalsIgnoreCase(isMettingPic)){
-				// 获取会议图片对象
-				MeetingPic meetingPic=meetingPicService.getById(Long.valueOf(id));
-				FileIndex fileIndex = fileIndexService.selectByPrimaryKey(Long.valueOf(id));
-				try {
-					meetingPicService.removeMeetingPic(meetingPic, fileIndex);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-				succeed = true;
-				notifCode="0001";
-				notifInfo="删除成功";
-			}else{
-				FileIndex fileIndex = fileIndexService.selectByPrimaryKey(Long.valueOf(id));
-				if (fileIndex != null) {
-					fileIndexService.delete(Long.parseLong(fileIndex.getId()));
-					succeed = true;
-					notifCode="0001";
-					notifInfo="删除成功";
-				}
-			}
+//			if(!Utils.isNullOrEmpty(isMettingPic)&&"T".equalsIgnoreCase(isMettingPic)){
+//				// 获取会议图片对象
+//				MeetingPic meetingPic=meetingPicService.getById(Long.valueOf(id));
+//				FileIndex fileIndex = fileIndexService.selectByPrimaryKey(Long.valueOf(id));
+//				try {
+//					meetingPicService.removeMeetingPic(meetingPic, fileIndex);
+//				} catch (Exception e) {
+//					e.printStackTrace();
+//				}
+//				succeed = true;
+//				notifCode="0001";
+//				notifInfo="删除成功";
+//			}else{
+//				FileIndex fileIndex = fileIndexService.selectByPrimaryKey(Long.valueOf(id));
+//				if (fileIndex != null) {
+//					fileIndexService.delete(Long.parseLong(fileIndex.getId()));
+//					succeed = true;
+//					notifCode="0001";
+//					notifInfo="删除成功";
+//				}
+//			}
 		}
 		responseDataMap.put("succeed", succeed);
 		notificationMap.put("notifCode", notifCode);
@@ -297,53 +299,53 @@ public class MeetingFileUtilController  {
 				notificationMap.put("notifCode", "0002");
 		    	notificationMap.put("notifInfo", "参数不全");
 	    	} else {
-		        String fileId = MeetingFilePrimaryKey.getPrimaryKey();
-		        // 文件上传后在数据库中记录相应记录
-		        FileIndex fileIndex = new FileIndex();
-		        fileIndex.setId(fileId);
-		        fileIndex.setFilePath(filePath);
-		        fileIndex.setFileTitle(fileRealName);
-		        fileIndex.setTaskId(taskId);
-		        fileIndex.setFileSize(Long.valueOf(size));
-		        fileIndex.setModuleType(-1);
-		        fileIndex.setCtime(DateFunc.getDate());
-		        if(!Utils.isNullOrEmpty(user)){
-	        		fileIndex.setAuthor(user.getId());
-		 	        fileIndex.setAuthorName(user.getName());
-	        	}
-		        fileIndex.setMd5(md5);
-		        fileIndex.setCrc32(crc32);
-		        fileIndex.setStatus(true);
-		        fileIndexService.insert(fileIndex);
-		    	// 图片目的地址
-		        String nginxRoot = (String) request.getSession().getServletContext().getAttribute("nginxRoot");
-				String url = nginxRoot + "/meeting/download?id=" + fileIndex.getId();
-				int width=0, height=0;
+//		        String fileId = MeetingFilePrimaryKey.getPrimaryKey();
+//		        // 文件上传后在数据库中记录相应记录
+//		        FileIndex fileIndex = new FileIndex();
+//		        fileIndex.setId(fileId);
+//		        fileIndex.setFilePath(filePath);
+//		        fileIndex.setFileTitle(fileRealName);
+//		        fileIndex.setTaskId(taskId);
+//		        fileIndex.setFileSize(Long.valueOf(size));
+//		        fileIndex.setModuleType(-1);
+//		        fileIndex.setCtime(DateFunc.getDate());
+//		        if(!Utils.isNullOrEmpty(user)){
+//	        		fileIndex.setAuthor(user.getId());
+//		 	        fileIndex.setAuthorName(user.getName());
+//	        	}
+//		        fileIndex.setMd5(md5);
+//		        fileIndex.setCrc32(crc32);
+//		        fileIndex.setStatus(true);
+//		        fileIndexService.insert(fileIndex);
+//		    	// 图片目的地址
+//		        String nginxRoot = (String) request.getSession().getServletContext().getAttribute("nginxRoot");
+//				String url = nginxRoot + "/meeting/download?id=" + fileIndex.getId();
+//				int width=0, height=0;
 				//设置图片宽度和高度
 //				BufferedImage bufferedImage = MeetingPicUtil.getBufferedImage(url);
 //				if(!Utils.isNullOrEmpty(bufferedImage)) {
 //					width = bufferedImage.getWidth();
 //					height = bufferedImage.getHeight();
 //				}
-				MeetingPic fileImg = new MeetingPic();
-				fileImg.setPicPath(url);
-				fileImg.setCreateDate(new Date());
-				fileImg.setFileIndexId(fileId);
-				fileImg.setPicStatus("1");
-				fileImg.setPicRealName(fileRealName);
-				fileImg.setPicDesc(picDesc);
-				fileImg.setWidth(""+width);
-				fileImg.setHeight(""+height);
-				if(!Utils.isNullOrEmpty(user)){
-					fileIndex.setAuthor(user.getId());
-				    fileIndex.setAuthorName(user.getName());
-				}
-				fileImg.setTaskId(taskId);
-				responseDataMap.put("fileImg", fileImg);
-		        responseDataMap.put("succeed", true);
-		        responseDataMap.put("url", url);
-				notificationMap.put("notifCode", "0001");
-		    	notificationMap.put("notifInfo", "上传成功");
+//				MeetingPic fileImg = new MeetingPic();
+//				fileImg.setPicPath(url);
+//				fileImg.setCreateDate(new Date());
+//				fileImg.setFileIndexId(fileId);
+//				fileImg.setPicStatus("1");
+//				fileImg.setPicRealName(fileRealName);
+//				fileImg.setPicDesc(picDesc);
+//				fileImg.setWidth(""+width);
+//				fileImg.setHeight(""+height);
+//				if(!Utils.isNullOrEmpty(user)){
+//					fileIndex.setAuthor(user.getId());
+//				    fileIndex.setAuthorName(user.getName());
+//				}
+//				fileImg.setTaskId(taskId);
+//				responseDataMap.put("fileImg", fileImg);
+//		        responseDataMap.put("succeed", true);
+//		        responseDataMap.put("url", url);
+//				notificationMap.put("notifCode", "0001");
+//		    	notificationMap.put("notifInfo", "上传成功");
 			}
 		} catch (Exception e) {
 			responseDataMap.put("succeed", false);

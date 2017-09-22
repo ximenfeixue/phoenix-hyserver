@@ -11,6 +11,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import com.ginkgocap.parasol.file.model.FileIndex;
+import com.ginkgocap.parasol.file.service.FileIndexService;
 import org.apache.commons.beanutils.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,8 +22,6 @@ import com.ginkgocap.ywxt.dao.meeting.MeetingNoteDao;
 import com.ginkgocap.ywxt.dao.meeting.MeetingNoteDetailDao;
 import com.ginkgocap.ywxt.dao.meeting.TopicChatDao;
 import com.ginkgocap.ywxt.dao.meeting.UserDao;
-import com.ginkgocap.ywxt.file.model.FileIndex;
-import com.ginkgocap.ywxt.file.service.FileIndexService;
 import com.ginkgocap.ywxt.model.meeting.MeetingNote;
 import com.ginkgocap.ywxt.model.meeting.MeetingNoteDetail;
 import com.ginkgocap.ywxt.model.meeting.TopicChat;
@@ -258,7 +258,7 @@ public class MeetingNoteServiceImpl implements MeetingNoteService{
 								// 如果附件Id不为空 获取附件
 								if(!Utils.isNullOrEmpty(meetingNoteDetailQuery.getTaskId())){
 									//List<FileIndex> listFileIndex=fileIndexDao.getByTaskId(meetingNoteDetailQuery.getTaskId());
-									List<FileIndex> listFileIndex=fileIndexService.selectByTaskId(meetingNoteDetailQuery.getTaskId(),"1");
+									List<FileIndex> listFileIndex=fileIndexService.getFileIndexesByTaskId(meetingNoteDetailQuery.getTaskId());
 									if(!Utils.isNullOrEmpty(listFileIndex)){
 										List<JTFile>listJTFile=new ArrayList<JTFile>();
 										for(FileIndex fileIndex:listFileIndex){

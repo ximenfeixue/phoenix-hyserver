@@ -11,6 +11,9 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.ginkgocap.parasol.file.exception.FileIndexServiceException;
+import com.ginkgocap.parasol.file.model.FileIndex;
+import com.ginkgocap.parasol.file.service.FileIndexService;
 import net.sf.json.JSONObject;
 
 import org.slf4j.Logger;
@@ -22,8 +25,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.ginkgocap.ywxt.common.base.BaseController;
-import com.ginkgocap.ywxt.file.model.FileIndex;
-import com.ginkgocap.ywxt.file.service.FileIndexService;
+// import com.ginkgocap.ywxt.file.model.FileIndex;
+// import com.ginkgocap.ywxt.file.service.FileIndexService;
 import com.ginkgocap.ywxt.model.meeting.Meeting;
 import com.ginkgocap.ywxt.model.meeting.MeetingFile;
 import com.ginkgocap.ywxt.model.meeting.MeetingMember;
@@ -379,7 +382,7 @@ public class MeetingTopicController extends BaseController {
 	 * 更新议题相关的图片、文件
 	 * @param meetingTopicQuery
 	 */
-	private void updateMeetingTopicPicAndFile(MeetingTopicQuery meetingTopicQuery) {
+	private void updateMeetingTopicPicAndFile(MeetingTopicQuery meetingTopicQuery) throws FileIndexServiceException {
 		List<String> listFileIndexId = new ArrayList<String>();
 		if(!Utils.isNullOrEmpty(meetingTopicQuery)) {
 			List<Long> listMeetingPicId = new ArrayList<Long>();
@@ -413,11 +416,11 @@ public class MeetingTopicController extends BaseController {
 			}
 			//删除已移除的FileIndex
 			if(!Utils.isNullOrEmpty(meetingTopicQuery.getTaskId())) {
-				List<FileIndex> listFileIndex = fileIndexService.selectByTaskId(meetingTopicQuery.getTaskId(), "1");
+				List<FileIndex> listFileIndex = fileIndexService.getFileIndexesByTaskId(meetingTopicQuery.getTaskId());
 				if(!Utils.isNullOrEmpty(listFileIndex)) {
 					for(FileIndex fileIndex : listFileIndex) {
 						if(!listFileIndexId.contains(""+fileIndex.getId())) {
-							fileIndexService.delete(Long.parseLong(fileIndex.getId()));
+							fileIndexService.deleteFileIndexById(meetingTopicQuery.getCreateId(),fileIndex.getId());
 						}
 					}
 				}
@@ -575,7 +578,7 @@ public class MeetingTopicController extends BaseController {
 					meetingTopicService.delete(Long.parseLong(topicIdStr));
 					//删除议题相关的附件
 					if(!Utils.isNullOrEmpty(meetingTopic.getTaskId())) {
-						fileIndexService.deleteByTaskId(meetingTopic.getTaskId());
+						fileIndexService.deleteFileIndexesByTaskId(meetingTopic.getTaskId());
 					}
 					//删除议题相关的图片
 					meetingPicService.deleteByModuleId(Long.parseLong(topicIdStr), MeetingPic.MODULE_TYPE_TOPIC, null);

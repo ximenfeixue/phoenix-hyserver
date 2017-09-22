@@ -11,6 +11,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import com.ginkgocap.parasol.file.exception.FileIndexServiceException;
 import com.ginkgocap.ywxt.model.meeting.Meeting;
 import com.ginkgocap.ywxt.model.meeting.MeetingVo;
 import com.ginkgocap.ywxt.user.model.User;
@@ -252,7 +253,7 @@ public interface MeetingService {
 	 * @since  2014-09-17
 	 * @author qingc
 	 */
-	public  MeetingQuery getMeetingByIdAndMemberId(Long id,Long memberId) throws IllegalAccessException, InvocationTargetException;
+	public  MeetingQuery getMeetingByIdAndMemberId(Long id,Long memberId) throws IllegalAccessException, InvocationTargetException, FileIndexServiceException;
 	/**
 	 * 名称: changeMeetingStatus
 	 * 描述:  改变会议状态

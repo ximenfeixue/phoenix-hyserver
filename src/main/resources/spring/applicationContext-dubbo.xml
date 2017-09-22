@@ -38,8 +38,8 @@
     
     <import resource="classpath:user-dubbo-consumer.xml"/> 
 	<import resource="classpath:mongo-dubbo-consumer.xml"/> 
-	<import resource="classpath:file-dubbo-consumer.xml"/> 
-	<import resource="classpath:metadata-dubbo-consumer.xml"/> 
+	<import resource="classpath:newfile-dubbo-consumer.xml"/>
+	<import resource="classpath:metadata-dubbo-consumer.xml"/>
 	<import resource="classpath:requirement-dubbo-consumer.xml" /> 
 	<import resource="classpath:sms-dubbo-consumer.xml" />
 	<import resource="classpath:message-dubbo-consumer.xml" />

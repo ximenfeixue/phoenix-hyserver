@@ -91,7 +91,7 @@
 		</dependency>
 		<dependency>
 			<groupId>com.ginkgocap.ywxt</groupId>
-			<artifactId>phoenix-entire-api</artifactId>
+			<artifactId>phoenix-user-api</artifactId>
 			<version>${entire.dependencied}</version>
 		</dependency>
 		<dependency>
@@ -510,7 +510,11 @@
 			<version>4.3.4</version>
 		</dependency>
 		<!-- icepdf end 已传到私服 -->
-
+		<dependency>
+			<groupId>com.ginkgocap.parasol</groupId>
+			<artifactId>parasol-file-api</artifactId>
+			<version>1.0.2-SNAPSHOT</version>
+		</dependency>
 		<!-- jetty start -->
 		<dependency>
 			<groupId>org.eclipse.jetty</groupId>

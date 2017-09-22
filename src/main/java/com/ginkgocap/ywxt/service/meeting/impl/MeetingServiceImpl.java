@@ -9,6 +9,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.Map.Entry;
 
+import com.ginkgocap.parasol.file.exception.FileIndexServiceException;
+import com.ginkgocap.parasol.file.model.FileIndex;
+import com.ginkgocap.parasol.file.service.FileIndexService;
 import com.ginkgocap.ywxt.dao.meeting.*;
 import com.ginkgocap.ywxt.model.meeting.*;
 import com.gintong.frame.util.dto.InterfaceResult;
@@ -21,8 +24,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.ginkgocap.ywxt.common.base.BaseServiceImpl;
-import com.ginkgocap.ywxt.file.model.FileIndex;
-import com.ginkgocap.ywxt.file.service.FileIndexService;
 import com.ginkgocap.ywxt.service.meeting.MeetingMemberService;
 import com.ginkgocap.ywxt.service.meeting.MeetingService;
 import com.ginkgocap.ywxt.service.meeting.TopicChatService;
@@ -89,6 +90,7 @@ public class MeetingServiceImpl extends BaseServiceImpl<Meeting, Long> implement
 	private MeetingPeopleDao meetingPeopleDao;
 	@Autowired
 	private FileIndexService fileIndexService;
+	// private FileIndexService fileIndexService;
 	@Autowired
 	private TopicChatService topicChatService;
 	@Autowired
@@ -826,7 +828,7 @@ public class MeetingServiceImpl extends BaseServiceImpl<Meeting, Long> implement
 	 * @author qingc
 	 */
 	@Transactional(readOnly = true)
-	public MeetingQuery getMeetingByIdAndMemberId(Long id, Long memberId) throws IllegalAccessException, InvocationTargetException {
+	public MeetingQuery getMeetingByIdAndMemberId(Long id, Long memberId) throws IllegalAccessException, InvocationTargetException, FileIndexServiceException {
 		MeetingQuery meetingObj = new MeetingQuery();
 		// 封装会议基本信息
 		if (!Utils.isNullOrEmpty(id)) {
@@ -928,12 +930,12 @@ public class MeetingServiceImpl extends BaseServiceImpl<Meeting, Long> implement
 				}
 				meetingObj.setListMeetingPic(listPic);
 				// 封装会议视频文件
-				List<FileIndex> listFileIndex = fileIndexService.selectByTaskId(meeting.getTaskId(), "1");
+				List<FileIndex> listFileIndex = fileIndexService.getFileIndexesByTaskId(meeting.getTaskId());
 				List<MeetingFile> listMeetingFile = new ArrayList<MeetingFile>();
 				if (!Utils.isNullOrEmpty(listFileIndex)) {
 					for (FileIndex fileIndex : listFileIndex) {
 						if (!Utils.isNullOrEmpty(fileIndex) && !listFileIndexId.contains(fileIndex.getId())) {
-							MeetingFile meetingFile = JsonToBean.fileIndexToMeetingFile(fileIndex);
+							MeetingFile meetingFile = JsonToBean.apiFileIndexToMeetingFile(fileIndex);
 							listMeetingFile.add(meetingFile);
 						}
 					}
@@ -1235,7 +1237,7 @@ public class MeetingServiceImpl extends BaseServiceImpl<Meeting, Long> implement
 		return listResult;
 	}
 
-	public List<MeetingTopicQuery> getMeetingTopicQuerys(List<MeetingTopic> listMeetingTopic) {
+	public List<MeetingTopicQuery> getMeetingTopicQuerys(List<MeetingTopic> listMeetingTopic) throws FileIndexServiceException {
 		if (!Utils.isNullOrEmpty(listMeetingTopic)) {
 			List<MeetingTopicQuery> mtqs = new ArrayList<MeetingTopicQuery>();
 			for (int i = 0; i < listMeetingTopic.size(); i++) {
@@ -1256,12 +1258,12 @@ public class MeetingServiceImpl extends BaseServiceImpl<Meeting, Long> implement
 				mtq.setCreateName(mt.getCreateName());
 				mtq.setCreateTime(mt.getCreateTime());
 				mtq.setUpdateTime(mt.getUpdateTime());
-				List<FileIndex> fileIndexs = fileIndexService.selectByTaskId(mt.getTaskId(), "1");
+				List<FileIndex> fileIndexs = fileIndexService.getFileIndexesByTaskId(mt.getTaskId());
 				List<MeetingFile> listMeetingFile = null;
 				if (fileIndexs != null && fileIndexs.size() > 0) {
 					listMeetingFile = new ArrayList<MeetingFile>();
 					for (int j = 0; j < fileIndexs.size(); j++) {
-						MeetingFile meetingFile = JsonToBean.fileIndexToMeetingFile(fileIndexs.get(j));
+						MeetingFile meetingFile = JsonToBean.apiFileIndexToMeetingFile(fileIndexs.get(j));
 						listMeetingFile.add(meetingFile);
 					}
 				}
@@ -1867,7 +1869,7 @@ public class MeetingServiceImpl extends BaseServiceImpl<Meeting, Long> implement
 		}
 	}
 	// 修改会议图片与文件
-	private String updateMeetingPicAndFile(MeetingQuery entity) {
+	private String updateMeetingPicAndFile(MeetingQuery entity) throws FileIndexServiceException {
 		String homePage = "";
 		List<String> listFileIndexId = new ArrayList<String>();
 		List<Long> listMeetingPicId = new ArrayList<Long>();
@@ -1902,11 +1904,11 @@ public class MeetingServiceImpl extends BaseServiceImpl<Meeting, Long> implement
 		}
 		// 删除已移除的FileIndex
 		if (!Utils.isNullOrEmpty(entity.getTaskId())) {
-			List<FileIndex> listFileIndex = fileIndexService.selectByTaskId(entity.getTaskId(), "1");
+			List<FileIndex> listFileIndex = fileIndexService.getFileIndexesByTaskId(entity.getTaskId());
 			if (!Utils.isNullOrEmpty(listFileIndex)) {
 				for (FileIndex fileIndex : listFileIndex) {
 					if (!listFileIndexId.contains("" + fileIndex.getId())) {
-						fileIndexService.delete(Long.parseLong(fileIndex.getId()));
+						fileIndexService.deleteFileIndexById(entity.getCreateId(),fileIndex.getId());
 					}
 				}
 			}
@@ -1969,7 +1971,7 @@ public class MeetingServiceImpl extends BaseServiceImpl<Meeting, Long> implement
 			meetingTopicDao.saveOrUpdate(meetingTopic);
 		}
 	}
-	private void updateMeetingTopicPicAndFile(MeetingQuery entity) {
+	private void updateMeetingTopicPicAndFile(MeetingQuery entity) throws FileIndexServiceException {
 		List<String> listFileIndexId = new ArrayList<String>();
 		if (!Utils.isNullOrEmpty(entity) && !Utils.isNullOrEmpty(entity.getListMeetingTopicQuery())) {
 			for (MeetingTopicQuery topicQuery : entity.getListMeetingTopicQuery()) {
@@ -2005,11 +2007,11 @@ public class MeetingServiceImpl extends BaseServiceImpl<Meeting, Long> implement
 				}
 				// 删除已移除的FileIndex
 				if (!Utils.isNullOrEmpty(topicQuery.getTaskId())) {
-					List<FileIndex> listFileIndex = fileIndexService.selectByTaskId(topicQuery.getTaskId(), "1");
+					List<FileIndex> listFileIndex = fileIndexService.getFileIndexesByTaskId(topicQuery.getTaskId());
 					if (!Utils.isNullOrEmpty(listFileIndex)) {
 						for (FileIndex fileIndex : listFileIndex) {
 							if (!listFileIndexId.contains("" + fileIndex.getId())) {
-								fileIndexService.delete(Long.parseLong(fileIndex.getId()));
+								fileIndexService.deleteFileIndexById(entity.getCreateId(),fileIndex.getId());
 							}
 						}
 					}

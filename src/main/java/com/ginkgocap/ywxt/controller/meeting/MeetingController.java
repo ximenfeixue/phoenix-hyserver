@@ -16,6 +16,7 @@ import java.util.ResourceBundle;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.ginkgocap.parasol.file.service.FileIndexService;
 import com.ginkgocap.ywxt.utils.*;
 import com.gintong.ywxt.im.model.SocialStatus;
 import com.gintong.ywxt.im.service.SocialStatusService;
@@ -42,7 +43,7 @@ import org.springframework.web.servlet.ModelAndView;
 import com.ginkgocap.ywxt.cache.Cache;
 import com.ginkgocap.ywxt.common.base.BaseController;
 import com.ginkgocap.ywxt.file.model.FileIndex;
-import com.ginkgocap.ywxt.file.service.FileIndexService;
+//import com.ginkgocap.ywxt.file.service.FileIndexService;
 import com.ginkgocap.ywxt.model.meeting.ChatMini;
 import com.ginkgocap.ywxt.model.meeting.Meeting;
 import com.ginkgocap.ywxt.model.meeting.MeetingData;
@@ -790,7 +791,7 @@ public class MeetingController extends BaseController {
 				String taskId = getStringJsonValueByKey(j, "taskId");
 				if (!isNullOrEmpty(taskId)) {
 					// list = fileIndexService.getByTaskId(taskId);
-					fileIndexService.selectByTaskId(taskId, "1");
+					fileIndexService.getFileIndexesByTaskId(taskId);
 					notificationMap.put("notifCode", "0001");
 					notificationMap.put("notifInfo", "hello mobile app");
 				} else {
