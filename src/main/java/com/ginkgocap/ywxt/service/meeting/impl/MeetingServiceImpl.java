@@ -497,6 +497,7 @@ public class MeetingServiceImpl extends BaseServiceImpl<Meeting, Long> implement
 			Map<Integer,Long> meetingDetailMap = new HashMap<Integer, Long>();
 			if (!Utils.isNullOrEmpty(entity.getListMeetingDetail())) {
 				for (MeetingDetail md : entity.getListMeetingDetail()) {
+					md.setMeetingId(meetingId);
 					long mdid= meetingDetailDao.save(md);
 					// 小模块Id要和对应的sequence做一次关联 供图片存储时关联用
 					meetingDetailMap.put(md.getSequence(),mdid);
@@ -518,7 +519,7 @@ public class MeetingServiceImpl extends BaseServiceImpl<Meeting, Long> implement
 //							meetingPic.setIshomePage(0);
 //						}
 						Long mudouleId = 0l;
-						if (meetingDetailMap.size() > 0)
+						if (meetingDetailMap.size() > 0 && meetingPic.getModuleId() != null)
 							mudouleId = meetingDetailMap.get(meetingPic.getModuleId().intValue());
 						meetingPic.setModuleId(mudouleId);
 						meetingPicDao.saveOrUpdate(meetingPic);
@@ -906,25 +907,18 @@ public class MeetingServiceImpl extends BaseServiceImpl<Meeting, Long> implement
 					}
 				}
 				meetingObj.setListMeetingTopic(listTopic);
+				// 封装会议详情小模块
+				List<MeetingDetail> listMeetingDetail = meetingDetailDao.getMeetingDetailByMeetingId(id);
 				// 封装会议时间信息
 				List<MeetingTime> listTime = meetingTimeDao.getByMeetingId(id);
 				meetingObj.setListMeetingTime(listTime);
 				// 封装会议图片信息
-				List<MeetingPic> listPic = meetingPicDao.getByModuleId(id, MeetingPic.MODULE_TYPE_MEETING);
+				List<MeetingPic> listPic = meetingPicDao.getByMeetingId(id);
 				List<String> listFileIndexId = new ArrayList<String>();
 				if (!Utils.isNullOrEmpty(listPic)) {
 					for (MeetingPic meetingPic : listPic) {
 						if (!Utils.isNullOrEmpty(meetingPic)) {
 							listFileIndexId.add(meetingPic.getFileIndexId());
-							// if(Utils.isNullOrEmpty(meetingPic.getWidth())
-							// || Utils.isNullOrEmpty(meetingPic.getHeight())) {
-							// BufferedImage bufferedImage =
-							// MeetingPicUtil.getBufferedImage(meetingPic.getPicPath());
-							// if(!Utils.isNullOrEmpty(bufferedImage)) {
-							// meetingPic.setWidth(""+bufferedImage.getWidth());
-							// meetingPic.setHeight(""+bufferedImage.getHeight());
-							// }
-							// }
 							if (1 == meetingPic.getIshomePage()) {
 								meetingObj.setPath(meetingPic.getPicPath());
 							}
