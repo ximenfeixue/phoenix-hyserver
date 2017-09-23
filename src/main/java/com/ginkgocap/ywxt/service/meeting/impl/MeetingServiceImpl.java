@@ -14,6 +14,7 @@ import com.ginkgocap.parasol.file.model.FileIndex;
 import com.ginkgocap.parasol.file.service.FileIndexService;
 import com.ginkgocap.ywxt.dao.meeting.*;
 import com.ginkgocap.ywxt.model.meeting.*;
+import com.ginkgocap.ywxt.vo.query.meeting.*;
 import com.gintong.frame.util.dto.InterfaceResult;
 import org.apache.commons.beanutils.BeanUtils;
 import org.h2.util.StringUtils;
@@ -29,7 +30,6 @@ import com.ginkgocap.ywxt.service.meeting.MeetingService;
 import com.ginkgocap.ywxt.service.meeting.TopicChatService;
 import com.ginkgocap.ywxt.user.model.User;
 import com.ginkgocap.ywxt.user.model.UserConfig;
-import com.ginkgocap.ywxt.user.service.DynamicNewsService;
 import com.ginkgocap.ywxt.user.service.UserConfigService;
 import com.ginkgocap.ywxt.user.service.UserService;
 import com.ginkgocap.ywxt.utils.DateUtil;
@@ -49,16 +49,7 @@ import com.ginkgocap.ywxt.utils.type.MemberType;
 import com.ginkgocap.ywxt.utils.type.ModifyMeetingNoticeType;
 import com.ginkgocap.ywxt.utils.type.NoticeReceiverType;
 import com.ginkgocap.ywxt.utils.type.NoticeType;
-import com.ginkgocap.ywxt.vo.query.meeting.BigDataQuery;
-import com.ginkgocap.ywxt.vo.query.meeting.MeetingMemberListQuery;
-import com.ginkgocap.ywxt.vo.query.meeting.MeetingQuery;
-import com.ginkgocap.ywxt.vo.query.meeting.MeetingTopicQuery;
-import com.ginkgocap.ywxt.vo.query.meeting.TopicChatQuery;
-import com.ginkgocap.ywxt.vo.query.meeting.UserBean;
 import com.ginkgocap.ywxt.vo.query.social.Social;
-
-import javax.persistence.Transient;
-//import com.gintong.easemob.server.httpclient.api.EasemobChatGroupsHandler;
 
 @Service
 @Transactional
@@ -103,8 +94,8 @@ public class MeetingServiceImpl extends BaseServiceImpl<Meeting, Long> implement
 	private MeetingOrganDao meetingOrganDao;
 	@Autowired
 	private ImRecordmessageDao imRecordmessageDao;
-	@Autowired
-	private DynamicNewsService dynamicNewsService;
+	/*@Autowired
+	private DynamicNewsService dynamicNewsService;*/
 	@Autowired
 	private MeetingMemberService meetingMemberService;
 	@Autowired
@@ -656,7 +647,7 @@ public class MeetingServiceImpl extends BaseServiceImpl<Meeting, Long> implement
 		mapUserRight.put("zhongle", zhongles);
 		mapUserRight.put("xiaole", xiaoles);
 		param.put("receiverIds", mapUserRight);
-		dynamicNewsService.insertNewsAndRelationByParam(param);
+		//dynamicNewsService.insertNewsAndRelationByParam(param);
 	}
 	/**
 	 * 名称: getInMeetingByMemberId 描述: 获取会议中的会议列表
@@ -2423,6 +2414,19 @@ public class MeetingServiceImpl extends BaseServiceImpl<Meeting, Long> implement
 
 		meetingDao.enable(id);
 		return InterfaceResult.getSuccessInterfaceResultInstance(true);
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public List<Meeting> getCommonMeetingList(MeetingCommonQuery meetingCommonQuery) throws Exception {
+
+		return meetingDao.getCommonMeetingList(meetingCommonQuery);
+	}
+
+	@Override
+	public long getCommonMeetingCount(MeetingCommonQuery meetingCommonQuery) throws Exception {
+
+		return meetingDao.getCommonMeetingCount(meetingCommonQuery);
 	}
 
 	@Override

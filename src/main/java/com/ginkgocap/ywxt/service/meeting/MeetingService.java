@@ -16,6 +16,7 @@ import com.ginkgocap.ywxt.model.meeting.Meeting;
 import com.ginkgocap.ywxt.model.meeting.MeetingVo;
 import com.ginkgocap.ywxt.user.model.User;
 import com.ginkgocap.ywxt.vo.query.meeting.BigDataQuery;
+import com.ginkgocap.ywxt.vo.query.meeting.MeetingCommonQuery;
 import com.ginkgocap.ywxt.vo.query.meeting.MeetingMemberListQuery;
 import com.ginkgocap.ywxt.vo.query.meeting.MeetingQuery;
 import com.ginkgocap.ywxt.vo.query.social.Social;
@@ -407,4 +408,20 @@ public interface MeetingService {
 	 * @throws Exception
 	 */
 	InterfaceResult enable(long id) throws Exception;
+
+	/**
+	 * 获取 筛选的会议 （运营后台）
+	 * @param meetingCommonQuery
+	 * @return
+	 * @throws Exception
+	 */
+	List<Meeting> getCommonMeetingList(MeetingCommonQuery meetingCommonQuery) throws Exception;
+
+	/**
+	 * 获取 筛选的会议 总个数 （运营后台）
+	 * @param meetingCommonQuery
+	 * @return
+	 * @throws Exception
+	 */
+	long getCommonMeetingCount(MeetingCommonQuery meetingCommonQuery) throws Exception;
 }

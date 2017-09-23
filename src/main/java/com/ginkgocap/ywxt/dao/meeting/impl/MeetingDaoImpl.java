@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.ginkgocap.ywxt.vo.query.meeting.MeetingCommonQuery;
 import org.mybatis.spring.support.SqlSessionDaoSupport;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -305,7 +306,7 @@ public class MeetingDaoImpl extends SqlSessionDaoSupport implements MeetingDao,A
 	}
 	/**
 	 * 查询我参加的会议数量
-	 * @param memberId
+	 * @param param
 	 * @return
 	 */
 	public Long getMyAttendAndCreateMeetingCount(Map<String, Object> param) {
@@ -430,7 +431,7 @@ public class MeetingDaoImpl extends SqlSessionDaoSupport implements MeetingDao,A
 	 * @author qingc
 	 * @throws Exception 
 	 */
-	public  void deleteBatchOther(List<Long> list,Long id,Integer type)throws Exception{
+	public void deleteBatchOther(List<Long> list,Long id,Integer type)throws Exception{
 		final Map<String,Object> map=new HashMap<String, Object>();
 		map.put("meetingId", id);
 		if(!Utils.isNullOrEmpty(type)){
@@ -530,6 +531,20 @@ public class MeetingDaoImpl extends SqlSessionDaoSupport implements MeetingDao,A
 	@Override
 	public void enable(long id) {
 		getSqlSession().update("Meeting.enable", id);
+	}
+
+	@Override
+	public List<Meeting> getCommonMeetingList(MeetingCommonQuery meetingCommonQuery) throws Exception {
+
+		// 设置开始行数
+		meetingCommonQuery.setStartRow(meetingCommonQuery.getIndex() * meetingCommonQuery.getSize());
+		return getSqlSession().selectList("Meeting.getCommonMeetingList", meetingCommonQuery);
+	}
+
+	@Override
+	public long getCommonMeetingCount(MeetingCommonQuery meetingCommonQuery) throws Exception {
+		long total = getSqlSession().selectOne("Meeting.getCommonMeetingCount", meetingCommonQuery);
+		return total;
 	}
 
 	/**

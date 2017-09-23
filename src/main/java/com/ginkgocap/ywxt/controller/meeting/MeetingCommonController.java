@@ -4,6 +4,9 @@ import com.ginkgocap.ywxt.common.base.BaseController;
 import com.ginkgocap.ywxt.model.meeting.Meeting;
 import com.ginkgocap.ywxt.service.meeting.MeetingService;
 import com.ginkgocap.ywxt.user.model.User;
+import com.ginkgocap.ywxt.utils.GsonUtils;
+import com.ginkgocap.ywxt.vo.query.meeting.MeetingCommonQuery;
+import com.gintong.frame.util.Page;
 import com.gintong.frame.util.dto.CommonResultCode;
 import com.gintong.frame.util.dto.InterfaceResult;
 import org.slf4j.Logger;
@@ -16,6 +19,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 /**
  * Created by wang fei on 2017/9/19.
@@ -166,4 +170,50 @@ public class MeetingCommonController extends BaseController{
         return result;
     }
 
+    /**
+     * 运营后台搜索以及默认展示所有会议（包括私密）
+     * @param request
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(value = "/getMeetingList", method = RequestMethod.POST, produces = {"application/json;charset=UTF-8"})
+    public InterfaceResult getCommonMeetingList(HttpServletRequest request) {
+
+        User user = this.getYINUser(request);
+        List<Meeting> meetingList = null;
+        long total = 0;
+        if (user == null)
+            return InterfaceResult.getInterfaceResultInstance(CommonResultCode.PERMISSION_EXCEPTION);
+
+        String requestJson = null;
+        try {
+            requestJson = this.getJsonParamStr(request);
+        } catch (Exception e ) {
+            e.printStackTrace();
+        }
+        MeetingCommonQuery meetingCommonQuery = GsonUtils.StringToObject(MeetingCommonQuery.class, requestJson);
+        if (meetingCommonQuery == null) {
+            return InterfaceResult.getInterfaceResultInstance(CommonResultCode.PARAMS_EXCEPTION);
+        }
+        try {
+            meetingList = meetingService.getCommonMeetingList(meetingCommonQuery);
+
+        } catch (Exception e) {
+            logger.error("invoke meetingService failed! method : {getCommonMeetingList}");
+            return InterfaceResult.getInterfaceResultInstance(CommonResultCode.PARAMS_DB_OPERATION_EXCEPTION);
+        }
+        try {
+            total = meetingService.getCommonMeetingCount(meetingCommonQuery);
+        } catch (Exception e) {
+            logger.error("invoke meetingService failed! method : {getCommonMeetingCount}");
+            return InterfaceResult.getInterfaceResultInstance(CommonResultCode.PARAMS_DB_OPERATION_EXCEPTION);
+        }
+
+        Page<Meeting> page = new Page<Meeting>();
+        page.setList(meetingList);
+        page.setPageNo(meetingCommonQuery.getIndex() + 1);
+        page.setPageSize(meetingCommonQuery.getSize());
+        page.setTotalCount(total);
+        return InterfaceResult.getSuccessInterfaceResultInstance(page);
+    }
 }

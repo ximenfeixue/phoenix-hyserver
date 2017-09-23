@@ -716,6 +716,86 @@ PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
 			LIMIT #{startRow},#{size}
 		</if>
 	</select>
+
+	<select id="getCommonMeetingList" parameterType="meetingCommonQuery" resultType="meeting">
+		SELECT
+			DISTINCT id AS id,
+			meeting_name AS meetingName,
+			meeting_status AS meetingStatus,
+			create_id AS createId,
+			create_name AS createName,
+			start_time as startTime,
+			end_time AS endTime,
+			province AS province,
+			city, town, top, disable,
+			is_pay as isPay
+		FROM tb_meeting
+		WHERE is_delete = 0
+		<if test="keyword != null and keyword != ''">
+			<if test="type == 0">
+				AND meeting_name LIKE concat('%',concat(#{keyword},'%'))
+			</if>
+			<if test="type == 1">
+				AND create_name LIKE concat('%',concat(#{keyword},'%'))
+			</if>
+		</if>
+		<if test="province != null and province != ''">
+			AND province = #{province}
+		</if>
+		<if test="city != null and city != ''">
+			AND city = #{city}
+		</if>
+		<if test="town != null and town != ''">
+			AND town = #{town}
+		</if>
+		<if test="startTime != null and startTime != ''">
+			AND start_time <![CDATA[>=]]> #{startTime}
+		</if>
+		<if test="endTime != null and endTime != ''">
+			AND end_time <![CDATA[<]]> #{endTime}
+		</if>
+		<if test="disable != null and disable != ''">
+			AND disable = #{disable}
+		</if>
+		ORDER BY
+		start_time DESC
+		<if test="startRow != null">
+			LIMIT #{startRow}, #{size}
+		</if>
+	</select>
+
+	<select id="getCommonMeetingCount" parameterType="meetingCommonQuery" resultType="Long">
+		SELECT
+		DISTINCT count(id)
+		FROM tb_meeting
+		WHERE is_delete = 0
+		<if test="keyword != null and keyword != ''">
+			<if test="type == 0">
+				AND meeting_name LIKE concat('%',concat(#{keyword},'%'))
+			</if>
+			<if test="type == 1">
+				AND create_name LIKE concat('%',concat(#{keyword},'%'))
+			</if>
+		</if>
+		<if test="province != null and province != ''">
+			AND province = #{province}
+		</if>
+		<if test="city != null and city != ''">
+			AND city = #{city}
+		</if>
+		<if test="town != null and town != ''">
+			AND town = #{town}
+		</if>
+		<if test="startTime != null and startTime != ''">
+			AND start_time <![CDATA[>=]]> #{startTime}
+		</if>
+		<if test="endTime != null and endTime != ''">
+			AND end_time <![CDATA[<]]> #{endTime}
+		</if>
+		<if test="disable != null and disable != ''">
+			AND disable = #{disable}
+		</if>
+	</select>
 	
 	<select id="getMyAttendAndCreateMeeting" parameterType="java.util.Map"
 		resultType="meetingMemberList">

@@ -48,7 +48,6 @@ import com.ginkgocap.ywxt.service.meeting.MeetingSignLabelService;
 import com.ginkgocap.ywxt.service.meeting.MeetingTopicService;
 import com.ginkgocap.ywxt.service.meeting.TopicChatService;
 import com.ginkgocap.ywxt.user.model.User;
-import com.ginkgocap.ywxt.user.service.DynamicNewsService;
 import com.ginkgocap.ywxt.user.service.UserService;
 import com.ginkgocap.ywxt.utils.DateUtil;
 import com.ginkgocap.ywxt.utils.GinTongInterface;
@@ -95,8 +94,8 @@ public class MeetingMemberController extends BaseController {
 	private MeetingTopicService meetingTopicService;
 	@Autowired
 	private MeetingPicService meetingPicService;
-	@Autowired
-	private DynamicNewsService dynamicNewsService;
+	/*@Autowired
+	private DynamicNewsService dynamicNewsService;*/
 	@Autowired
 	private ImRecordmessageService imRecordmessageService;
 	
@@ -318,7 +317,7 @@ public class MeetingMemberController extends BaseController {
 		mapUserRight.put("dale", dales);
 		mapUserRight.put("zhongle", zhongles);
 		param.put("receiverIds", mapUserRight);
-		dynamicNewsService.insertNewsAndRelationByParam(param);
+		//dynamicNewsService.insertNewsAndRelationByParam(param);
 	}
 	/**
 	 * 名称: signInMeetingGet 描述: 签到

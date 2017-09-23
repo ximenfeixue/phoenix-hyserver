@@ -10,6 +10,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import com.ginkgocap.ywxt.vo.query.meeting.MeetingCommonQuery;
 import org.springframework.stereotype.Repository;
 
 import com.ginkgocap.ywxt.model.meeting.Meeting;
@@ -346,4 +347,20 @@ public interface MeetingDao{
 	 * @param id
 	 */
 	void enable(long id);
+
+	/**
+	 * 获取 筛选的会议 （运营后台）
+	 * @param meetingCommonQuery
+	 * @return
+	 * @throws Exception
+	 */
+	List<Meeting> getCommonMeetingList(MeetingCommonQuery meetingCommonQuery) throws Exception;
+
+	/**
+	 * 获取 筛选的会议 总个数 （运营后台）
+	 * @param meetingCommonQuery
+	 * @return
+	 * @throws Exception
+	 */
+	long getCommonMeetingCount(MeetingCommonQuery meetingCommonQuery) throws Exception;
 }

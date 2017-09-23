@@ -51,7 +51,7 @@ public abstract class BaseController {
         String result=JsonReadUtil.getJsonIn(request);
         User user = getUser(request);
         long userId = user != null ? user.getId() : 0;
-        getLogger().info("{request:{url:"+request.getRequestURI()+","+"prarm:"+result+"}}" + "   请求的userId为：" + userId);
+        getLogger().info("{request:{url:"+request.getRequestURI()+","+"param:"+result+"}}" + "   请求的userId为：" + userId);
 		return result;
     }
     
