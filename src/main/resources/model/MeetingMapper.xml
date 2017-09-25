@@ -730,7 +730,7 @@ PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
 			city, town, top, disable,
 			is_pay as isPay
 		FROM tb_meeting
-		WHERE is_delete = 0
+		WHERE is_delete = 0 
 		<if test="keyword != null and keyword != ''">
 			<if test="type == 0">
 				AND meeting_name LIKE concat('%',concat(#{keyword},'%'))
