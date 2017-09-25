@@ -14,7 +14,7 @@ public class MeetingCommonQuery implements Serializable{
     // 关键字
     private String keyword;
     // 关键字类型 0：活动名称 1：主办人
-    private byte type;
+    private Byte type;
     // 省
     private String province;
     // 市
@@ -26,17 +26,17 @@ public class MeetingCommonQuery implements Serializable{
     // 结束时间
     private Date endTime;
     // 禁用状态 0：未禁用 1：禁用
-    private byte disable;
+    private Byte disable;
     // 审核状态 0：未审核 1：审核通过 2：审核拒绝
-    private byte checkStatus;
+    private Byte checkStatus;
     // 保密状态 0：开放 1：保密
-    private byte isSecret;
+    private Byte isSecret;
     // 第几页 （从 0 开始）
-    private int index;
+    private Integer index;
     // 每页显示条数
-    private int size;
+    private Integer size;
     // 每页的索引开始
-    private int startRow;
+    private Integer startRow;
 
     public String getKeyword() {
         return keyword;
@@ -46,11 +46,11 @@ public class MeetingCommonQuery implements Serializable{
         this.keyword = keyword;
     }
 
-    public byte getType() {
+    public Byte getType() {
         return type;
     }
 
-    public void setType(byte type) {
+    public void setType(Byte type) {
         this.type = type;
     }
 
@@ -94,51 +94,51 @@ public class MeetingCommonQuery implements Serializable{
         this.endTime = endTime;
     }
 
-    public byte getDisable() {
+    public Byte getDisable() {
         return disable;
     }
 
-    public void setDisable(byte disable) {
+    public void setDisable(Byte disable) {
         this.disable = disable;
     }
 
-    public byte getIsSecret() {
+    public Byte getIsSecret() {
         return isSecret;
     }
 
-    public void setIsSecret(byte isSecret) {
+    public void setIsSecret(Byte isSecret) {
         this.isSecret = isSecret;
     }
 
-    public int getIndex() {
+    public Integer getIndex() {
         return index;
     }
 
-    public void setIndex(int index) {
+    public void setIndex(Integer index) {
         this.index = index;
     }
 
-    public int getSize() {
+    public Integer getSize() {
         return size;
     }
 
-    public void setSize(int size) {
+    public void setSize(Integer size) {
         this.size = size;
     }
 
-    public byte getCheckStatus() {
+    public Byte getCheckStatus() {
         return checkStatus;
     }
 
-    public void setCheckStatus(byte checkStatus) {
+    public void setCheckStatus(Byte checkStatus) {
         this.checkStatus = checkStatus;
     }
 
-    public int getStartRow() {
+    public Integer getStartRow() {
         return startRow;
     }
 
-    public void setStartRow(int startRow) {
+    public void setStartRow(Integer startRow) {
         this.startRow = startRow;
     }
 }
