@@ -9,12 +9,14 @@
         <result property="meetingId" column="meeting_id"/>
         <result property="meetingDetailTitle" column="meeting_detail_title"/>
         <result property="meetingDetail" column="meeting_detail"/>
+        <result property="sequence" column="sequence"/>
     </resultMap>
 
     <!-- 用于select查询公用抽取的列 -->
     <sql id="columns">
         <![CDATA[
-		id as id,meeting_id as meetingId,meeting_detail_title as meetingDetailTitle,meeting_detail as meetingDetail
+		id as id,meeting_id as meetingId,meeting_detail_title as meetingDetailTitle,
+		meeting_detail as meetingDetail,sequence AS sequence
 	    ]]>
     </sql>
 
@@ -25,12 +27,14 @@
         	id,
         	meeting_id,
         	meeting_detail_title,
-        	meeting_detail
+        	meeting_detail,
+        	sequence
         ) VALUES (
         	#{id},
         	#{meetingId},
         	#{meetingDetailTitle},
-        	#{meetingDetail}
+        	#{meetingDetail},
+        	#{sequence}
         )
     ]]>
     </insert>
@@ -40,7 +44,8 @@
         UPDATE tb_meeting_detail SET
 	        meeting_id = #{meetingId},
 	        meeting_detail_title = #{meetingDetailTitle},
-	        meeting_detail = #{meetingDetail}
+	        meeting_detail = #{meetingDetail},
+	        sequence = #{sequence}
         WHERE
 	        id = #{id}
         ]]>

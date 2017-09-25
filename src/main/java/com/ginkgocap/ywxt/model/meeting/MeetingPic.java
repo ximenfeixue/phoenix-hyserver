@@ -23,6 +23,7 @@ public class MeetingPic extends BaseEntity implements java.io.Serializable{
 	public static final long MODULE_TYPE_MEETING = 1;
 	public static final long MODULE_TYPE_TOPIC = 2;
 	public static final long MODULE_TYPE_NOTE = 3;
+	public static final long MODULE_TYPE_CHUNK = 4;
 	//alias
 	public static final String TABLE_ALIAS = "MeetingPic";
 	public static final String ALIAS_ID = "id";
@@ -75,7 +76,7 @@ public class MeetingPic extends BaseEntity implements java.io.Serializable{
 	private String taskId;
 	//会议/议题ID 
 	private Long moduleId;
-	//图片所属模块类型 1：会议 2：议题 3：笔记
+	//图片所属模块类型 1：会议 2：议题 3：笔记 4:模块
 	private Long moduleType;
 	//图片宽度
 	private String width;

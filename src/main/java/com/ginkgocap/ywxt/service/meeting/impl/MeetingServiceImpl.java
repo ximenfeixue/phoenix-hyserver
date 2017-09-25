@@ -503,7 +503,7 @@ public class MeetingServiceImpl extends BaseServiceImpl<Meeting, Long> implement
 					MeetingPic meetingPic = entity.getListMeetingPic().get(i);
 					if (!Utils.isNullOrEmpty(meetingPic)) {
 						meetingPic.setMeetingId(meeting.getId());
-						meetingPic.setModuleType(MeetingPic.MODULE_TYPE_MEETING);
+						meetingPic.setModuleType(MeetingPic.MODULE_TYPE_CHUNK);
 						meetingPic.setCreateDate(new Date());
 //						if (i == 0) {
 //							homePage = meetingPic.getPicPath();
@@ -511,10 +511,10 @@ public class MeetingServiceImpl extends BaseServiceImpl<Meeting, Long> implement
 //						} else {
 //							meetingPic.setIshomePage(0);
 //						}
-						Long mudouleId = 0l;
-						if (meetingDetailMap.size() > 0 && meetingPic.getModuleId() != null)
-							mudouleId = meetingDetailMap.get(meetingPic.getModuleId().intValue());
-						meetingPic.setModuleId(mudouleId);
+//						Long mudouleId = 0l;
+//						if (meetingDetailMap.size() > 0 && meetingPic.getModuleId() != null)
+//							mudouleId = meetingDetailMap.get(meetingPic.getModuleId().intValue());
+//						meetingPic.setModuleId(mudouleId);
 						meetingPicDao.saveOrUpdate(meetingPic);
 					}
 				}
