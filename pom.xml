@@ -91,7 +91,7 @@
 		</dependency>
 		<dependency>
 			<groupId>com.ginkgocap.ywxt</groupId>
-			<artifactId>phoenix-user-api</artifactId>
+			<artifactId>phoenix-entire-api</artifactId>
 			<version>${entire.dependencied}</version>
 		</dependency>
 		<dependency>
