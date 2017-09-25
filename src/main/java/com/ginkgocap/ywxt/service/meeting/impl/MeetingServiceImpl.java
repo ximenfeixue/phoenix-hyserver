@@ -2432,6 +2432,12 @@ public class MeetingServiceImpl extends BaseServiceImpl<Meeting, Long> implement
 	}
 
 	@Override
+	public List<MeetingQuery> getTops(int index, final int size) throws Exception {
+
+		return meetingDao.getTops(index, size);
+	}
+
+	@Override
 	public Social getMeetingWithLatestMessage(Long userId) {
 		return meetingDao.getMeetingWithLatestMessage(userId);
 	}

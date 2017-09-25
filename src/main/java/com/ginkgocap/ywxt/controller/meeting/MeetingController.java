@@ -18,6 +18,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.ginkgocap.parasol.file.service.FileIndexService;
 import com.ginkgocap.ywxt.utils.*;
+import com.gintong.frame.util.dto.CommonResultCode;
+import com.gintong.frame.util.dto.InterfaceResult;
 import com.gintong.ywxt.im.model.SocialStatus;
 import com.gintong.ywxt.im.service.SocialStatusService;
 import net.sf.ezmorph.object.DateMorpher;
@@ -3030,6 +3032,29 @@ public class MeetingController extends BaseController {
 		resultMap.put("responseData", result);
 		resultMap.put("notification", notification);
 		return resultMap;
+	}
+
+	/**
+	 * 获取广告位 列表
+	 * @param index
+	 * @param request
+	 * @param size
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/getMeetingTops/{index}/{size}", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
+	public InterfaceResult getMeetingTop(@PathVariable("index") Integer index, HttpServletRequest request,
+										 @PathVariable("size") Integer size) {
+
+		List<MeetingQuery> meetingList = null;
+		try {
+			meetingList = meetingService.getTops(index, size);
+
+		} catch (Exception e) {
+			logger.error("invoke meetingService failed! method getTops " + e);
+			return InterfaceResult.getInterfaceResultInstance(CommonResultCode.PARAMS_DB_OPERATION_EXCEPTION);
+		}
+		return InterfaceResult.getSuccessInterfaceResultInstance(meetingList);
 	}
 	
 	private void setChatListToCache(final List<Social> chat,final long userId) {

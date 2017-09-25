@@ -547,6 +547,15 @@ public class MeetingDaoImpl extends SqlSessionDaoSupport implements MeetingDao,A
 		return total;
 	}
 
+	@Override
+	public List<MeetingQuery> getTops(int index, final int size) throws Exception {
+
+		Map<String, Integer> map = new HashMap<String, Integer>(2);
+		map.put("startRow", index * size);
+		map.put("size", size);
+		return getSqlSession().selectList("Meeting.getTops", map);
+	}
+
 	/**
 	 * 名称: getMyAttendAndCreateMeeting
 	 * 描述:  获取我参加的和我创建的会议列表

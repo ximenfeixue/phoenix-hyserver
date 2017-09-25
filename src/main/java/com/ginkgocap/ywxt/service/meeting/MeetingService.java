@@ -424,4 +424,13 @@ public interface MeetingService {
 	 * @throws Exception
 	 */
 	long getCommonMeetingCount(MeetingCommonQuery meetingCommonQuery) throws Exception;
+
+	/**
+	 * 获取发现活动页 广告位 （跑马灯）
+	 * @param index
+	 * @param size
+	 * @return
+	 * @throws Exception
+	 */
+	List<MeetingQuery> getTops(int index, int size) throws Exception;
 }

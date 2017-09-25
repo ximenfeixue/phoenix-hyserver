@@ -363,4 +363,13 @@ public interface MeetingDao{
 	 * @throws Exception
 	 */
 	long getCommonMeetingCount(MeetingCommonQuery meetingCommonQuery) throws Exception;
+
+	/**
+	 * 获取 会议的发现列表 广告位
+	 * @param index
+	 * @param size
+	 * @return
+	 * @throws Exception
+	 */
+	List<MeetingQuery> getTops(int index, final int size) throws Exception;
 }
