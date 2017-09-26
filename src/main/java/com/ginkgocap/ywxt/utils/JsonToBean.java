@@ -72,8 +72,8 @@ public class JsonToBean {
 			}
 			meetingFile.setTaskId(fileIndex.getTaskId());
 			ResourceBundle resourceBundle =  ResourceBundle.getBundle("application");
-			String nginxRoot=resourceBundle.getString("nginx.root");
-			meetingFile.setUrl(fileIndex.getUrl());
+			String nginxRoot=resourceBundle.getString("dfs.path");
+			meetingFile.setUrl(nginxRoot + fileIndex.getFilePath());
 		}
 		return meetingFile;
 	}
