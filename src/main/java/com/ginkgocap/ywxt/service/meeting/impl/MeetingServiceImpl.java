@@ -1870,31 +1870,46 @@ public class MeetingServiceImpl extends BaseServiceImpl<Meeting, Long> implement
 			for (int i = 0; i < entity.getListMeetingPic().size(); i++) {
 				MeetingPic meetingPic = entity.getListMeetingPic().get(i);
 				if (!Utils.isNullOrEmpty(meetingPic)) {
-					meetingPic.setMeetingId(entity.getId());
-					meetingPic.setModuleId(entity.getId());
-					meetingPic.setModuleType(MeetingPic.MODULE_TYPE_MEETING);
-					meetingPic.setCreateDate(new Date());
-					if (i == 0) {
-						homePage = meetingPic.getPicPath();
-						meetingPic.setIshomePage(1);
-					} else {
-						meetingPic.setIshomePage(0);
+					// 判断删除标志位，是否删除 1 删除  id没有的情况下视为插入
+					if (meetingPic.getPicDel().equals("1")) {
+						meetingPicDao.delete(meetingPic.getId());
+					} else if (meetingPic.getId() == null || meetingPic.getId() == 0 || meetingPic.getIshomePage() ==1) {
+						meetingPic.setMeetingId(entity.getId());
+						meetingPic.setModuleType(MeetingPic.MODULE_TYPE_CHUNK);
+						meetingPic.setCreateDate(new Date());
+						meetingPicDao.saveOrUpdate(meetingPic);
+						// 判断封面返回
+						if (meetingPic.getIshomePage() == 1) {
+							homePage = meetingPic.getPicPath();
+						}
 					}
-					meetingPicDao.saveOrUpdate(meetingPic);
-					listMeetingPicId.add(meetingPic.getId());
-					listFileIndexId.add("" + meetingPic.getFileIndexId());
+					// 如果是封面是修改操作
+
+//					meetingPic.setMeetingId(entity.getId());
+//					meetingPic.setModuleId(entity.getId());
+//					meetingPic.setModuleType(MeetingPic.MODULE_TYPE_MEETING);
+//					meetingPic.setCreateDate(new Date());
+//					if (i == 0) {
+//						homePage = meetingPic.getPicPath();
+//						meetingPic.setIshomePage(1);
+//					} else {
+//						meetingPic.setIshomePage(0);
+//					}
+//					meetingPicDao.saveOrUpdate(meetingPic);
+					// listMeetingPicId.add(meetingPic.getId());
+					// listFileIndexId.add("" + meetingPic.getFileIndexId());
 				}
 			}
 		}
 		// 删除图片
-		meetingPicDao.deleteByModuleId(entity.getId(), MeetingPic.MODULE_TYPE_MEETING, listMeetingPicId);
-		if (!Utils.isNullOrEmpty(entity.getListMeetingFile())) {
-			for (MeetingFile meetingFile : entity.getListMeetingFile()) {
-				if (!Utils.isNullOrEmpty(meetingFile)) {
-					listFileIndexId.add("" + meetingFile.getFileIndexId());
-				}
-			}
-		}
+//		meetingPicDao.deleteByModuleId(entity.getId(), MeetingPic.MODULE_TYPE_MEETING, listMeetingPicId);
+//		if (!Utils.isNullOrEmpty(entity.getListMeetingFile())) {
+//			for (MeetingFile meetingFile : entity.getListMeetingFile()) {
+//				if (!Utils.isNullOrEmpty(meetingFile)) {
+//					listFileIndexId.add("" + meetingFile.getFileIndexId());
+//				}
+//			}
+//		}
 		// 删除已移除的FileIndex
 		if (!Utils.isNullOrEmpty(entity.getTaskId())) {
 			List<FileIndex> listFileIndex = fileIndexService.getFileIndexesByTaskId(entity.getTaskId());
