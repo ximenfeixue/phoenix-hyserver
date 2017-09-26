@@ -65,6 +65,13 @@
         ]]>
     </delete>
 
+    <delete id="deleteByMeetingIdAndNotDetailIdList">
+        DELETE FROM tb_meeting_detail WHERE meeting_id = #{meetingId} AND id NOT IN
+        <foreach collection="list" index="index" item="item" open="(" separator="," close=")">
+          #{item}
+        </foreach>
+    </delete>
+
     <select id="getByMeetingId" resultMap="meetingDetailMap" parameterType="java.lang.Long">
         SELECT <include refid="columns"/>
         <![CDATA[

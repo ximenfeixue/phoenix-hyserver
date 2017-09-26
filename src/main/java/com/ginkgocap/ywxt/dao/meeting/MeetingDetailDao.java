@@ -45,4 +45,10 @@ public interface MeetingDetailDao {
      * @return
      */
     public List<MeetingDetail> getMeetingDetailByMeetingId(Long id);
+
+    /**
+     * 根据会议ID删除会议详情现有ID以外的模块
+     * @param meetingDetailIdList
+     */
+    public int deleteByMeetingIdAndNotDetailIdList(Long meetingId,List<Long> meetingDetailIdList);
 }

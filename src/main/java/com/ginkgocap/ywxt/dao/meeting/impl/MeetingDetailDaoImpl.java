@@ -9,7 +9,9 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Repository;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by xutlong on 2017/9/21.
@@ -50,5 +52,13 @@ public class MeetingDetailDaoImpl extends SqlSessionDaoSupport implements Meetin
     @Override
     public List<MeetingDetail> getMeetingDetailByMeetingId(Long id) {
         return getSqlSession().selectList("MeetingDetail.getByMeetingId",id);
+    }
+
+    @Override
+    public int deleteByMeetingIdAndNotDetailIdList(Long meetingId, List<Long> meetingDetailIdList) {
+        Map<String,Object> map = new HashMap();
+        map.put("meetingId",meetingId);
+        map.put("list",meetingDetailIdList);
+        return getSqlSession().delete("MeetingDetail.deleteByMeetingIdAndNotDetailIdList",map);
     }
 }

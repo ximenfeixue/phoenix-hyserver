@@ -1690,6 +1690,23 @@ public class MeetingServiceImpl extends BaseServiceImpl<Meeting, Long> implement
 				 */
 				String homePage = this.updateMeetingPicAndFile(entity);
 				/**
+				 * 保存会议详情
+				 */
+				List<MeetingDetail> listMeetingDetail = entity.getListMeetingDetail();
+				List<Long> meetingDetailIdList = new ArrayList<Long>();
+				if (null != listMeetingDetail && listMeetingDetail.size() > 1) {
+					for (MeetingDetail md : listMeetingDetail) {
+						if (md.getId() == 0) {
+							md.setMeetingId(entity.getId());
+							meetingDetailDao.save(md);
+						} else {
+							meetingDetailDao.update(md);
+							meetingDetailIdList.add(md.getId());
+						}
+					}
+					meetingDetailDao.deleteByMeetingIdAndNotDetailIdList(entity.getId(),meetingDetailIdList);
+				}
+				/**
 				 * 保存会议人脉
 				 */
 				List<MeetingPeople> listPeoples = meetingPeopleDao.getByMeetingId(meeting.getId());
