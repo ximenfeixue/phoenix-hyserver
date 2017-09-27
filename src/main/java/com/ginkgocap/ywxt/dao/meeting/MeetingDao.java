@@ -10,6 +10,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import com.ginkgocap.ywxt.vo.query.meeting.MeetingAdQuery;
 import com.ginkgocap.ywxt.vo.query.meeting.MeetingCommonQuery;
 import org.springframework.stereotype.Repository;
 
@@ -371,5 +372,5 @@ public interface MeetingDao{
 	 * @return
 	 * @throws Exception
 	 */
-	List<MeetingQuery> getTops(int index, final int size) throws Exception;
+	List<MeetingAdQuery> getTops(int index, final int size) throws Exception;
 }

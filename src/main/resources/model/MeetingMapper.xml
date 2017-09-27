@@ -1653,19 +1653,14 @@ PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
 		SET disable = 0
 		WHERE id = #{id}
 	</update>
-	<select id="getTops" parameterType="java.util.Map" resultType="meetingQuery">
+	<select id="getTops" parameterType="java.util.Map" resultType="meetingAdQuery">
 		SELECT
 		m.id AS id,
 		m.meeting_name AS meetingName,
-		m.start_time AS startTime,
-		m.end_time AS endTime,
-		m.meeting_type AS meetingType,
 		m.meeting_status AS meetingStatus,
 		m.meeting_desc AS meetingDesc,
 		m.top,
 		m.disable,
-		m.is_pay AS isPay,
-		m.pay_money AS payMoney,
 		mp.pic_path AS path
 		FROM tb_meeting m
 		LEFT JOIN tb_meeting_pic mp
@@ -1674,6 +1669,7 @@ PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
 		m.is_delete = 0
 		AND mp.module_type = 1
 		AND mp.ishome_page = 1
+		AND m.disable = 0
 		AND m.top = 1
 		<if test="startRow != null">
 			LIMIT #{startRow}, #{size}

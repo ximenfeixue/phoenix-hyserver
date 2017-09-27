@@ -18,6 +18,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.ginkgocap.parasol.file.service.FileIndexService;
 import com.ginkgocap.ywxt.utils.*;
+import com.ginkgocap.ywxt.vo.query.meeting.*;
 import com.gintong.frame.util.dto.CommonResultCode;
 import com.gintong.frame.util.dto.InterfaceResult;
 import com.gintong.ywxt.im.model.SocialStatus;
@@ -74,12 +75,6 @@ import com.ginkgocap.ywxt.user.service.UserService;
 import com.ginkgocap.ywxt.util.HttpClientHelper;
 import com.ginkgocap.ywxt.utils.type.SocialType;
 import com.ginkgocap.ywxt.vo.query.community.Community;
-import com.ginkgocap.ywxt.vo.query.meeting.BigDataQuery;
-import com.ginkgocap.ywxt.vo.query.meeting.MeetingNoteQuery;
-import com.ginkgocap.ywxt.vo.query.meeting.MeetingQuery;
-import com.ginkgocap.ywxt.vo.query.meeting.Notification;
-import com.ginkgocap.ywxt.vo.query.meeting.ResponseObject;
-import com.ginkgocap.ywxt.vo.query.meeting.UserBean;
 import com.ginkgocap.ywxt.vo.query.social.CommunityNewCount;
 import com.ginkgocap.ywxt.vo.query.social.Social;
 import com.ginkgocap.ywxt.vo.query.social.SocialDetail;
@@ -3046,7 +3041,7 @@ public class MeetingController extends BaseController {
 	public InterfaceResult getMeetingTop(@PathVariable("index") Integer index, HttpServletRequest request,
 										 @PathVariable("size") Integer size) {
 
-		List<MeetingQuery> meetingList = null;
+		List<MeetingAdQuery> meetingList = null;
 		try {
 			meetingList = meetingService.getTops(index, size);
 

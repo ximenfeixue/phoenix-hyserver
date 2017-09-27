@@ -38,5 +38,6 @@
         <typeAlias alias="meetingCount" type="com.ginkgocap.ywxt.model.meeting.MeetingCount" />
         <typeAlias alias="socialListReq" type="com.ginkgocap.ywxt.model.meeting.SocialListReq" />
         <typeAlias alias="meetingCommonQuery" type = "com.ginkgocap.ywxt.vo.query.meeting.MeetingCommonQuery"/>
+        <typeAlias alias="meetingAdQuery" type = "com.ginkgocap.ywxt.vo.query.meeting.MeetingAdQuery"/>
     </typeAliases>
 </configuration>

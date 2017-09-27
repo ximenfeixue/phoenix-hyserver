@@ -15,10 +15,7 @@ import com.ginkgocap.parasol.file.exception.FileIndexServiceException;
 import com.ginkgocap.ywxt.model.meeting.Meeting;
 import com.ginkgocap.ywxt.model.meeting.MeetingVo;
 import com.ginkgocap.ywxt.user.model.User;
-import com.ginkgocap.ywxt.vo.query.meeting.BigDataQuery;
-import com.ginkgocap.ywxt.vo.query.meeting.MeetingCommonQuery;
-import com.ginkgocap.ywxt.vo.query.meeting.MeetingMemberListQuery;
-import com.ginkgocap.ywxt.vo.query.meeting.MeetingQuery;
+import com.ginkgocap.ywxt.vo.query.meeting.*;
 import com.ginkgocap.ywxt.vo.query.social.Social;
 import com.gintong.frame.util.dto.InterfaceResult;
 
@@ -432,5 +429,5 @@ public interface MeetingService {
 	 * @return
 	 * @throws Exception
 	 */
-	List<MeetingQuery> getTops(int index, int size) throws Exception;
+	List<MeetingAdQuery> getTops(int index, int size) throws Exception;
 }

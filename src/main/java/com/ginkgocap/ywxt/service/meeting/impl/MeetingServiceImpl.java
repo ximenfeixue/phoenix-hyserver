@@ -539,7 +539,7 @@ public class MeetingServiceImpl extends BaseServiceImpl<Meeting, Long> implement
 				meetingPic.setCreateDate(new Date());
 				meetingPic.setIshomePage(1);
 				meetingPic.setMeetingId(meetingId);
-				meetingPic.setModuleId(meetingId);
+				meetingPic.setModuleId(0l);
 				meetingPic.setModuleType(MeetingPic.MODULE_TYPE_MEETING);
 				meetingPic.setPicStatus("1");
 				Random random = new Random();
@@ -2495,7 +2495,7 @@ public class MeetingServiceImpl extends BaseServiceImpl<Meeting, Long> implement
 	}
 
 	@Override
-	public List<MeetingQuery> getTops(int index, final int size) throws Exception {
+	public List<MeetingAdQuery> getTops(int index, final int size) throws Exception {
 
 		return meetingDao.getTops(index, size);
 	}
@@ -2503,13 +2503,5 @@ public class MeetingServiceImpl extends BaseServiceImpl<Meeting, Long> implement
 	@Override
 	public Social getMeetingWithLatestMessage(Long userId) {
 		return meetingDao.getMeetingWithLatestMessage(userId);
-	}
-
-	public static void main(String[] args) {
-		Random random = new Random();
-		for (int i = 0; i < 100; i++) {
-			int s =  random.nextInt(12) + 1; // [1,13)
-			System.out.println(s);
-		}
 	}
 }

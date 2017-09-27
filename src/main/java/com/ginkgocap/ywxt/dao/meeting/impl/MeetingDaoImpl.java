@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.ginkgocap.ywxt.vo.query.meeting.MeetingAdQuery;
 import com.ginkgocap.ywxt.vo.query.meeting.MeetingCommonQuery;
 import org.mybatis.spring.support.SqlSessionDaoSupport;
 import org.springframework.beans.BeansException;
@@ -548,7 +549,7 @@ public class MeetingDaoImpl extends SqlSessionDaoSupport implements MeetingDao,A
 	}
 
 	@Override
-	public List<MeetingQuery> getTops(int index, final int size) throws Exception {
+	public List<MeetingAdQuery> getTops(int index, final int size) throws Exception {
 
 		Map<String, Integer> map = new HashMap<String, Integer>(2);
 		map.put("startRow", index * size);
