@@ -1489,6 +1489,8 @@ public class MeetingServiceImpl extends BaseServiceImpl<Meeting, Long> implement
 					listNoticeField.add(ModifyMeetingNoticeType.INTRODUCE.toString());
 				}
 				meeting.setMeetingDesc(entity.getMeetingDesc());
+				meeting.setIsPay(entity.getIsPay());
+				meeting.setPayMoney(entity.getPayMoney());
 				meeting.setMeetingStatus(entity.getMeetingStatus());
 				meeting.setMeetingType(entity.getMeetingType());
 				meeting.setMemberCount(entity.getMemberCount());
