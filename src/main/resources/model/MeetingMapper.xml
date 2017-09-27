@@ -810,6 +810,9 @@ PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
 					m.meeting_status AS meetingStatus,
 					m.create_id AS createId,
 					m.create_name AS createName,
+					m.meeting_address AS meetingAddress,
+					m.meeting_address_pos_x AS meetingAddressPosX,
+					m.meeting_address_pos_y AS meetingAddressPosY,
 					m.top,
 					m.disable,
 					m.is_pay AS isPay,
@@ -818,7 +821,7 @@ PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
 					CASE m.meeting_status WHEN 3 THEN -1 ELSE m.meeting_status END AS orderType
 				FROM tb_meeting m 
 				LEFT JOIN tb_meeting_pic AS p 
-					ON p.module_id = m.id 
+					ON p.meeting_id = m.id
 					AND p.module_type = 1 
 					AND p.ishome_page = 1 
 				WHERE m.meeting_status = 0 
@@ -834,6 +837,9 @@ PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
 					m.meeting_status AS meetingStatus,
 					m.create_id AS createId,
 					m.create_name AS createName,
+					m.meeting_address AS meetingAddress,
+					m.meeting_address_pos_x AS meetingAddressPosX,
+					m.meeting_address_pos_y AS meetingAddressPosY,
 					m.top,
 					m.disable,
 					m.is_pay AS isPay,
@@ -842,7 +848,7 @@ PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
 					CASE m.meeting_status WHEN 3 THEN -1 ELSE m.meeting_status END AS orderType
 				FROM tb_meeting m
 				LEFT JOIN tb_meeting_pic AS p 
-					ON p.module_id = m.id 
+					ON p.meeting_id = m.id
 					AND p.module_type = 1
 					AND p.ishome_page = 1 
 				INNER JOIN tb_meeting_member mm 
@@ -872,6 +878,9 @@ PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
 					m.meeting_status AS meetingStatus,
 					m.create_id AS createId,
 					m.create_name AS createName,
+					m.meeting_address AS meetingAddress,
+					m.meeting_address_pos_x AS meetingAddressPosX,
+					m.meeting_address_pos_y AS meetingAddressPosY,
 					m.top,
 					m.disable,
 					m.is_pay AS isPay,
@@ -880,7 +889,7 @@ PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
 					CASE m.meeting_status WHEN 3 THEN -1 ELSE m.meeting_status END AS orderType
 				FROM tb_meeting m
 				LEFT JOIN tb_meeting_pic AS p 
-					ON p.module_id = m.id 
+					ON p.meeting_id = m.id
 					AND p.module_type = 1
 					AND p.ishome_page = 1 
 				INNER JOIN tb_meeting_member mm 
@@ -972,7 +981,7 @@ PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
 					m.create_id AS createId
 				FROM tb_meeting m 
 				LEFT JOIN tb_meeting_pic AS p 
-					ON p.module_id = m.id 
+					ON p.meeting_id = m.id
 					AND p.module_type = 1 
 					AND p.ishome_page = 1 
 				WHERE m.meeting_status = 0 
@@ -984,7 +993,7 @@ PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
 					m.create_id AS createId
 				FROM tb_meeting m
 				LEFT JOIN tb_meeting_pic AS p 
-					ON p.module_id = m.id 
+					ON p.meeting_id = m.id
 					AND p.module_type = 1 
 					AND p.ishome_page = 1 
 				INNER JOIN tb_meeting_member mm 
