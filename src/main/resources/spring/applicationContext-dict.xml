@@ -23,16 +23,18 @@
 			<map>
 				<entry key="industry" >
 					<map>
-						<entry key="1" value="能源" />
-						<entry key="2" value="工商业" />
-						<entry key="3" value="矿产资源" />
-						<entry key="4" value="医药" />
-						<entry key="5" value="消费品" />
-						<entry key="6" value="金融" />
-						<entry key="7" value="房地产" />
-						<entry key="8" value="公用事业" />
-						<entry key="9" value="农林牧渔" />
-						<entry key="10" value="通信、媒体与科技" />
+						<entry key="1" value="TMT（科技、媒体和通信）" />
+						<entry key="2" value="时政" />
+						<entry key="3" value="社会" />
+						<entry key="4" value="金融" />
+						<entry key="5" value="教育" />
+						<entry key="6" value="医疗" />
+						<entry key="7" value="大数据" />
+						<entry key="8" value="财务" />
+						<entry key="9" value="法律" />
+						<entry key="10" value="人力HR" />
+						<entry key="11" value="产品开发"/>
+						<entry key="12" value="运营"/>
 					</map>
 				</entry>
 			</map>
