@@ -14,6 +14,7 @@ import com.ginkgocap.parasol.file.model.FileIndex;
 import com.ginkgocap.parasol.file.service.FileIndexService;
 import com.ginkgocap.ywxt.dao.meeting.*;
 import com.ginkgocap.ywxt.model.meeting.*;
+import com.ginkgocap.ywxt.utils.pic.DefaultPic;
 import com.ginkgocap.ywxt.vo.query.meeting.*;
 import com.gintong.frame.util.dto.InterfaceResult;
 import org.apache.commons.beanutils.BeanUtils;
@@ -21,6 +22,7 @@ import org.h2.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -100,6 +102,9 @@ public class MeetingServiceImpl extends BaseServiceImpl<Meeting, Long> implement
 	private MeetingMemberService meetingMemberService;
 	@Autowired
 	private UserConfigService userConfigService;
+
+	@Value("${nginx.root}")
+	private String nginxRoot;
 
 	public interface Callback<T> {
 		void callback(T t) throws Exception;
@@ -319,6 +324,9 @@ public class MeetingServiceImpl extends BaseServiceImpl<Meeting, Long> implement
 			meeting.setCreateId(user.getId());
 			meeting.setCreateName(user.getName());
 			// 设置会议的行业
+			List<String> industryList = entity.getListIndustry();
+			String s = industryList.get(0);
+
 			String industry = meetingDict.getDictStr(entity.getListIndustry(), MeetingDict.INDUSTRY);
 			meeting.setIndustry(industry);
 			// 创建人信息
@@ -498,12 +506,18 @@ public class MeetingServiceImpl extends BaseServiceImpl<Meeting, Long> implement
 			}
 			// 保存会议图片
 			String homePage = "";
+			boolean flag = false;
 			if (!Utils.isNullOrEmpty(entity.getListMeetingPic())) {
 				for (int i = 0; i < entity.getListMeetingPic().size(); i++) {
 					MeetingPic meetingPic = entity.getListMeetingPic().get(i);
 					if (!Utils.isNullOrEmpty(meetingPic)) {
+						if (meetingPic.getIshomePage() == 1) {
+							meetingPic.setModuleType(MeetingPic.MODULE_TYPE_MEETING);
+							flag = true;
+						} else {
+							meetingPic.setModuleType(MeetingPic.MODULE_TYPE_CHUNK);
+						}
 						meetingPic.setMeetingId(meeting.getId());
-						meetingPic.setModuleType(MeetingPic.MODULE_TYPE_CHUNK);
 						meetingPic.setCreateDate(new Date());
 //						if (i == 0) {
 //							homePage = meetingPic.getPicPath();
@@ -518,6 +532,21 @@ public class MeetingServiceImpl extends BaseServiceImpl<Meeting, Long> implement
 						meetingPicDao.saveOrUpdate(meetingPic);
 					}
 				}
+			}
+			if (!flag) {
+				// 在前端不传封面时 默认赋予一个封面
+				MeetingPic meetingPic = new MeetingPic();
+				meetingPic.setCreateDate(new Date());
+				meetingPic.setIshomePage(1);
+				meetingPic.setMeetingId(meetingId);
+				meetingPic.setModuleId(meetingId);
+				meetingPic.setModuleType(MeetingPic.MODULE_TYPE_MEETING);
+				meetingPic.setPicStatus("1");
+				Random random = new Random();
+				int type = random.nextInt(12) + 1;
+				String picPath = DefaultPic.defaultPic((byte) type).getPicPath();
+				meetingPic.setPicPath(nginxRoot + picPath);
+				meetingPicDao.saveOrUpdate(meetingPic);
 			}
 			/***
 			 * 保存会议人脉
@@ -2474,5 +2503,13 @@ public class MeetingServiceImpl extends BaseServiceImpl<Meeting, Long> implement
 	@Override
 	public Social getMeetingWithLatestMessage(Long userId) {
 		return meetingDao.getMeetingWithLatestMessage(userId);
+	}
+
+	public static void main(String[] args) {
+		Random random = new Random();
+		for (int i = 0; i < 100; i++) {
+			int s =  random.nextInt(12) + 1; // [1,13)
+			System.out.println(s);
+		}
 	}
 }
