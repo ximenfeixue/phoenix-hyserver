@@ -75,7 +75,7 @@ public class MeetingPic extends BaseEntity implements java.io.Serializable{
 	//任务ID
 	private String taskId;
 	//会议/议题ID 
-	private Long moduleId;
+	private Long moduleId = 0l;
 	//图片所属模块类型 1：会议 2：议题 3：笔记 4:模块
 	private Long moduleType;
 	//图片宽度

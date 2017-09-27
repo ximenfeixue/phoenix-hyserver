@@ -1888,7 +1888,7 @@ public class MeetingServiceImpl extends BaseServiceImpl<Meeting, Long> implement
 				MeetingPic meetingPic = entity.getListMeetingPic().get(i);
 				if (!Utils.isNullOrEmpty(meetingPic)) {
 					// 判断删除标志位，是否删除 1 删除  id没有的情况下视为插入
-					if (meetingPic.getPicDel().equals("1")) {
+					if (meetingPic.getPicDel() != null && meetingPic.getPicDel().equals("1")) {
 						meetingPicDao.delete(meetingPic.getId());
 					} else if (meetingPic.getId() == null || meetingPic.getId() == 0 || meetingPic.getIshomePage() ==1) {
 						meetingPic.setMeetingId(entity.getId());
@@ -1920,13 +1920,13 @@ public class MeetingServiceImpl extends BaseServiceImpl<Meeting, Long> implement
 		}
 		// 删除图片
 //		meetingPicDao.deleteByModuleId(entity.getId(), MeetingPic.MODULE_TYPE_MEETING, listMeetingPicId);
-//		if (!Utils.isNullOrEmpty(entity.getListMeetingFile())) {
-//			for (MeetingFile meetingFile : entity.getListMeetingFile()) {
-//				if (!Utils.isNullOrEmpty(meetingFile)) {
-//					listFileIndexId.add("" + meetingFile.getFileIndexId());
-//				}
-//			}
-//		}
+		if (!Utils.isNullOrEmpty(entity.getListMeetingFile())) {
+			for (MeetingFile meetingFile : entity.getListMeetingFile()) {
+				if (!Utils.isNullOrEmpty(meetingFile)) {
+					listFileIndexId.add("" + meetingFile.getFileIndexId());
+				}
+			}
+		}
 		// 删除已移除的FileIndex
 		if (!Utils.isNullOrEmpty(entity.getTaskId())) {
 			List<FileIndex> listFileIndex = fileIndexService.getFileIndexesByTaskId(entity.getTaskId());
