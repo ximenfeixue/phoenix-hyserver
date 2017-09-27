@@ -677,7 +677,7 @@ PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
 		FROM
 			tb_meeting m
 		LEFT JOIN tb_meeting_pic p
-			ON m.id = p.module_id 
+			ON m.id = p.meeting_id
 			AND p.module_type = 1
 			AND p.ishome_page = 1
 		WHERE  (m.meeting_status = 1 
