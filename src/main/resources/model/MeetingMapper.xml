@@ -1673,7 +1673,7 @@ PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
 		mp.pic_path AS path
 		FROM tb_meeting m
 		LEFT JOIN tb_meeting_pic mp
-		ON m.id = mp.module_id
+		ON m.id = mp.meeting_id
 		WHERE
 		m.is_delete = 0
 		AND mp.module_type = 1
