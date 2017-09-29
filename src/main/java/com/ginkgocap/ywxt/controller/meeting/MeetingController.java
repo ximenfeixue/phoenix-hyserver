@@ -235,23 +235,8 @@ public class MeetingController extends BaseController {
 
 			if (!isNullOrEmpty(requestJson)) {
 				try {
-					Map<String, Class> classMap = new HashMap<String, Class>();
-					classMap.put("listMeetingMember", MeetingMember.class);
-					classMap.put("listMeetingPic", MeetingPic.class);
-					classMap.put("listMeetingTime", MeetingTime.class);
-					classMap.put("listMeetingTopic", MeetingTopic.class);
-					classMap.put("listMeetingData", MeetingData.class);
-					classMap.put("listMeetingRequirement", MeetingData.class);
-					classMap.put("listMeetingKnowledge", MeetingData.class);
-					classMap.put("listMeetingPeople", MeetingPeople.class);
-					classMap.put("listMeetingOrgan", MeetingOrgan.class);
-					classMap.put("listMeetingSignLabel", MeetingSignLabel.class);
 					// json 转为对象
 					JSONUtils.getMorpherRegistry().registerMorpher(new DateMorpher(new String[]{"yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd"}));
-					/*
-					 * MeetingQuery meetingObj = (MeetingQuery)
-					 * JSONObject.toBean(j, MeetingQuery.class, classMap);
-					 */
 					Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
 					MeetingQuery meetingObj = (MeetingQuery) gson.fromJson(requestJson, MeetingQuery.class);
 					String nfsHome = (String) request.getSession().getServletContext().getAttribute("nfsHome");
@@ -2430,18 +2415,28 @@ public class MeetingController extends BaseController {
 	}
 
 	public static void main(String[] args) {
-		List<Integer> list = new ArrayList<Integer>();
-		list.add(10);
-		list.add(11);
-		list.add(12);
-		list.add(13);
-		list.add(14);
-		list.add(15);
-		list.add(16);
-		list.add(17);
-
-		list = list.subList(0, 3);
-		System.out.println(list);
+		String json = "{\n" +
+				"\t\t\"peopleId\": 7469165,\n" +
+				"\t\t\"peopleName\": \"che\",\n" +
+				"\t\t\"peoplePhoto\": \"http:\\/\\/file.online.gintong.com\\/web\\/pic\\/people\\/original\\/default.jpeg\",\n" +
+				"\t\t\"peopleDesc\": \"\",\n" +
+				"\t\t\"relation\": \"\",\n" +
+				"\t\t\"id\": 0,\n" +
+				"\t\t\"meetingId\": 3156,\n" +
+				"\t\t\"peopleType\": 2\n" +
+				"\t}";
+		String ojson = "{\n" +
+				"\"organType\":  2,\n" +
+				"\"relation\":  \"提及\",\n" +
+				"\"organPhoto\":  \"http:\\/\\/file.online.gintong.com\\/web1\\/organ\\/avatar\\/default.jpeg\",\n" +
+				"\"meetingId\":  3223,\n" +
+				"\"organId\":  3622246,\n" +
+				"\"organName\":  \"龙神\"\n" +
+				"}";
+		String alljson = "";
+		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
+		MeetingQuery meetingOuery = gson.fromJson(alljson,MeetingQuery.class);
+		System.out.println(meetingOuery.getListMeetingOrgan().size());
 	}
 
 	static int count(List<Social> listResult) {
