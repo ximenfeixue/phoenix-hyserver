@@ -180,7 +180,7 @@ public class MeetingMemberServiceImpl implements MeetingMemberService{
 	public void signUp(Meeting meeting,MeetingMember meetingMember,User user) throws Exception{
 		meetingMemberDao.saveOrUpdate(meetingMember);
 		// 添加报名记录表
-		MeetingNotice meetingNotice=new MeetingNotice();
+		MeetingNotice meetingNotice = new MeetingNotice();
 		// 封装创建人
 		meetingNotice.setCreateId(user.getId());
 		meetingNotice.setCreateName(user.getName());
@@ -200,7 +200,7 @@ public class MeetingMemberServiceImpl implements MeetingMemberService{
 		// 封装更新时间
 		meetingNotice.setUpdateTime(new Date());
 		// 封装通知字段
-		NoticeField noticeField=new NoticeField();
+		NoticeField noticeField = new NoticeField();
 		noticeField.setField(user.getId()+Constant.NOTICE_CONTENT_SPLIT_CHAR+user.getName());
 //		添加通知
 		addNotice(user,meetingNotice,noticeField,user.getName()+"报名参加"+meeting.getMeetingName(),new Date());
