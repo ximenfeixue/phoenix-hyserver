@@ -11,7 +11,6 @@ public class MeetingSignUpFormQuery implements Serializable{
 
     private static final long serialVersionUID = 3148176768559230817L;
 
-    private Long id;
     // 会议 id
     private Long meetingId;
     // 报名时间
@@ -31,14 +30,6 @@ public class MeetingSignUpFormQuery implements Serializable{
     private Byte friendStatus;
     // 报名人 行业
     private String industry;
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
 
     public Long getCreateTime() {
         return createTime;

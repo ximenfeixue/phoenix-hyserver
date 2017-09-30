@@ -1672,7 +1672,7 @@ public class MeetingMemberController extends BaseController {
 		try {
 			meetingMongoService.saveMeetingSignForm(signUpForm);
 		} catch (Exception e) {
-			logger.error("invoke meetingMongoService failed! method : {saveMeetingSignForm}. userId : " + user.getId());
+			logger.error("invoke meetingMongoService failed! method : {saveMeetingSignForm}. userId : " + user.getId(), e);
 		}
 	}
 }
