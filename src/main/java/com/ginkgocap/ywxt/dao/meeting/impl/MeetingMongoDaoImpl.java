@@ -28,7 +28,7 @@ public class MeetingMongoDaoImpl implements MeetingMongoDao {
     @Override
     public void saveMeetingSignForm(MeetingSignUpFormQuery signUpFormQuery) throws Exception {
 
-        mongoTemplate.insert(signUpFormQuery, "meetingSignForm");
+        mongoTemplate.save(signUpFormQuery, "meetingSignForm");
     }
 
     @Override
