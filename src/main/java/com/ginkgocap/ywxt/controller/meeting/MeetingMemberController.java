@@ -12,9 +12,13 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.ginkgocap.ywxt.service.meeting.*;
+import com.ginkgocap.ywxt.vo.query.meeting.MeetingCustom;
+import com.ginkgocap.ywxt.vo.query.meeting.MeetingSignUpFormQuery;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,15 +42,6 @@ import com.ginkgocap.ywxt.person.model.Person;
 import com.ginkgocap.ywxt.person.model.PersonName;
 import com.ginkgocap.ywxt.person.model.WorkExperience;
 import com.ginkgocap.ywxt.person.service.PersonService;
-import com.ginkgocap.ywxt.service.meeting.ImRecordmessageService;
-import com.ginkgocap.ywxt.service.meeting.MeetingMemberService;
-import com.ginkgocap.ywxt.service.meeting.MeetingNoticeService;
-import com.ginkgocap.ywxt.service.meeting.MeetingPicService;
-import com.ginkgocap.ywxt.service.meeting.MeetingService;
-import com.ginkgocap.ywxt.service.meeting.MeetingSignLabelDataService;
-import com.ginkgocap.ywxt.service.meeting.MeetingSignLabelService;
-import com.ginkgocap.ywxt.service.meeting.MeetingTopicService;
-import com.ginkgocap.ywxt.service.meeting.TopicChatService;
 import com.ginkgocap.ywxt.user.model.User;
 import com.ginkgocap.ywxt.user.service.UserService;
 import com.ginkgocap.ywxt.utils.DateUtil;
@@ -98,6 +93,8 @@ public class MeetingMemberController extends BaseController {
 	private DynamicNewsService dynamicNewsService;*/
 	@Autowired
 	private ImRecordmessageService imRecordmessageService;
+	@Autowired
+	private MeetingMongoService meetingMongoService;
 	
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 	
@@ -715,51 +712,45 @@ public class MeetingMemberController extends BaseController {
 						notificationMap.put("notifCode", "0002");
 						notificationMap.put("notifInfo", "会议是保密会议，不允许报名");
 					} else {
-						List<MeetingMember> list = meetingMemberService
-								.getByMeetingIdAndMemberId(meetingId, memberId);
+						List<MeetingMember> list = meetingMemberService.getByMeetingIdAndMemberId(meetingId, memberId);
 						if (!isNullOrEmpty(list)) {
 							MeetingMember meetingMember = list.get(0);
 							if (!isNullOrEmpty(meetingMember)) {
 								if (meeting.getCreateId().toString().equals(memberIdStr)) {
 									responseDataMap.put("succeed", false);
 									notificationMap.put("notifCode", "0002");
-									notificationMap.put("notifInfo",
-											"你是会议发起人不能报名");
-								}else if (meetingMember.getAttendMeetType() == 0) {
-									if(AttendMeetStatusType.REFUSE_INVITATION.code()==meetingMember.getAttendMeetStatus()){
+									notificationMap.put("notifInfo", "你是会议发起人不能报名");
+								} else if (meetingMember.getAttendMeetType() == 0) {
+									if (AttendMeetStatusType.REFUSE_INVITATION.code() == meetingMember.getAttendMeetStatus()){
 										User user = getUser(request);
 										// 报名
-										signUp(meetingMember.getId(),memberName, memberPhoto, memberId, user,
-												meeting);
+										signUp(meetingMember.getId(),memberName, memberPhoto, memberId, user, meeting);
 										responseDataMap.put("succeed", true);
 										notificationMap.put("notifCode", "0001");
-										notificationMap.put("notifInfo",
-												"hello mobile app!");
-									}else{
+										notificationMap.put("notifInfo", "hello mobile app!");
+									} else {
 										responseDataMap.put("succeed", false);
 										notificationMap.put("notifCode", "0002");
 										notificationMap.put("notifInfo",
 												"会议举办方已经邀请您参会，无需报名");
 									}
-								} else if(meetingMember.getAttendMeetType() == 1&&meetingMember.getExcuteMeetSign()==2){
+								} else if (meetingMember.getAttendMeetType() == 1 && meetingMember.getExcuteMeetSign() == 2){
 									User user = getUser(request);
 									// 报名
-									signUp(meetingMember.getId(),memberName, memberPhoto, memberId, user,
-											meeting);
+									signUp(meetingMember.getId(),memberName, memberPhoto, memberId, user, meeting);
 									responseDataMap.put("succeed", true);
 									notificationMap.put("notifCode", "0001");
 									notificationMap.put("notifInfo",
 											"hello mobile app!");
-								}else{
+								} else {
 									responseDataMap.put("succeed", false);
 									notificationMap.put("notifCode", "0002");
 									notificationMap.put("notifInfo","等待审核或者您已经参会");
 								}
-							}else{
+							} else {
 								User user = getUser(request);
 								// 报名
-								signUp(meetingMember.getId(),memberName, memberPhoto, memberId, user,
-										meeting);
+								signUp(meetingMember.getId(),memberName, memberPhoto, memberId, user, meeting);
 								responseDataMap.put("succeed", true);
 								notificationMap.put("notifCode", "0001");
 								notificationMap.put("notifInfo",
@@ -768,8 +759,7 @@ public class MeetingMemberController extends BaseController {
 						} else {
 							User user = getUser(request);
 							// 报名
-							signUp(null,memberName, memberPhoto, memberId, user,
-									meeting);
+							signUp(null,memberName, memberPhoto, memberId, user, meeting);
 							responseDataMap.put("succeed", true);
 							notificationMap.put("notifCode", "0001");
 							notificationMap.put("notifInfo",
@@ -821,7 +811,7 @@ public class MeetingMemberController extends BaseController {
 		/** 0：默认，1：归档，2：删除 **/
 		meetingMember.setMemberMeetStatus(0);
 		/**
-		 * 参会状态 0.未答复 1接受邀请2拒绝邀请， 4 报名 5取消报名
+		 * 参会状态 0.未答复 1接受邀请 2拒绝邀请， 4 报名 5取消报名
 		 */
 		meetingMember.setAttendMeetStatus(4);
 		/** 0 邀请，1 报名 **/
@@ -1172,57 +1162,44 @@ public class MeetingMemberController extends BaseController {
 					notificationMap.put("notifCode", "0002");
 					notificationMap.put("notifInfo", "会议iD不能为空!");
 				} else {
-//					UserBean userBean = getUserBean(request);
 					User user = getUser(request);
 					// 获取用户详细资料呢
-//					PeopleTemp people = peopleMongoService.selectByPrimary(user.getPeopleId());
 					Person person = null;
 					if (StringUtils.isNotBlank(user.getPeopleId())) {
 						person = personService.get(Long.valueOf(user.getPeopleId()));
 					}
 
-					List<MeetingSignLabel> list = meetingSignLabelService
-							.getByMeetingId(Long.valueOf(meetingIdStr));
+					List<MeetingSignLabel> list = meetingSignLabelService.getByMeetingId(Long.valueOf(meetingIdStr));
 					if (!isNullOrEmpty(list)) {
 						// 遍历标签
 						for (MeetingSignLabel meetingSignLabel : list) {
 							if (!isNullOrEmpty(meetingSignLabel)) {
 								MeetingSignLabelDataQuery meetingSignLabelDataQuery = new MeetingSignLabelDataQuery();
 								// 封装报名用户ID
-								meetingSignLabelDataQuery.setMemberId(user
-										.getId());
+								meetingSignLabelDataQuery.setMemberId(user.getId());
 								// 封装报名字段编号
-								meetingSignLabelDataQuery
-										.setMslabelId(meetingSignLabel.getId());
+								meetingSignLabelDataQuery.setMslabelId(meetingSignLabel.getId());
 								// 封装报名字段名字
-								meetingSignLabelDataQuery
-										.setMslabelName(meetingSignLabel
-												.getLabelName());
+								meetingSignLabelDataQuery.setMslabelName(meetingSignLabel.getLabelName());
 								// 封装是否自定义字段
-								meetingSignLabelDataQuery
-										.setIsCustomer(meetingSignLabel
-												.getIsCustom());
+								meetingSignLabelDataQuery.setIsCustomer(meetingSignLabel.getIsCustom());
 								// 是否为后台人脉原有数据
 								meetingSignLabelDataQuery.setIsPeopleData(0);
 								// 非自定义字段
 								if (0 == meetingSignLabel.getIsCustom()) {
 									if (!isNullOrEmpty(person)) {
 										// 获取名字
-										if (DefaultSignUpMeetingLabelType.NAME.toString().equals(meetingSignLabel
-												.getLabelName())) {
+										if (DefaultSignUpMeetingLabelType.NAME.toString().equals(meetingSignLabel.getLabelName())) {
 											// 获取名字集合
-											List<PersonName> peopleNameList = person
-													.getPeopleNameList();
+											List<PersonName> peopleNameList = person.getPeopleNameList();
 											if (!isNullOrEmpty(peopleNameList)) {
 												// 取第一个名字
-												PersonName peopleName = peopleNameList
-														.get(0);
+												PersonName peopleName = peopleNameList.get(0);
 												if (!isNullOrEmpty(peopleName)) {
 													// 是否为后台人脉原有数据
-													meetingSignLabelDataQuery
-															.setIsPeopleData(1);
-													meetingSignLabelDataQuery
-															.setLabelContent(StringUtils.trimToEmpty(peopleName.getLastname()) + StringUtils.trimToEmpty(peopleName.getFirstname()));
+													meetingSignLabelDataQuery.setIsPeopleData(1);
+													meetingSignLabelDataQuery.setLabelContent(StringUtils.trimToEmpty(peopleName.getLastname()) +
+																	StringUtils.trimToEmpty(peopleName.getFirstname()));
 												}
 											}
 										}
@@ -1399,6 +1376,7 @@ public class MeetingMemberController extends BaseController {
 		model.put("responseData", responseDataMap);
 		model.put("notification", notificationMap);
 		User user = getUser(request);
+
 		if (StringUtils.isBlank(requestJson)) {
 			logger.error("传入参数异常");
 			responseDataMap.put("succeed", false);
@@ -1410,20 +1388,23 @@ public class MeetingMemberController extends BaseController {
 			// 获取用户必填信息
 			JSONObject j = JSONObject.fromObject(requestJson);
 			JSONArray jsonArray = j.getJSONArray("listMeetingSignLabelDataQuery");
-			List<MeetingSignLabelDataQuery> list = JSONArray.toList(jsonArray, MeetingSignLabelDataQuery.class);
-			if(null != list && list.size() > 0){
-				MeetingSignLabelDataQuery meetingSignLabelDataQuery = list.get(0);
+			String meetingId = getStringJsonValueByKey(j, "meetingId");
+			List<MeetingSignLabelDataQuery> signLabelDataList = JSONArray.toList(jsonArray, MeetingSignLabelDataQuery.class);
+			if(null != signLabelDataList && signLabelDataList.size() > 0){
+				MeetingSignLabelDataQuery meetingSignLabelDataQuery = signLabelDataList.get(0);
 				if(!Utils.isNullOrEmpty(meetingSignLabelDataQuery)) {
 					//删除已填写的报名信息
 					MeetingSignLabel meetingSignLabel = meetingSignLabelService.getById(meetingSignLabelDataQuery.getMslabelId());
-					if(!Utils.isNullOrEmpty(meetingSignLabel)
-							&& !Utils.isNullOrEmpty(user)) {
+					if(!Utils.isNullOrEmpty(meetingSignLabel) && !Utils.isNullOrEmpty(user)) {
 						meetingSignLabelDataService.deleteByMeetingIdAndMemberId(meetingSignLabel.getMeetingId(), user.getId());
 					}
 				}
 				//保存新的报名信息
-				meetingSignLabelDataService.addBatchMeetingSignLabelData(list);
+				meetingSignLabelDataService.addBatchMeetingSignLabelData(signLabelDataList);
+
 			}
+			// 保存报名表单到 mongo 中， 以便提取 （稍后放到线程池中玩一下）
+			saveDataToMongo(user, meetingId, signLabelDataList);
 			responseDataMap.put("succeed", true);
 			notificationMap.put("notifCode", "0001");
 			notificationMap.put("notifInfo", "hello mobile app!");
@@ -1667,5 +1648,31 @@ public class MeetingMemberController extends BaseController {
 	@Override
 	public Logger getLogger() {
 		return logger;
+	}
+
+	private void saveDataToMongo(User user, String meetingId, List<MeetingSignLabelDataQuery> signLabelDataList) {
+		List<MeetingCustom> meetingCustomList = new ArrayList<MeetingCustom>();
+		if (CollectionUtils.isNotEmpty(signLabelDataList)) {
+			for (MeetingSignLabelDataQuery signLabel : signLabelDataList) {
+				MeetingCustom meetingCustom = new MeetingCustom();
+				String name = signLabel.getMslabelName();
+				String value = signLabel.getLabelContent();
+				meetingCustom.setName(name);
+				meetingCustom.setValue(value);
+				meetingCustomList.add(meetingCustom);
+			}
+		}
+		MeetingSignUpFormQuery signUpForm = new MeetingSignUpFormQuery();
+		signUpForm.setMeetingId(Long.valueOf(meetingId));
+		signUpForm.setCreateTime(System.currentTimeMillis());
+		signUpForm.setIndustry(user.getIndustry());
+		signUpForm.setUserId(user.getId());
+		signUpForm.setSignUpFormList(meetingCustomList);
+		// 报名信息 存到 mongo中 以便拿取
+		try {
+			meetingMongoService.saveMeetingSignForm(signUpForm);
+		} catch (Exception e) {
+			logger.error("invoke meetingMongoService failed! method : {saveMeetingSignForm}. userId : " + user.getId());
+		}
 	}
 }
