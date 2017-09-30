@@ -228,10 +228,12 @@ public class MeetingPicDaoImpl extends SqlSessionDaoSupport implements MeetingPi
 	 * @author qingc
 	 */
 	public void saveOrUpdate(MeetingPic entity) {
-		if(entity.getId() == null) 
+		if(entity.getId() == null || entity.getId() == 0) {
+			entity.setId(null);
 			getSqlSession().insert("MeetingPic.insert", entity);
-		else 
+		} else {
 			getSqlSession().update("MeetingPic.update", entity);
+		}
 	}
 	/**
 	 * 名称: save
