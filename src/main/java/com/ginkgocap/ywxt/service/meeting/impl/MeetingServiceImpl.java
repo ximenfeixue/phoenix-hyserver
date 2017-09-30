@@ -1510,6 +1510,9 @@ public class MeetingServiceImpl extends BaseServiceImpl<Meeting, Long> implement
 						listNoticeField.add(ModifyMeetingNoticeType.ADDRESS.toString());
 					}
 				}
+				meeting.setCountry(entity.getCountry());
+				meeting.setCity(entity.getCity());
+				meeting.setProvince(entity.getProvince());
 				meeting.setMeetingAddress(entity.getMeetingAddress());
 				meeting.setMeetingAddressPosX(entity.getMeetingAddressPosX());
 				meeting.setMeetingAddressPosY(entity.getMeetingAddressPosY());
