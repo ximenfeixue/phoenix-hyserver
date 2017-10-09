@@ -107,8 +107,7 @@ public class MeetingNoticeController extends BaseController {
 					Long memberId = Long.valueOf(memberIdStr);
 					if(!isNullOrEmpty(memberIdStr)){
 						List<MeetingNoticeRelation> list = meetingNoticeService.getMeetingNoticeRelation(memberId);
-						if(!Utils.isNullOrEmpty(meetingIdStr)
-								&& !Utils.isNullOrEmpty(list)) {
+						if(!Utils.isNullOrEmpty(meetingIdStr) && !Utils.isNullOrEmpty(list)) {
 							List<MeetingNoticeRelation> newList = new ArrayList<MeetingNoticeRelation>();
 							for(MeetingNoticeRelation meetingNoticeRelation : list) {
 								if(meetingIdStr.equals(""+meetingNoticeRelation.getMeetingId())) {
@@ -125,7 +124,7 @@ public class MeetingNoticeController extends BaseController {
 									TreeSet<MeetingNoticeQuery> setNoticeQuery=new TreeSet<MeetingNoticeQuery>();
 									Meeting meeting=meetingService.getById(meetingNoticeRelation.getMeetingId());
 									
-									meetingNoticeRelation.equals(meeting.getGroupId());
+									meetingNoticeRelation.setGroupId(meeting.getGroupId());
 									// receiverType: 0会议创建者，1普通参会人
 									Integer receiverType=memberId.equals(meeting.getCreateId())?0:1;
 									List<MeetingNotice> listNotice=meetingNoticeService.getMyNoticeByMeetingIdAndReceiverType(memberId, meetingNoticeRelation.getMeetingId(), receiverType);
