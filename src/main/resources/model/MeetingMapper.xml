@@ -35,6 +35,7 @@ PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
 		<result property="disable" column="disable"/>
 		<result property="isPay" column="is_pay"/>
 		<result property="payMoney" column="pay_money"/>
+		<result property="sendFlag" column="send_flag"/>
 	</resultMap>
 	
 	<sql id="columns">
@@ -46,7 +47,8 @@ PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
 			is_secrecy AS isSecrecy,member_count AS memberCount,meeting_desc AS meetingDesc,
 			create_id AS createId,create_name AS createName,task_id AS taskId,create_time AS createTime,
 			update_time AS updateTime,group_id AS groupId,industry,is_delete AS isDelete,formated_desc AS formatedDesc,
-			create_user_type AS createUserType, top AS top, disable AS disable, is_pay AS isPay, pay_money AS payMoney
+			create_user_type AS createUserType, top AS top, disable AS disable, is_pay AS isPay, pay_money AS payMoney,
+			send_flag AS sendFlag
 		]]>
 	</sql>
 
@@ -81,7 +83,8 @@ PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
         	top,
         	disable,
         	is_pay,
-        	pay_money
+        	pay_money,
+        	send_flag
         ) VALUES (
         	#{id},
         	#{meetingName},
@@ -111,7 +114,8 @@ PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
         	#{top},
         	#{disable},
         	#{isPay},
-        	#{payMoney}
+        	#{payMoney},
+        	#{sendFlag}
         )
         
     ]]>
@@ -146,7 +150,8 @@ PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
 	        top = #{top},
 	        disable = #{disable},
 	        is_pay = #{isPay},
-	        pay_money = #{payMoney}
+	        pay_money = #{payMoney},
+	        send_flag = #{sendFlag}
         WHERE id = #{id} 
     ]]>
 	</update>

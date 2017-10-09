@@ -107,8 +107,7 @@ public class MeetingNoticeController extends BaseController {
 					Long memberId = Long.valueOf(memberIdStr);
 					if(!isNullOrEmpty(memberIdStr)){
 						List<MeetingNoticeRelation> list = meetingNoticeService.getMeetingNoticeRelation(memberId);
-						if(!Utils.isNullOrEmpty(meetingIdStr)
-								&& !Utils.isNullOrEmpty(list)) {
+						if(!Utils.isNullOrEmpty(meetingIdStr) && !Utils.isNullOrEmpty(list)) {
 							List<MeetingNoticeRelation> newList = new ArrayList<MeetingNoticeRelation>();
 							for(MeetingNoticeRelation meetingNoticeRelation : list) {
 								if(meetingIdStr.equals(""+meetingNoticeRelation.getMeetingId())) {

@@ -124,7 +124,9 @@ public class MeetingQuery implements Serializable {
 	private byte isPay;
 	//支付金额
 	private BigDecimal payMoney = new BigDecimal(0);
-	
+	// 是否会议开始时畅聊  0 是   1 不是
+	private int sendFalg;
+
 	public Long getId() {
 		return this.id;
 	}
@@ -626,5 +628,13 @@ public class MeetingQuery implements Serializable {
 
 	public void setSecrecy(Boolean secrecy) {
 		isSecrecy = secrecy;
+	}
+
+	public int getSendFalg() {
+		return sendFalg;
+	}
+
+	public void setSendFalg(int sendFalg) {
+		this.sendFalg = sendFalg;
 	}
 }

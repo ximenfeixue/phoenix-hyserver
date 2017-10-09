@@ -25,7 +25,7 @@ public class MeetingNotice extends BaseEntity implements java.io.Serializable{
 	private Long receiver;
 	//接收人名字
 	private String receiverName;
-    //通知类型
+    //通知类型 0：修改议题，1：报名申请，2：报名通过，3：报名未通过，4：接受邀请，5：拒绝邀请，6同意报名，7拒绝报名
 	private Integer noticeType;
 	//是否显示：0：不显示，1：显示
 	private Integer isShow;
