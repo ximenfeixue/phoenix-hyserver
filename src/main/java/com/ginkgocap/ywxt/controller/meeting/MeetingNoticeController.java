@@ -124,7 +124,7 @@ public class MeetingNoticeController extends BaseController {
 									TreeSet<MeetingNoticeQuery> setNoticeQuery=new TreeSet<MeetingNoticeQuery>();
 									Meeting meeting=meetingService.getById(meetingNoticeRelation.getMeetingId());
 									
-									meetingNoticeRelation.equals(meeting.getGroupId());
+									meetingNoticeRelation.setGroupId(meeting.getGroupId());
 									// receiverType: 0会议创建者，1普通参会人
 									Integer receiverType=memberId.equals(meeting.getCreateId())?0:1;
 									List<MeetingNotice> listNotice=meetingNoticeService.getMyNoticeByMeetingIdAndReceiverType(memberId, meetingNoticeRelation.getMeetingId(), receiverType);
