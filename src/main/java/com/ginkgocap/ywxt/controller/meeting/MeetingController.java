@@ -17,6 +17,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.ginkgocap.parasol.file.service.FileIndexService;
+import com.ginkgocap.ywxt.service.meeting.*;
+import com.ginkgocap.ywxt.user.service.corporation.CorporationRelationService;
 import com.ginkgocap.ywxt.utils.*;
 import com.ginkgocap.ywxt.vo.query.meeting.*;
 import com.gintong.frame.util.dto.CommonResultCode;
@@ -61,15 +63,6 @@ import com.ginkgocap.ywxt.model.meeting.MeetingTopic;
 import com.ginkgocap.ywxt.model.meeting.MeetingVo;
 import com.ginkgocap.ywxt.model.meeting.SocialListReq;
 import com.ginkgocap.ywxt.model.meeting.TopicChat;
-import com.ginkgocap.ywxt.service.meeting.ImRecordmessageService;
-import com.ginkgocap.ywxt.service.meeting.MeetingCountService;
-import com.ginkgocap.ywxt.service.meeting.MeetingMemberService;
-import com.ginkgocap.ywxt.service.meeting.MeetingNoteService;
-import com.ginkgocap.ywxt.service.meeting.MeetingNoticeService;
-import com.ginkgocap.ywxt.service.meeting.MeetingPicService;
-import com.ginkgocap.ywxt.service.meeting.MeetingService;
-import com.ginkgocap.ywxt.service.meeting.MeetingTopicService;
-import com.ginkgocap.ywxt.service.meeting.TopicChatService;
 import com.ginkgocap.ywxt.user.model.User;
 import com.ginkgocap.ywxt.user.service.UserService;
 import com.ginkgocap.ywxt.util.HttpClientHelper;
@@ -130,6 +123,10 @@ public class MeetingController extends BaseController {
 	private SocialStatusService socialStatusService;
 	@Autowired
 	private DefaultMessageService defaultMessageService;
+	@Autowired
+	private MeetingMongoService meetingMongoService;
+	@Autowired
+	private CorporationRelationService corporationRelationService;
 	@Autowired
 	private Cache cache;
 	private static int  expiredTime = 60 * 60 * 24 * 7;
@@ -3046,7 +3043,41 @@ public class MeetingController extends BaseController {
 		}
 		return InterfaceResult.getSuccessInterfaceResultInstance(meetingList);
 	}
-	
+
+	/**
+	 * 获取报名 表单列表
+	 * @param meetingId 会议id
+	 * @param start 分页 0，1，2...
+	 * @param size  分页 每页显示条数
+	 * @param request
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/getMeetingSignFormList/{meetingId}/{start}/{size}", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
+	public InterfaceResult getMeetingSignFormListByMeetingId(@PathVariable long meetingId, @PathVariable int start,
+															 @PathVariable int size, HttpServletRequest request) {
+
+		List<MeetingSignUpFormQuery> signUpFormList = null;
+		User user = this.getUser(request);
+		try {
+			signUpFormList = meetingMongoService.getMeetingSignFormListByMeetingId(meetingId, start, size);
+		} catch (Exception e) {
+			logger.error("invoke meetingMongoService failed! method : {getMeetingSignFormListByMeetingId} userId : " + user.getId());
+		}
+		if (CollectionUtils.isNotEmpty(signUpFormList)) {
+			for (MeetingSignUpFormQuery signUpForm : signUpFormList) {
+				Long userId = signUpForm.getUserId();
+				User member = userService.getUserById(userId);
+				signUpForm.setUserName(member.getName());
+				signUpForm.setUserLogo(member.getPicPath());
+				// 检查当前用户 与 填写表单的用户是否是好友
+				int status = corporationRelationService.getFriendsStatus(user.getId(), userId);
+				signUpForm.setFriendStatus((byte)status);
+			}
+		}
+		return InterfaceResult.getSuccessInterfaceResultInstance(signUpFormList);
+	}
+
 	private void setChatListToCache(final List<Social> chat,final long userId) {
 		logger.info("set chat list to cached. userId: " + userId);
 		cache.setByRedis(chatListKey(userId), chat, expiredTime);

@@ -1,11 +1,15 @@
 package com.ginkgocap.ywxt.vo.query.meeting;
 
+import java.io.Serializable;
+
 /**
  * Created by wang fei on 2017/9/27.
  *
  * 广告位 返回封装数据
  */
-public class MeetingAdQuery {
+public class MeetingAdQuery implements Serializable{
+
+    private static final long serialVersionUID = 3148276768559230877L;
 
     private Long id;
 
