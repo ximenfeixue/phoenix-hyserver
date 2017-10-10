@@ -151,7 +151,7 @@ PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
 	        disable = #{disable},
 	        is_pay = #{isPay},
 	        pay_money = #{payMoney},
-	        send_flag = #{sendFlag}
+	        send_flag = #{sendFalg}
         WHERE id = #{id} 
     ]]>
 	</update>
