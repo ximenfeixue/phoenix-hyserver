@@ -1571,6 +1571,38 @@ public class MeetingController extends BaseController {
 	}
 
 	/**
+	 * 获取会议通知和邀请函的未读数量
+	 * @param request
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/getFetchNewCount", method = RequestMethod.POST)
+	public InterfaceResult getFetchNewCount(HttpServletRequest request){
+		Map<String,Object> responseDate = new HashMap<String,Object>();
+		Integer noticeCount = 0;
+		Integer invitationNewCount = 0;
+		User user = getUser(request);
+		long userId = user.getId();
+		// 获取最新的通知未读消息数
+		MeetingNotice meetingNotice = meetingNoticeService.getNewNotice(user.getId());
+		if (!isNullOrEmpty(meetingNotice)) {
+			noticeCount = meetingNoticeService.getUnReadNoticeCount(user.getId());
+			if (Utils.isNullOrEmpty(noticeCount)) {
+				noticeCount = 0;
+			}
+			responseDate.put("noticeCount",noticeCount);
+		}
+
+		// 获取邀请函未读消息数
+		Social invitation = meetingService.getLatestInvitation(user.getId());
+		if (null != invitation) {
+			invitationNewCount = invitation.getNewCount();
+		}
+		responseDate.put("invitationNewCount",invitationNewCount);
+		return InterfaceResult.getSuccessInterfaceResultInstance(responseDate);
+	}
+
+	/**
 	 * socialList 最新的社交列表
 	 *
 	 * @return
