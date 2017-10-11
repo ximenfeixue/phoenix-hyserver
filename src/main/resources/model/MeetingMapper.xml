@@ -35,7 +35,7 @@ PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
 		<result property="disable" column="disable"/>
 		<result property="isPay" column="is_pay"/>
 		<result property="payMoney" column="pay_money"/>
-		<result property="sendFlag" column="send_flag"/>
+		<result property="sendFalg" column="send_flag"/>
 	</resultMap>
 	
 	<sql id="columns">
@@ -48,7 +48,7 @@ PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
 			create_id AS createId,create_name AS createName,task_id AS taskId,create_time AS createTime,
 			update_time AS updateTime,group_id AS groupId,industry,is_delete AS isDelete,formated_desc AS formatedDesc,
 			create_user_type AS createUserType, top AS top, disable AS disable, is_pay AS isPay, pay_money AS payMoney,
-			send_flag AS sendFlag
+			send_flag AS sendFalg
 		]]>
 	</sql>
 
@@ -115,7 +115,7 @@ PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
         	#{disable},
         	#{isPay},
         	#{payMoney},
-        	#{sendFlag}
+        	#{sendFalg}
         )
         
     ]]>
@@ -151,7 +151,7 @@ PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
 	        disable = #{disable},
 	        is_pay = #{isPay},
 	        pay_money = #{payMoney},
-	        send_flag = #{sendFlag}
+	        send_flag = #{sendFalg}
         WHERE id = #{id} 
     ]]>
 	</update>

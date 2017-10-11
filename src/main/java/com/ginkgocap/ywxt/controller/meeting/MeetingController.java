@@ -189,12 +189,12 @@ public class MeetingController extends BaseController {
 	 * @return model
 	 * @throws IOException
 	 */
-	@ResponseBody
+/*	@ResponseBody
 	@RequestMapping(value = "/add.json", method = RequestMethod.GET)
 	public Map<String, Object> addMettingGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		Map<String, Object> model = addMetting(request, response);
 		return model;
-	}
+	}*/
 
 	/**
 	 * 名称: addMetting 描述: 新增会议
@@ -209,7 +209,7 @@ public class MeetingController extends BaseController {
 	@SuppressWarnings("rawtypes")
 	@ResponseBody
 	@RequestMapping(value = "/add.json", method = RequestMethod.POST)
-	public Map<String, Object> addMetting(HttpServletRequest request, HttpServletResponse response) {
+	public InterfaceResult addMetting(HttpServletRequest request, HttpServletResponse response) {
 		// 获取json参数串
 		String debugStr="";
 		String requestJson = "";
@@ -249,25 +249,16 @@ public class MeetingController extends BaseController {
 					}
 					responseDataMap.put("succeed", true);
 					responseDataMap.put("meetingid", meetingid);
-					notificationMap.put("notifCode", "0001");
-					notificationMap.put("notifInfo", "hello app");
 				} catch (Exception e) {
-					responseDataMap.put("succeed", false);
-					notificationMap.put("notifCode", "0002");
-					notificationMap.put("notifInfo", e.getMessage());
-					e.printStackTrace();
+					logger.error(e.getMessage());
+					return InterfaceResult.getInterfaceResultInstance(CommonResultCode.SYSTEM_EXCEPTION);
 				}
 			} else {
-				responseDataMap.put("succeed", false);
-				notificationMap.put("notifCode", "0002");
-				notificationMap.put("notifInfo", "参数错误");
+				logger.error("0002 参数错误");
+				return InterfaceResult.getInterfaceResultInstance(CommonResultCode.PARAMS_EXCEPTION);
 			}
 		}
-		model.put("responseData", responseDataMap);
-		model.put("notification", notificationMap);
-		model.put("debugStr:", debugStr);
-		
-		return model;
+		return InterfaceResult.getSuccessInterfaceResultInstance(responseDataMap);
 	}
 
 	/**
@@ -278,15 +269,15 @@ public class MeetingController extends BaseController {
 	 * @return
 	 * @throws IOException
 	 */
-	@ResponseBody
+/*	@ResponseBody
 	@RequestMapping(value = "/delete.json", method = RequestMethod.GET)
 	public Map<String, Object> deleteGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		return this.delete(request, response);
-	}
+	}*/
 
 	@ResponseBody
 	@RequestMapping(value = "/delete.json", method = RequestMethod.POST)
-	public Map<String, Object> delete(HttpServletRequest request, HttpServletResponse response) throws IOException {
+	public InterfaceResult delete(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		// 获取json参数串
 		String requestJson = "";
 		try {
@@ -325,19 +316,15 @@ public class MeetingController extends BaseController {
 			notifInfo = "参数错误";
 		}
 		responseDataMap.put("succeed", succeed);
-		notificationMap.put("notifCode", notifCode);
-		notificationMap.put("notifInfo", notifInfo);
-		result.put("responseData", responseDataMap);
-		result.put("notification", notificationMap);
-		return result;
+		return InterfaceResult.getSuccessInterfaceResultInstance(responseDataMap);
 	}
 
-	@ResponseBody
+/*	@ResponseBody
 	@RequestMapping(value = "/upate.json", method = RequestMethod.GET)
 	public Map<String, Object> updateMeetingGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		Map<String, Object> model = updateMeeting(request, response);
 		return model;
-	}
+	}*/
 
 	/**
 	 * 名称: upateMetting 描述: 修改会议
@@ -352,7 +339,7 @@ public class MeetingController extends BaseController {
 	@SuppressWarnings("rawtypes")
 	@ResponseBody
 	@RequestMapping(value = "/upate.json", method = RequestMethod.POST)
-	public Map<String, Object> updateMeeting(HttpServletRequest request, HttpServletResponse response) {
+	public InterfaceResult updateMeeting(HttpServletRequest request, HttpServletResponse response) {
 		// 获取json参数串
 		String requestJson = "";
 		try {
@@ -415,24 +402,16 @@ public class MeetingController extends BaseController {
 
 						}
 						responseDataMap.put("succeed", true);
-						notificationMap.put("notifCode", "0001");
-						notificationMap.put("notifInfo", "hollo app");
 					}
 				} catch (Exception e) {
-					responseDataMap.put("succeed", false);
-					notificationMap.put("notifCode", "0002");
-					notificationMap.put("notifInfo", e.getMessage());
-					e.printStackTrace();
+					logger.error(e.getMessage());
+					return InterfaceResult.getInterfaceResultInstance(CommonResultCode.SYSTEM_EXCEPTION);
 				}
 			} else {
-				responseDataMap.put("succeed", false);
-				notificationMap.put("notifCode", "0002");
-				notificationMap.put("notifInfo", "参数错误");
+				return InterfaceResult.getInterfaceResultInstance(CommonResultCode.SYSTEM_EXCEPTION);
 			}
 		}
-		model.put("responseData", responseDataMap);
-		model.put("notification", notificationMap);
-		return model;
+		return InterfaceResult.getSuccessInterfaceResultInstance(responseDataMap);
 	}
 
 	private void modifyMeeting(MeetingQuery meetingObj, User creator) {

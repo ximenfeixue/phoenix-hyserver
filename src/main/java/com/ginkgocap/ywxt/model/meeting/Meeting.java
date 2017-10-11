@@ -80,7 +80,7 @@ public class Meeting extends BaseEntity implements Serializable{
 	//支付金额
 	private BigDecimal payMoney;
 	// 是否会议开始时畅聊
-	private int sendFlag;
+	private int sendFalg;
 
 	public Meeting() {}
 
@@ -416,11 +416,11 @@ public class Meeting extends BaseEntity implements Serializable{
 		this.payMoney = payMoney;
 	}
 
-	public int getSendFlag() {
-		return sendFlag;
+	public int getSendFalg() {
+		return sendFalg;
 	}
 
-	public void setSendFlag(int sendFlag) {
-		this.sendFlag = sendFlag;
+	public void setSendFalg(int sendFalg) {
+		this.sendFalg = sendFalg;
 	}
 }
