@@ -567,11 +567,9 @@ public class GinTongInterface {
 
 	/**
 	 * 获取用户个人单聊与畅聊的会话列表
-	 * 
-	 * @param groupName
-	 * @param roomsize
-	 * @param ownerId
-	 * @param memberIds
+	 * @param inviteUserId
+	 * @param listInvitedUserId
+	 * @param groupId
 	 * @return
 	 */
 	public static void invite2MUC(long inviteUserId, List<Long> listInvitedUserId, String groupId) {
