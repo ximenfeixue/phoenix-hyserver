@@ -1927,7 +1927,7 @@ public class MeetingServiceImpl extends BaseServiceImpl<Meeting, Long> implement
 						meetingPicDao.delete(meetingPic.getId());
 					} else if (meetingPic.getId() == null || meetingPic.getId() == 0 || meetingPic.getIshomePage() ==1) {
 						meetingPic.setMeetingId(entity.getId());
-						meetingPic.setModuleType(MeetingPic.MODULE_TYPE_CHUNK);
+						// meetingPic.setModuleType(MeetingPic.MODULE_TYPE_CHUNK);
 						meetingPic.setCreateDate(new Date());
 						meetingPicDao.saveOrUpdate(meetingPic);
 						// 判断封面返回
