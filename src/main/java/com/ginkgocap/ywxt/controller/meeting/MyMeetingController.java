@@ -11,6 +11,8 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.gintong.frame.util.dto.CommonResultCode;
+import com.gintong.frame.util.dto.InterfaceResult;
 import net.sf.json.JSONObject;
 
 import org.slf4j.Logger;
@@ -204,29 +206,25 @@ public class MyMeetingController extends BaseController {
 	 * @return model
 	 * @throws IOException
 	 */
-
-	@ResponseBody
-	@RequestMapping(value = "/getMyInvitation.json", method = RequestMethod.GET)
-	public Map<String, Object> getMyInvitationGet(HttpServletRequest request,
-			HttpServletResponse response) throws IOException {
-		Map<String, Object> model = getMyInvitation(request, response);
-		return model;
-	}
+//
+//	@ResponseBody
+//	@RequestMapping(value = "/getMyInvitation.json", method = RequestMethod.GET)
+//	public Map<String, Object> getMyInvitationGet(HttpServletRequest request,
+//			HttpServletResponse response) throws IOException {
+//		Map<String, Object> model = getMyInvitation(request);
+//		return model;
+//	}
 
 	/**
 	 * 名称: getMyInvitation 描述: 获取我的邀请函列表
 	 * 
-	 * @param request
-	 *            请求
-	 * @param response
-	 *            响应
+	 * @param request 请求
 	 * @return model
 	 * @throws IOException
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/getMyInvitation.json", method = RequestMethod.POST)
-	public Map<String, Object> getMyInvitation(HttpServletRequest request,
-			HttpServletResponse response) {
+	public InterfaceResult getMyInvitation(HttpServletRequest request) {
 		// 获取json参数串
 		String requestJson = "";
 		try {
@@ -235,9 +233,7 @@ public class MyMeetingController extends BaseController {
 			e.printStackTrace();
 		}
 		// 封装 response
-		Map<String, Object> model = new HashMap<String, Object>();
 		Map<String, Object> responseDataMap = new HashMap<String, Object>();
-		Map<String, Object> notificationMap = new HashMap<String, Object>();
 		List<MeetingMemberListQuery> listResult = new ArrayList<MeetingMemberListQuery>();
 		if (!isNullOrEmpty(requestJson)) {
 			try {
@@ -247,25 +243,18 @@ public class MyMeetingController extends BaseController {
 				if (!isNullOrEmpty(memberIdStr)) {
 					Long memberId=Long.valueOf(memberIdStr);
 					listResult = meetingService.getMyInvitation(memberId);
-					notificationMap.put("notifCode", "0001");
-					notificationMap.put("notifInfo", "hello mobile app!");
 				} else {
-					notificationMap.put("notifCode", "0002");
-					notificationMap.put("notifInfo", "没有数据!");
+					return InterfaceResult.getInterfaceResultInstance(CommonResultCode.PARAMS_NULL_EXCEPTION);
 				}
 			} catch (Exception e) {
-				notificationMap.put("notifCode", "0002");
-				notificationMap.put("notifInfo",e.getMessage());
-				e.printStackTrace();
+				logger.error(e.getMessage());
+				return InterfaceResult.getInterfaceResultInstance(CommonResultCode.SYSTEM_EXCEPTION);
 			}
 		} else {
-			notificationMap.put("notifCode", "0002");
-			notificationMap.put("notifInfo","参数异常");
+			return InterfaceResult.getInterfaceResultInstance(CommonResultCode.PARAMS_EXCEPTION);
 		}
 		responseDataMap.put("listMeetingMemberListQuery", listResult);
-		model.put("responseData", responseDataMap);
-		model.put("notification", notificationMap);
-		return model;
+		return InterfaceResult.getSuccessInterfaceResultInstance(responseDataMap);
 	}
 
 
