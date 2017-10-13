@@ -951,7 +951,7 @@ public class MeetingServiceImpl extends BaseServiceImpl<Meeting, Long> implement
 				meetingObj.setListMeetingPic(listPic);
 				// 封装会议视频文件
 				List<FileIndex> listFileIndex = new ArrayList<FileIndex>();
-				if (null != meeting.getTaskId() || !meeting.getTaskId().equals(""))
+				if (null != meeting.getTaskId() && !meeting.getTaskId().equals(""))
 					listFileIndex = fileIndexService.getFileIndexesByTaskId(meeting.getTaskId());
 				List<MeetingFile> listMeetingFile = new ArrayList<MeetingFile>();
 				if (!Utils.isNullOrEmpty(listFileIndex)) {
