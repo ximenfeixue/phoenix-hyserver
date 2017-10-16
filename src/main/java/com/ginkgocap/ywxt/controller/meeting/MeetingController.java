@@ -310,6 +310,7 @@ public class MeetingController extends BaseController {
 				} catch (Exception e) {
 					notifInfo = e.getMessage();
 					logger.error("删除失败", e);
+					return InterfaceResult.getInterfaceResultInstance("9001",notifInfo);
 				}
 			}
 		} else {
