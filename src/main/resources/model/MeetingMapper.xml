@@ -809,6 +809,7 @@ PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
 				SELECT 
 					DISTINCT m.id AS id,
 					m.start_time AS startTime,
+					m.end_time AS endTime,
 					m.meeting_name AS meetingName,
 					m.meeting_desc AS meetingDesc,
 					m.meeting_type  AS meetingType,
@@ -836,6 +837,7 @@ PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
 				SELECT 
 					DISTINCT m.id AS id,
 					m.start_time AS startTime,
+					m.end_time AS endTime,
 					m.meeting_name AS meetingName,
 					m.meeting_desc AS meetingDesc,
 					m.meeting_type AS meetingType,
@@ -877,6 +879,7 @@ PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
 				SELECT 
 					DISTINCT m.id AS id,
 					m.start_time AS startTime,
+					m.end_time AS endTime,
 					m.meeting_name AS meetingName,
 					m.meeting_desc AS meetingDesc,
 					m.meeting_type AS meetingType,
