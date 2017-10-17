@@ -278,7 +278,7 @@ public class MeetingNoticeController extends BaseController {
 									meetingNoticeRelation.setSetMeetingNoticeQuery(setNoticeQuery);
 								}
 								listResult.add(meetingNoticeRelation);
-								if (noticeIds.size() > 1) {
+                                if (noticeIds.size() > 0 && memberId > 0) {
 									meetingNoticeService.updateMeetingIdRead(noticeIds);
 								}
 							}
