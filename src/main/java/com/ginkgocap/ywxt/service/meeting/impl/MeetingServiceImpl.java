@@ -416,15 +416,15 @@ public class MeetingServiceImpl extends BaseServiceImpl<Meeting, Long> implement
 			final Long ownerId = createId;
 			final Meeting updatedMeeting = meeting;
 			final Long meetingid = meetingId;
-			ThreadPoolUtils.getExecutorService().execute(new Runnable() {
-				@Override
-				public void run() {
+//			ThreadPoolUtils.getExecutorService().execute(new Runnable() {
+//				@Override
+//				public void run() {
 					String groupId = createFreeChatGroup(meetingid, meetingQuery, userIds, ownerId);
 					updatedMeeting.setGroupId(groupId);
 					updatedMeeting.setId(meetingid);
 					meetingDao.saveOrUpdate(updatedMeeting);
-				}
-			});
+//				}
+//			});
 
 			/***
 			 * 保存会议议题 所有会议聊天记录都与议题相关联，无主讲会议给一个默认议题，页面不显示，仅用于关联连天数据
