@@ -96,6 +96,7 @@ public class MeetingNoticeController extends BaseController {
 		Map<String, Object> model = new HashMap<String, Object>();
 		Map<String, Object> responseDataMap = new HashMap<String, Object>();
 		Map<String, Object> notificationMap = new HashMap<String, Object>();
+		List<Long> noticeIds = new ArrayList<Long>();
 		User user=getUser(request);
 		if(!isNullOrEmpty(user)&&!isNullOrEmpty(user.getId())){
 			if (!isNullOrEmpty(requestJson)) {
@@ -271,11 +272,15 @@ public class MeetingNoticeController extends BaseController {
 										}
 										// 多条显示的通知此处不添加
 										meetingNoticeQuery.setMeetingCreateName(meetingNoticeRelation.getMeetingCreateName());
+										noticeIds.add(meetingNoticeQuery.getId());
 										setNoticeQuery.add(meetingNoticeQuery);
 									}
 									meetingNoticeRelation.setSetMeetingNoticeQuery(setNoticeQuery);
 								}
 								listResult.add(meetingNoticeRelation);
+								if (noticeIds.size() > 1) {
+									meetingNoticeService.updateMeetingIdRead(noticeIds);
+								}
 							}
 						}
 						responseDataMap.put("listMeetingNoticeRelation",listResult);

@@ -84,6 +84,15 @@ PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
     ]]>
 	</update>
 
+	<update id="updateMeetingIdRead">
+		UPDATE tb_meeting_notice
+		SET is_read = 0
+		WHERE id IN
+		<foreach collection="list" index="index" item="item" open="(" separator="," close=")">
+			 #{item}
+		</foreach>
+	</update>
+
     <delete id="delete">
     <![CDATA[
         DELETE FROM tb_meeting_notice 

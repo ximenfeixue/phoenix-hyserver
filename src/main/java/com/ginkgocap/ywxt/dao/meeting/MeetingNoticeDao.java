@@ -160,4 +160,11 @@ public interface MeetingNoticeDao{
 	 * @return
 	 */
 	public Integer getUnReadNoticeCount(Long memberId);
+
+	/**
+	 * 将通知设为已读
+	 * @param ids
+	 * @return
+	 */
+	public Integer updateMeetingIdRead(List<Long> ids);
 }

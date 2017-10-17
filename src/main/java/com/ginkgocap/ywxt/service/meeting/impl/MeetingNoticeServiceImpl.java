@@ -246,4 +246,9 @@ public class MeetingNoticeServiceImpl implements MeetingNoticeService{
 	public Integer getUnReadNoticeCount(Long memberId) {
 		return meetingNoticeDao.getUnReadNoticeCount(memberId);
 	}
+
+	@Override
+	public Integer updateMeetingIdRead(List<Long> ids) {
+		return meetingNoticeDao.updateMeetingIdRead(ids);
+	}
 }

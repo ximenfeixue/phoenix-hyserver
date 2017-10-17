@@ -287,4 +287,9 @@ public class MeetingNoticeDaoImpl extends SqlSessionDaoSupport implements Meetin
 	public List<Map<String, Object>> selectnoticeindex(long user_id) {
 		 return  getSqlSession().selectList("MeetingNotice.selectnoticeindex",user_id);
 	}
+
+	@Override
+	public Integer updateMeetingIdRead(List<Long> ids) {
+		return getSqlSession().update("MeetingNotice.updateMeetingIdRead",ids);
+	}
 }
