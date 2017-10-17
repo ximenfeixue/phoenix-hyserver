@@ -27,12 +27,14 @@ import com.ginkgocap.ywxt.vo.query.meeting.UserBean;
 public class AppFilter implements Filter {
 	String excludedUrl = "";
 	String[] excludedUrlArray={};
+	//允许游客状态的接口
+	String[] webExcludedUrl = {"/meeting/getByIdAndMemberId.json"};
 	
 	public void destroy() {
 
 	}
 
-	private User getUser(HttpServletRequest request) {
+	private User getUser(String url, HttpServletRequest request) {
 		// 判断客户端请求方式
 		String s = request.getHeader("s");
 		if ("web".equals(s)) {
@@ -40,6 +42,13 @@ public class AppFilter implements Filter {
 			if (StringUtils.isNotBlank(sessionId)) {
 				String key = RedisKeyUtils.getSessionIdKey(sessionId);
 				return getUser(request, key);
+			} else {
+				// 对于游客允许的 url 设置默认的 userId
+				for (String excludedUrl : webExcludedUrl) {
+					if (url.contains(excludedUrl)) {
+						return getJINUser();
+					}
+				}
 			}
 		} else {
 			String sessionId = request.getHeader("sessionID");
@@ -50,6 +59,17 @@ public class AppFilter implements Filter {
 			}
 		}
 		return null;
+	}
+
+	/**
+	 * 在访问游客允许的 url 时，并进行分享功能，提供默认的 userId
+	 * @return
+	 */
+	private User getJINUser() {
+
+		User user = new User();
+		user.setId(0l);
+		return user;
 	}
 
 	/**
@@ -79,7 +99,7 @@ public class AppFilter implements Filter {
 			return;
 		}
 		
-		User user = getUser(req);
+		User user = getUser(url, req);
 		if (user == null) {
 			PrintWriter out = res.getWriter();
 			String errorStr="{\"notification\":{\"notifCode\": \"0003\",\"notifInfo\": \"用户长时间未操作或已过期,请重新登录\"}}";
@@ -94,11 +114,10 @@ public class AppFilter implements Filter {
 		userBean.setSessionId(sessionId);
 		String jtUserIDs = req.getHeader("jtUserID");
 
-		if(Utils.isNullOrEmpty(jtUserIDs)){
+		if (Utils.isNullOrEmpty(jtUserIDs)){
 			userBean.setId(user.getId());
 			userBean.setName(user.getName());
-		}
-		else{
+		} else {
 			Long jtUserId = Long.parseLong(jtUserIDs);
 			userBean.setId(jtUserId);
 			String name = req.getHeader("jtNickName");

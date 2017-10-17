@@ -12,6 +12,7 @@ import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ContentType;
@@ -167,5 +168,19 @@ public class HttpClientUtil {
 			logger.error("请求phoenix-mobile异常", e);
 		}
 		return "";
+	}
+
+	public static String getGintongDelete(String url, String interfaceName) {
+
+		HttpClient httpClient = HttpConnectionManager.getHttpClient();
+		String result = "";
+		try {
+			HttpResponse response = httpClient.execute(new HttpDelete(url + interfaceName));
+			HttpEntity httpEntity = response.getEntity();
+			result = EntityUtils.toString(httpEntity);// 取出应答字符串
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return result;
 	}
 }

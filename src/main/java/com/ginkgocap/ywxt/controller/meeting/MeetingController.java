@@ -269,11 +269,6 @@ public class MeetingController extends BaseController {
 	 * @return
 	 * @throws IOException
 	 */
-/*	@ResponseBody
-	@RequestMapping(value = "/delete.json", method = RequestMethod.GET)
-	public Map<String, Object> deleteGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-		return this.delete(request, response);
-	}*/
 
 	@ResponseBody
 	@RequestMapping(value = "/delete.json", method = RequestMethod.POST)
@@ -286,46 +281,47 @@ public class MeetingController extends BaseController {
 			e.printStackTrace();
 		}
 		Map<String, Object> responseDataMap = new HashMap<String, Object>();
-		Map<String, Object> notificationMap = new HashMap<String, Object>();
 		boolean succeed = false;
-		String notifCode = "0002";
-		String notifInfo = "删除失败";
-		Map<String, Object> result = new HashMap<String, Object>();
 		if (!isNullOrEmpty(requestJson)) {
 			JSONObject j = JSONObject.fromObject(requestJson);
 			// 获取会议id
-			String memberId = getStringJsonValueByKey(j, "memberId");
+			final String memberId = getStringJsonValueByKey(j, "memberId");
 			String meetingId = getStringJsonValueByKey(j, "meetingId");
 			if (!Utils.isNullOrEmpty(memberId) && !Utils.isNullOrEmpty(meetingId)) {
 				String[] meetingIdArr = meetingId.split(",");
-				List<Long> meetingIdList = new ArrayList<Long>();
+				final List<Long> meetingIdList = new ArrayList<Long>();
+				final List<String> groupIdList = new ArrayList<String>();
 				for (String id : meetingIdArr) {
 					meetingIdList.add(Long.parseLong(id));
 				}
 				try {
 					meetingService.deleteMyMeetingBatch(meetingIdList, Long.parseLong(memberId));
 					succeed = true;
-					notifCode = "0001";
-					notifInfo = "删除成功";
 				} catch (Exception e) {
-					notifInfo = e.getMessage();
 					logger.error("删除失败", e);
-					return InterfaceResult.getInterfaceResultInstance("9001",notifInfo);
+					return InterfaceResult.getInterfaceResultInstance("9001", e.getMessage());
+				}
+				if (succeed) {
+					ThreadPoolUtils.getExecutorService().execute(new Runnable() {
+						@Override
+						public void run() {
+							for (Long id : meetingIdList) {
+								Meeting meeting = meetingService.getById(id);
+								String groupId = meeting.getGroupId();
+								if (StringUtils.isNotBlank(groupId)) {
+									GinTongInterface.dissolveMUC(Long.valueOf(memberId), groupId);
+								}
+							}
+						}
+					});
 				}
 			}
 		} else {
-			notifInfo = "参数错误";
+			logger.error("参数为空");
 		}
 		responseDataMap.put("succeed", succeed);
 		return InterfaceResult.getSuccessInterfaceResultInstance(responseDataMap);
 	}
-
-/*	@ResponseBody
-	@RequestMapping(value = "/upate.json", method = RequestMethod.GET)
-	public Map<String, Object> updateMeetingGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-		Map<String, Object> model = updateMeeting(request, response);
-		return model;
-	}*/
 
 	/**
 	 * 名称: upateMetting 描述: 修改会议
@@ -591,6 +587,14 @@ public class MeetingController extends BaseController {
 					Long id = Long.valueOf(idStr);
 					Long memberId = Long.valueOf(memberIdStr);
 					meetingObj = meetingService.getMeetingByIdAndMemberId(id, memberId);
+					// 当会议被禁用 返回 该会议已被禁用
+					if (meetingObj.getDisable() == 1) {
+						notificationMap.put("notifCode", "0002");
+						notificationMap.put("notifInfo", "该会议已被禁用");
+						model.put("notification", notificationMap);
+						model.put("responseData", responseDataMap);
+						return model;
+					}
 					if (!Utils.isNullOrEmpty(meetingObj)) {
 						// 封装会议笔记
 						List<MeetingNoteQuery> listMeetingNoteQuery = meetingNoteService.getNoteAndDetailtByMeetingIdAndCreater(id, memberId);

@@ -3,8 +3,11 @@ package com.ginkgocap.ywxt.utils;
 import java.net.URLEncoder;
 import java.util.*;
 
+import com.ginkgocap.ywxt.util.JsonUtil;
+import com.google.gson.GsonBuilder;
 import net.sf.json.JSONObject;
 
+import net.sf.json.util.JSONUtils;
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,6 +37,7 @@ public class GinTongInterface {
 
 	private static ResourceBundle resource = ResourceBundle.getBundle("gintongService");
 
+	private static final int hyType = 3;
 	/**
 	 * 获取人脉详情
 	 * 
@@ -628,6 +632,27 @@ public class GinTongInterface {
 			logger.error("req frrechat.exitFromMUC failed!", e);
 		}
 	}
+
+	public static void dissolveMUC(long createUserId, String groupId) {
+		String url = resource.getString("imUrl");
+		String interfaceName = "/mobile/im/deleteGroup/";
+		StringBuffer json = new StringBuffer();
+		json.append(interfaceName).append(groupId).append("/").append(createUserId);
+		String responseJson = HttpClientUtil.getGintongDelete(url, interfaceName);
+		logger.info("responseJson: " + responseJson);
+	}
+
+	public static void addFreechatToBlack(String groupId) {
+
+		final String url = resource.getString("imUrl");
+		final String interfaceName = "/msgcenter/im/removeChatGroup/";
+
+		StringBuffer json = new StringBuffer();
+		json.append(interfaceName).append(groupId).append("/").append(hyType);
+		String responseJson = HttpClientUtil.getGintongDelete(url, interfaceName);
+		logger.info("responseJson: " + responseJson);
+	}
+
 
 	public static void main(String[] args) {
 		String groupId = "10024";
