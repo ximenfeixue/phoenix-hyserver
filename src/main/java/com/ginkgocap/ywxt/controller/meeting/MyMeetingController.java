@@ -1086,7 +1086,8 @@ public class MyMeetingController extends BaseController {
 			String meetingId = getStringJsonValueByKey(j, "meetingId");
 			String memberId = getStringJsonValueByKey(j, "memberId");
 			if(!Utils.isNullOrEmpty(meetingId) && !Utils.isNullOrEmpty(memberId)) {
-				List<MeetingMember> listMeetingMember = meetingMemberService.getByMeetingIdAndMemberId(Long.parseLong(meetingId), Long.parseLong(memberId));
+				List<MeetingMember> listMeetingMember =
+						meetingMemberService.getByMeetingIdAndMemberId(Long.parseLong(meetingId), Long.parseLong(memberId));
 				if(!Utils.isNullOrEmpty(listMeetingMember)) {
 					for(MeetingMember meetingMember : listMeetingMember) {
 						if(!Utils.isNullOrEmpty(meetingMember)) {
