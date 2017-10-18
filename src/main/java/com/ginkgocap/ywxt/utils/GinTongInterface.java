@@ -637,7 +637,7 @@ public class GinTongInterface {
 		String url = resource.getString("imUrl");
 		String interfaceName = "/mobile/im/deleteGroup/";
 		StringBuffer json = new StringBuffer();
-		json.append(interfaceName).append(groupId).append("/").append(createUserId);
+		interfaceName = json.append(interfaceName).append(groupId).append("/").append(createUserId).toString();
 		String responseJson = HttpClientUtil.getGintongDelete(url, interfaceName);
 		logger.info("responseJson: " + responseJson);
 	}
