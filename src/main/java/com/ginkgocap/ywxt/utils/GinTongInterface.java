@@ -1,5 +1,7 @@
 package com.ginkgocap.ywxt.utils;
 
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.*;
 
@@ -9,6 +11,14 @@ import net.sf.json.JSONObject;
 
 import net.sf.json.util.JSONUtils;
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpDelete;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -690,6 +700,35 @@ public class GinTongInterface {
 			}
 		} catch (Exception e) {
 			logger.error("req frrechat.exitFromMUC failed!", e);
+		}
+	}
+
+	public static void removeMuc(Long operatorUserId,String groupId,Long memberId) {
+		String url = resource.getString("imUrl");
+		String interfaceName = "/mobile/im/kickFromGroup/" + groupId + "/" + memberId;
+		try {
+			HttpClient httpClient = HttpConnectionManager.getHttpClient();
+			UserBean userbean = new UserBean();
+			userbean.setId(operatorUserId);
+
+			HttpDelete deleteRequest = new HttpDelete(url + interfaceName);
+			deleteRequest.setHeader("Accept", "application/json");
+			deleteRequest.setHeader("sessionID", userbean.getSessionId());
+			deleteRequest.setHeader("jtNickName", userbean.getName());
+			deleteRequest.setHeader("jtUserId", userbean.getId().toString());
+
+			HttpResponse response = httpClient.execute(deleteRequest);
+			HttpEntity entity = response.getEntity();
+			if (entity != null) {
+				logger.info("REQEST => " + url);
+				String result = EntityUtils.toString(entity).toString();
+				final String ret = (result != null && result.length() > 55) ? result.substring(0, 55) : result;
+				logger.info("RETURN => " + ret);
+			}
+
+		} catch (IOException e) {
+			logger.info("RETURN => ");
+			logger.error("请求phoenix-mobile异常", e);
 		}
 	}
 }
