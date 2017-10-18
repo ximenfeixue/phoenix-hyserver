@@ -599,7 +599,7 @@ public class MeetingController extends BaseController {
 					boolean flag = true;
 					List<MeetingMember> mlist = meetingObj.getListMeetingMember();
 					for (MeetingMember mm : mlist) {
-						if (mm.getMemberId() == memberId)
+						if (mm.getMemberId().equals(memberId))
 							flag = false;
 					}
 					// 私密会议不允许非成员查看
