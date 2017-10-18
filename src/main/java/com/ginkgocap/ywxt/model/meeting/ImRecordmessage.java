@@ -36,7 +36,7 @@ public class ImRecordmessage extends BaseEntity implements java.io.Serializable 
 	public static final String ALIAS_MUC_CREATE_USER_ID = "会议，群 创建者ID";
 	public static final String ALIAS_MUC_MESSAGE_ID = "会议，群聊消息表ID";
 	public static final String ALIAS_MUC_START_DATE = "会议开始时间";
-	public static final String ALIAS_TYPE = "1-私聊，2-群聊";
+	public static final String ALIAS_TYPE = "1-私聊，2-群聊，3-会议";
 	public static final String ALIAS_LAST_MESSAGE_DATE = "最后一条消息发送时间";
 	public static final String ALIAS_NEW_COUNT = "未读消息，新消息记录数";
 	public static final String ALIAS_MESSAGE_START_TIME = "消息记录开始时间";

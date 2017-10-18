@@ -144,8 +144,7 @@ public class MeetingMemberController extends BaseController {
 				// json 转为对象
 				MeetingMember meetingMember = (MeetingMember) JSONObject
 						.toBean(j, MeetingMember.class);
-				if (isNullOrEmpty(meetingMember)
-						|| isNullOrEmpty(meetingMember.getMeetingId())) {
+				if (isNullOrEmpty(meetingMember) || isNullOrEmpty(meetingMember.getMeetingId())) {
 					responseDataMap.put("succeed", false);
 					notificationMap.put("notifCode", "0002");
 					notificationMap.put("notifInfo", "参数异常!");
@@ -173,8 +172,7 @@ public class MeetingMemberController extends BaseController {
 							notificationMap.put("notifCode", "0002");
 							notificationMap.put("notifInfo", "参数异常，id不应有值");
 						} else {
-							List<MeetingMember> list = meetingMemberService
-									.getByMeetingIdAndMemberId(
+							List<MeetingMember> list = meetingMemberService.getByMeetingIdAndMemberId(
 											meetingMember.getMeetingId(),
 											meetingMember.getMemberId());
 							if (!isNullOrEmpty(list) || list.size() > 0) {

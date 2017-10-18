@@ -595,6 +595,22 @@ public class MeetingController extends BaseController {
 						model.put("responseData", responseDataMap);
 						return model;
 					}
+
+					boolean flag = true;
+					List<MeetingMember> mlist = meetingObj.getListMeetingMember();
+					for (MeetingMember mm : mlist) {
+						if (mm.getMemberId() == memberId)
+							flag = false;
+					}
+					// 私密会议不允许非成员查看
+					if (flag && meetingObj.getSecrecy()) {
+						notificationMap.put("notifCode", "0002");
+						notificationMap.put("notifInfo", "非会议成员不可以查看私密会议");
+						model.put("notification", notificationMap);
+						model.put("responseData", responseDataMap);
+						return model;
+					}
+
 					if (!Utils.isNullOrEmpty(meetingObj)) {
 						// 封装会议笔记
 						List<MeetingNoteQuery> listMeetingNoteQuery = meetingNoteService.getNoteAndDetailtByMeetingIdAndCreater(id, memberId);
