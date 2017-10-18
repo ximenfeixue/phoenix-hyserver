@@ -881,27 +881,27 @@ public class MeetingMemberController extends BaseController {
 						if(AttendMeetStatusType.ACCEPT_INVITATION.code()==Integer.valueOf(type)||AttendMeetStatusType.REFUSE_INVITATION.code()==Integer.valueOf(type)){
 							// 只有未开始和进行中的会议可以接受邀请或者拒绝邀请
 							if(MeetingStatusType.NOT_BEGIN.code()==meeting.getMeetingStatus()||MeetingStatusType.IN_MEETING.code()==meeting.getMeetingStatus()){
-								meetingMemberService.changeAttendMeetStatus(
-										Long.valueOf(meetingIdStr),
-										Long.valueOf(memberIdStr),
-										Integer.valueOf(type), user);
+
+							    meetingMemberService.changeAttendMeetStatus(Long.valueOf(meetingIdStr), Long.valueOf(memberIdStr), Integer.valueOf(type), user);
+
 								responseDataMap.put("succeed", true);
 								notificationMap.put("notifCode", "0001");
 								notificationMap.put("notifInfo", "hello mobile app!");
 								final String group_Id = StringUtils.isBlank(groupId) ? meeting.getGroupId() : groupId;//解决客户端发送groupId丢失的问题
 								/**
-							 	* 集成环信：会议添加成员
-							 	*/
+                                 * 集成环信：会议添加成员
+                                 */
 								final String userId = memberIdStr;
 								final long creatorUserId = meeting.getCreateId();
-								ThreadPoolUtils.getExecutorService().execute(new Runnable() {
-									@Override
-									public void run() {
-										//2016-03-03 tanm 将操作环信的部分改为操作畅聊
-										GinTongInterface.invite2MUC(creatorUserId, Arrays.asList(Long.valueOf(userId)), group_Id);
-//										HuanxinUtils.addUserToChatGroups(group_Id,userId);
-									}
-								});
+								if (AttendMeetStatusType.REFUSE_INVITATION.code() != Integer.valueOf(type)) {
+                                    ThreadPoolUtils.getExecutorService().execute(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            //2016-03-03 tanm 将操作环信的部分改为操作畅聊
+                                            GinTongInterface.invite2MUC(creatorUserId, Arrays.asList(Long.valueOf(userId)), group_Id);
+                                        }
+                                    });
+                                }
 								//增加ImRecordmessage记录
 								ImRecordmessage recordMessageBean = new ImRecordmessage();
 								recordMessageBean.setUserId(Integer.valueOf(memberIdStr));
