@@ -588,7 +588,7 @@ public class MeetingController extends BaseController {
 					Long memberId = Long.valueOf(memberIdStr);
 					meetingObj = meetingService.getMeetingByIdAndMemberId(id, memberId);
 					// 当会议被禁用 返回 该会议已被禁用
-					if (meetingObj.getDisable() == 1) {
+					if (1 == meetingObj.getDisable()) {
 						notificationMap.put("notifCode", "0002");
 						notificationMap.put("notifInfo", "该会议已被禁用");
 						model.put("notification", notificationMap);
