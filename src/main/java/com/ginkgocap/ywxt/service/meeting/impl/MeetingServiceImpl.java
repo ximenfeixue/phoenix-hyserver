@@ -1472,7 +1472,7 @@ public class MeetingServiceImpl extends BaseServiceImpl<Meeting, Long> implement
 		if (!Utils.isNullOrEmpty(entity)) {
 			Meeting meeting = this.getById(entity.getId());
 			final String groupId = meeting.getGroupId();
-			Meeting beginUpdateMeeting = meeting;
+			Meeting f = meeting;
 			if (Utils.isNullOrEmpty(meeting)) {
 				logger.info("会议不存在");
 				throw new Exception("会议不存在");
@@ -1688,7 +1688,7 @@ public class MeetingServiceImpl extends BaseServiceImpl<Meeting, Long> implement
 				/**
 				 * 保存会议议题
 				 */
-				this.updateMeetingTopic(entity, beginUpdateMeeting);
+				// this.updateMeetingTopic(entity, beginUpdateMeeting);
 				/**
 				 * 保存会议时间
 				 */
@@ -1956,16 +1956,16 @@ public class MeetingServiceImpl extends BaseServiceImpl<Meeting, Long> implement
 			}
 		}
 		// 删除已移除的FileIndex
-		if (!Utils.isNullOrEmpty(entity.getTaskId())) {
-			List<FileIndex> listFileIndex = fileIndexService.getFileIndexesByTaskId(entity.getTaskId());
-			if (!Utils.isNullOrEmpty(listFileIndex)) {
-				for (FileIndex fileIndex : listFileIndex) {
-					if (!listFileIndexId.contains("" + fileIndex.getId())) {
-						fileIndexService.deleteFileIndexById(entity.getCreateId(),fileIndex.getId());
-					}
-				}
-			}
-		}
+//		if (!Utils.isNullOrEmpty(entity.getTaskId())) {
+//			List<FileIndex> listFileIndex = fileIndexService.getFileIndexesByTaskId(entity.getTaskId());
+//			if (!Utils.isNullOrEmpty(listFileIndex)) {
+//				for (FileIndex fileIndex : listFileIndex) {
+//					if (!listFileIndexId.contains("" + fileIndex.getId())) {
+//						fileIndexService.deleteFileIndexById(entity.getCreateId(),fileIndex.getId());
+//					}
+//				}
+//			}
+//		}
 		return homePage;
 	}
 	private void updateMeetingTopic(MeetingQuery entity, Meeting beginUpdateMeeting) throws Exception {
