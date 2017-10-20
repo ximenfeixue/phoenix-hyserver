@@ -1136,7 +1136,7 @@ public class MeetingServiceImpl extends BaseServiceImpl<Meeting, Long> implement
 						meetingNoticeDao.saveOrUpdate(meetingNotice);
 					}
 				}
-			} else if (meeting.getMeetingStatus() == 2) {
+			} else if (1 != meeting.getDisable() && meeting.getMeetingStatus() == 2) {
 				throw new Exception("不能删除进行中会议");
 			} else if (meeting.getMeetingStatus() == 3) {
 				// 已结束会议从自己的会议列表移除
@@ -2415,7 +2415,7 @@ public class MeetingServiceImpl extends BaseServiceImpl<Meeting, Long> implement
 					finishedIdList.add("" + meeting.getId().longValue());
 				} else {
 					if (memberId.longValue() == meeting.getCreateId().longValue()) {// 我创建的
-						if (meeting.getMeetingStatus().intValue() == 2) {
+						if (1 != meeting.getDisable() && meeting.getMeetingStatus().intValue() == 2) {
 							throw new Exception("不能删除进行中的会议");
 						} else {
 							cancelNotBenginMeeting(meeting.getId(), memberId);
