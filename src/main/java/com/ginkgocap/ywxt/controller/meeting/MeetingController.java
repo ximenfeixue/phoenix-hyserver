@@ -602,7 +602,7 @@ public class MeetingController extends BaseController {
 						if (mm.getMemberId().equals(memberId))
 							flag = false;
 					}
-					if (memberId.equals(1)) {
+					if (memberId.equals(1l)) {
 						flag = false;
 					}
 					// 私密会议不允许非成员查看
