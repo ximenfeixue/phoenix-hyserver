@@ -603,7 +603,7 @@ public class MeetingController extends BaseController {
 							flag = false;
 					}
 					// 私密会议不允许非成员查看
-					if (flag && meetingObj.getSecrecy()) {
+					if (flag && meetingObj.getSecrecy() && !memberId.equals(1)) {
 						notificationMap.put("notifCode", "0002");
 						notificationMap.put("notifInfo", "非会议成员不可以查看私密会议");
 						model.put("notification", notificationMap);
