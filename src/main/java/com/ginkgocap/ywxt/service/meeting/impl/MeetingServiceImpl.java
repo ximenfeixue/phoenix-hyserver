@@ -935,7 +935,7 @@ public class MeetingServiceImpl extends BaseServiceImpl<Meeting, Long> implement
 					for (MeetingPic meetingPic : listPic) {
 						if (!Utils.isNullOrEmpty(meetingPic)) {
 							listFileIndexId.add(meetingPic.getFileIndexId());
-							if (1 == meetingPic.getIshomePage()) {
+							if (meetingPic.getIshomePage() != null && 1 == meetingPic.getIshomePage()) {
 								meetingObj.setPath(meetingPic.getPicPath());
 							}
 						}
