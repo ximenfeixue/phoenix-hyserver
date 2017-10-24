@@ -107,8 +107,7 @@ public class MeetingMemberController extends BaseController {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/add.json", method = RequestMethod.GET)
-	public Map<String, Object> addMettingMemberGet(HttpServletRequest request,
-			HttpServletResponse response) throws IOException {
+	public Map<String, Object> addMettingMemberGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		Map<String, Object> model = addMettingMember(request, response);
 		return model;
 	}
@@ -122,8 +121,7 @@ public class MeetingMemberController extends BaseController {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/add.json", method = RequestMethod.POST)
-	public Map<String, Object> addMettingMember(HttpServletRequest request,
-			HttpServletResponse response) {
+	public Map<String, Object> addMettingMember(HttpServletRequest request,	HttpServletResponse response) {
 		// 获取json参数串
 		String requestJson = "";
 		try {
@@ -137,13 +135,11 @@ public class MeetingMemberController extends BaseController {
 		Map<String, Object> responseDataMap = new HashMap<String, Object>();
 		Map<String, Object> notificationMap = new HashMap<String, Object>();
 		User user = getUser(request);
-		if (!isNullOrEmpty(user)
-				&& !isNullOrEmpty(requestJson)) {
+		if (!isNullOrEmpty(user) && !isNullOrEmpty(requestJson)) {
 			try {
 				JSONObject j = JSONObject.fromObject(requestJson);
 				// json 转为对象
-				MeetingMember meetingMember = (MeetingMember) JSONObject
-						.toBean(j, MeetingMember.class);
+				MeetingMember meetingMember = (MeetingMember) JSONObject.toBean(j, MeetingMember.class);
 				if (isNullOrEmpty(meetingMember) || isNullOrEmpty(meetingMember.getMeetingId())) {
 					responseDataMap.put("succeed", false);
 					notificationMap.put("notifCode", "0002");
@@ -159,8 +155,7 @@ public class MeetingMemberController extends BaseController {
 						List<MeetingPic> listMeetingPic = meetingPicService.getByModuleId(meetingMember.getMeetingId(), MeetingPic.MODULE_TYPE_MEETING);
 						if(!Utils.isNullOrEmpty(listMeetingPic)) {
 							for(MeetingPic meetingPic : listMeetingPic) {
-								if(!Utils.isNullOrEmpty(meetingPic)
-										&& !Utils.isNullOrEmpty(meetingPic.getIshomePage())
+								if(!Utils.isNullOrEmpty(meetingPic)	&& !Utils.isNullOrEmpty(meetingPic.getIshomePage())
 										&& (1==meetingPic.getIshomePage().intValue())) {
 									homePage = meetingPic.getPicPath();
 									break;
@@ -199,9 +194,10 @@ public class MeetingMemberController extends BaseController {
 											notificationMap.put("notifCode", "0001");
 											notificationMap.put("notifInfo", "hello mobile app!");
 											//增加动态
+											/*
 											List<Long> listUserId = new ArrayList<Long>();
 											listUserId.add(meetingMember.getMemberId());
-			 								this.insertNewsAndRelation(meeting, homePage, user, listUserId);
+			 								this.insertNewsAndRelation(meeting, homePage, user, listUserId);*/
 										}
 										// 用户被邀请参会
 									}else if(AttendMeetType.INVITATION.code()==meetingMemberTemp.getAttendMeetType()){
@@ -256,9 +252,9 @@ public class MeetingMemberController extends BaseController {
 								});*/
 								
 								//增加动态
-								List<Long> listUserId = new ArrayList<Long>();
+								/*List<Long> listUserId = new ArrayList<Long>();
 								listUserId.add(meetingMember.getMemberId());
-								this.insertNewsAndRelation(meeting, homePage, user, listUserId);
+								this.insertNewsAndRelation(meeting, homePage, user, listUserId);*/
 							}
 						}
 					}
@@ -338,8 +334,7 @@ public class MeetingMemberController extends BaseController {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/signInMeeting.json", method = RequestMethod.POST)
-	public Map<String, Object> signInMeeting(HttpServletRequest request,
-			HttpServletResponse response) throws IOException {
+	public Map<String, Object> signInMeeting(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		// 获取json参数串
 		String requestJson = "";
 		try {
@@ -392,8 +387,7 @@ public class MeetingMemberController extends BaseController {
 								} else {
 									meetingMember.setIsSign(1);
 									meetingMember.setSignDistance(signDistance);
-									meetingMemberService
-											.saveOrUpdate(meetingMember);
+									meetingMemberService.saveOrUpdate(meetingMember);
 									User user=getUser(request);
 									// 签到发送系统消息
 									List<MeetingTopic> listMeetingTopic=meetingTopicService.getByMeetingId(meetingMember.getMeetingId());
@@ -469,8 +463,7 @@ public class MeetingMemberController extends BaseController {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/signUpReview.json", method = RequestMethod.POST)
-	public Map<String, Object> signUpReview(HttpServletRequest request,
-			HttpServletResponse response) throws IOException {
+	public Map<String, Object> signUpReview(HttpServletRequest request,	HttpServletResponse response) throws IOException {
 		// 获取json参数串
 		String requestJson = "";
 		try {
@@ -649,8 +642,7 @@ public class MeetingMemberController extends BaseController {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/signUpMeeting.json", method = RequestMethod.GET)
-	public Map<String, Object> signUpMeetingGet(HttpServletRequest request,
-			HttpServletResponse response) throws IOException {
+	public Map<String, Object> signUpMeetingGet(HttpServletRequest request,	HttpServletResponse response) throws IOException {
 		Map<String, Object> model = signUpMeeting(request, response);
 		return model;
 	}
@@ -664,8 +656,7 @@ public class MeetingMemberController extends BaseController {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/signUpMeeting.json", method = RequestMethod.POST)
-	public Map<String, Object> signUpMeeting(HttpServletRequest request,
-			HttpServletResponse response) throws IOException {
+	public Map<String, Object> signUpMeeting(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		// 获取json参数串
 		String requestJson = "";
 		try {
@@ -789,8 +780,7 @@ public class MeetingMemberController extends BaseController {
 		return model;
 	}
 
-	public void signUp(Long id,String memberName, String memberPhoto, Long memberId,
-			User user, Meeting meeting) throws Exception {
+	public void signUp(Long id,String memberName, String memberPhoto, Long memberId, User user, Meeting meeting) throws Exception {
 		MeetingMember meetingMember = new MeetingMember();
 		meetingMember.setMeetingId(meeting.getId());
 		meetingMember.setMemberId(memberId);
@@ -828,8 +818,7 @@ public class MeetingMemberController extends BaseController {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/changeAttendMeetStatus.json", method = RequestMethod.GET)
-	public Map<String, Object> changeAttendMeetStatusGet(
-			HttpServletRequest request, HttpServletResponse response)
+	public Map<String, Object> changeAttendMeetStatusGet(HttpServletRequest request, HttpServletResponse response)
 			throws IOException {
 		Map<String, Object> model = changeAttendMeetStatus(request, response);
 		return model;
@@ -844,8 +833,7 @@ public class MeetingMemberController extends BaseController {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/changeAttendMeetStatus.json", method = RequestMethod.POST)
-	public Map<String, Object> changeAttendMeetStatus(
-			HttpServletRequest request, HttpServletResponse response)
+	public Map<String, Object> changeAttendMeetStatus(HttpServletRequest request, HttpServletResponse response)
 			throws IOException {
 		// 获取json参数串
 		String requestJson = "";
@@ -883,7 +871,6 @@ public class MeetingMemberController extends BaseController {
 							if(MeetingStatusType.NOT_BEGIN.code()==meeting.getMeetingStatus()||MeetingStatusType.IN_MEETING.code()==meeting.getMeetingStatus()){
 
 							    meetingMemberService.changeAttendMeetStatus(Long.valueOf(meetingIdStr), Long.valueOf(memberIdStr), Integer.valueOf(type), user);
-
 								responseDataMap.put("succeed", true);
 								notificationMap.put("notifCode", "0001");
 								notificationMap.put("notifInfo", "hello mobile app!");
@@ -970,8 +957,7 @@ public class MeetingMemberController extends BaseController {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/getmeetingMemberList.json", method = RequestMethod.GET)
-	public Map<String, Object> getmeetingMemberListGet(
-			HttpServletRequest request, HttpServletResponse response)
+	public Map<String, Object> getmeetingMemberListGet(HttpServletRequest request, HttpServletResponse response)
 			throws IOException {
 		Map<String, Object> model = getmeetingMemberList(request, response);
 		return model;
@@ -1044,8 +1030,7 @@ public class MeetingMemberController extends BaseController {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/getmeetingVisitantList.json", method = RequestMethod.GET)
-	public Map<String, Object> getmeetingVisitantListGet(
-			HttpServletRequest request, HttpServletResponse response)
+	public Map<String, Object> getmeetingVisitantListGet(HttpServletRequest request, HttpServletResponse response)
 			throws IOException {
 		Map<String, Object> model = getmeetingVisitantList(request, response);
 		return model;
@@ -1060,8 +1045,7 @@ public class MeetingMemberController extends BaseController {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/getmeetingVisitantList.json", method = RequestMethod.POST)
-	public Map<String, Object> getmeetingVisitantList(
-			HttpServletRequest request, HttpServletResponse response)
+	public Map<String, Object> getmeetingVisitantList(HttpServletRequest request, HttpServletResponse response)
 			throws IOException {
 		// 获取json参数串
 		String requestJson = "";
@@ -1135,8 +1119,7 @@ public class MeetingMemberController extends BaseController {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/getRequiredSignupInfo.json", method = RequestMethod.POST)
-	public Map<String, Object> getRequiredSignupInfo(
-			HttpServletRequest request, HttpServletResponse response)
+	public Map<String, Object> getRequiredSignupInfo(HttpServletRequest request, HttpServletResponse response)
 			throws IOException {
 		// 获取json参数串
 		String requestJson = "";
@@ -1340,8 +1323,7 @@ public class MeetingMemberController extends BaseController {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/improveSignInformation.json", method = RequestMethod.GET)
-	public Map<String, Object> improveSignInformationGet(
-			HttpServletRequest request, HttpServletResponse response)
+	public Map<String, Object> improveSignInformationGet(HttpServletRequest request, HttpServletResponse response)
 			throws IOException {
 		Map<String, Object> model = improveSignInformation(request, response);
 		return model;
@@ -1356,8 +1338,7 @@ public class MeetingMemberController extends BaseController {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/improveSignInformation.json", method = RequestMethod.POST)
-	public Map<String, Object> improveSignInformation(
-			HttpServletRequest request, HttpServletResponse response)
+	public Map<String, Object> improveSignInformation(HttpServletRequest request, HttpServletResponse response)
 			throws IOException {
 		// 获取json参数串
 		String requestJson = "";
@@ -1481,8 +1462,7 @@ public class MeetingMemberController extends BaseController {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/deleteMeetingMember.json", method = RequestMethod.GET)
-	public Map<String, Object> deleteMeetingMemberGet(
-			HttpServletRequest request, HttpServletResponse response)
+	public Map<String, Object> deleteMeetingMemberGet(HttpServletRequest request, HttpServletResponse response)
 			throws IOException {
 		Map<String, Object> model = deleteMeetingMember(request, response);
 		return model;
