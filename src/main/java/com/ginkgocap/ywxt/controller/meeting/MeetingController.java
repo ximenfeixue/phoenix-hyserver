@@ -590,7 +590,7 @@ public class MeetingController extends BaseController {
 					// 当会议被禁用 返回 该会议已被禁用
 					if (1 == meetingObj.getDisable()) {
 						notificationMap.put("notifCode", "0002");
-						notificationMap.put("notifInfo", "该会议已被禁用");
+						notificationMap.put("notifInfo", "该活动已被禁用，不允许查看");
 						model.put("notification", notificationMap);
 						model.put("responseData", responseDataMap);
 						return model;
@@ -608,7 +608,7 @@ public class MeetingController extends BaseController {
 					// 私密会议不允许非成员查看
 					if (flag && meetingObj.getSecrecy()) {
 						notificationMap.put("notifCode", "0002");
-						notificationMap.put("notifInfo", "非会议成员不可以查看私密会议");
+						notificationMap.put("notifInfo", "该活动为私密，不允许查看");
 						model.put("notification", notificationMap);
 						model.put("responseData", responseDataMap);
 						return model;
