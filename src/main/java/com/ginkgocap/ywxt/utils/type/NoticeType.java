@@ -203,6 +203,19 @@ public enum NoticeType {
         public int code() {
             return 14;
         }
+    },
+    /**
+     * 不需要审核的活动
+     */
+    NO_REVIEW_MEETING {
+        @Override
+        public String toString() {
+        	return "不需要审核的活动";
+        }
+        @Override
+        public int code() {
+            return 15;
+        }
     };
     @Override
     public abstract String toString();

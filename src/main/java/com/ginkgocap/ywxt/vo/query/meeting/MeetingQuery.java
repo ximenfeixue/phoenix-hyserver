@@ -64,6 +64,8 @@ public class MeetingQuery implements Serializable {
 	private String taskId;
 	/** 创建时间 */
 	private Date createTime;
+	/** 删除标识位(0：默认、1：删除)*/
+	private int isDelete = 0;
 	/**会议成员**/
 	private List<MeetingMember>  listMeetingMember;
 	/**会议成员**/
@@ -126,6 +128,10 @@ public class MeetingQuery implements Serializable {
 	private BigDecimal payMoney = new BigDecimal(0);
 	// 是否会议开始时畅聊  0 是   1 不是
 	private int sendFalg;
+	// 公开活动 0 ：默认不需要审核 1：需要审核
+	private Byte reviewFlag;
+	// 签到提醒时间 （0 —— 120）
+	private Integer signReminderTime;
 
 	public Long getId() {
 		return this.id;
@@ -636,5 +642,29 @@ public class MeetingQuery implements Serializable {
 
 	public void setSendFalg(int sendFalg) {
 		this.sendFalg = sendFalg;
+	}
+
+	public Byte getReviewFlag() {
+		return reviewFlag;
+	}
+
+	public void setReviewFlag(Byte reviewFlag) {
+		this.reviewFlag = reviewFlag;
+	}
+
+	public Integer getSignReminderTime() {
+		return signReminderTime;
+	}
+
+	public void setSignReminderTime(Integer signReminderTime) {
+		this.signReminderTime = signReminderTime;
+	}
+
+	public int getIsDelete() {
+		return isDelete;
+	}
+
+	public void setIsDelete(int isDelete) {
+		this.isDelete = isDelete;
 	}
 }

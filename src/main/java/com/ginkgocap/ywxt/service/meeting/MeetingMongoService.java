@@ -1,5 +1,6 @@
 package com.ginkgocap.ywxt.service.meeting;
 
+import com.ginkgocap.ywxt.model.meeting.Meeting;
 import com.ginkgocap.ywxt.vo.query.meeting.MeetingSignUpFormQuery;
 
 import java.util.List;
@@ -23,4 +24,21 @@ public interface MeetingMongoService {
      * @throws Exception
      */
     List<MeetingSignUpFormQuery> getMeetingSignFormListByMeetingId(Long meetingId, int start, final int size) throws Exception;
+
+    /**
+     * 删除报名信息
+     * @param meetingId
+     * @param userId
+     * @throws Exception
+     */
+    void deleteMeetingByIdAndUserId(long meetingId, long userId) throws Exception;
+
+    /**
+     * 获取报名信息
+     * @param meetingId
+     * @param userId
+     * @return
+     * @throws Exception
+     */
+    MeetingSignUpFormQuery getMeetingSignFormByMeetingIdAndUserId(long meetingId, long userId) throws Exception;
 }

@@ -15,7 +15,6 @@ import org.apache.commons.lang.builder.ToStringStyle;
 
 public class MeetingMemberQuery implements Serializable {
     private static final long serialVersionUID = 3148176768559230877L;
-    
 
 	/** 成员序号 */
 	private Long id;

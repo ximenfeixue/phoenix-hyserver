@@ -16,6 +16,8 @@ import org.apache.commons.lang.builder.ToStringStyle;
 import com.ginkgocap.ywxt.common.base.BaseEntity;
 import com.ginkgocap.ywxt.utils.Utils;
 
+import javax.persistence.Transient;
+
 @SuppressWarnings("rawtypes")
 public class MeetingMember extends BaseEntity implements java.io.Serializable,Comparable{
 	private static final long serialVersionUID = 5454155825314635342L;
@@ -31,9 +33,9 @@ public class MeetingMember extends BaseEntity implements java.io.Serializable,Co
 	private String memberName;
     //人员图片
 	private String memberPhoto;
-    //人员处理会议的状态 0.未答复 1接受邀请 2拒绝邀请，3签到 4 报名 5取消报名
+    //人员处理会议的状态 0：默认，1：归档，2：删除'
 	private Integer memberMeetStatus;
-    //参会状态 0.参会状态	0.未答复 1接受邀请 2拒绝邀请， 4 报名 5取消报名
+    //参会状态 0.未答复 1接受邀请 2拒绝邀请， 4 报名 5取消报名
 	private Integer attendMeetStatus;
 	//是否签到 0：未签，1：已签
 	private Integer isSign;
@@ -55,7 +57,7 @@ public class MeetingMember extends BaseEntity implements java.io.Serializable,Co
 	private Date createTime;
 	//更新时间
 	private Date updateTime;
-	
+
 	public MeetingMember() {}
 
 	public MeetingMember(Long id) {

@@ -57,4 +57,22 @@ public class MeetingMongoDaoImpl implements MeetingMongoDao {
         query.addCriteria(Criteria.where("meetingId").is(meetingId));
         return mongoTemplate.count(query, "meetingSignForm");
     }
+
+    @Override
+    public void deleteMeetingByIdAndUserId(long meetingId, long userId) throws Exception {
+
+        Query query = new Query();
+        query.addCriteria(Criteria.where("meetingId").is(meetingId));
+        query.addCriteria(Criteria.where("userId").is(userId));
+        mongoTemplate.remove(query, "meetingSignForm");
+    }
+
+    @Override
+    public MeetingSignUpFormQuery getMeetingSignFormByMeetingIdAndUserId(long meetingId, long userId) throws Exception {
+
+        Query query = new Query();
+        query.addCriteria(Criteria.where("meetingId").is(meetingId));
+        query.addCriteria(Criteria.where("userId").is(userId));
+        return mongoTemplate.findOne(query, MeetingSignUpFormQuery.class, "meetingSignForm");
+    }
 }

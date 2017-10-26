@@ -4,6 +4,7 @@ import com.ginkgocap.ywxt.dao.meeting.MeetingMongoDao;
 import com.ginkgocap.ywxt.service.meeting.MeetingMongoService;
 import com.ginkgocap.ywxt.vo.query.meeting.MeetingSignUpFormQuery;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -27,5 +28,17 @@ public class MeetingMongoServiceImpl implements MeetingMongoService {
     public List<MeetingSignUpFormQuery> getMeetingSignFormListByMeetingId(Long meetingId, int start, final int size) throws Exception {
 
         return meetingMongoDao.getMeetingSignFormListByMeetingId(meetingId, start, size);
+    }
+
+    @Override
+    public void deleteMeetingByIdAndUserId(long meetingId, long userId) throws Exception {
+
+        meetingMongoDao.deleteMeetingByIdAndUserId(meetingId, userId);
+    }
+
+    @Override
+    public MeetingSignUpFormQuery getMeetingSignFormByMeetingIdAndUserId(long meetingId, long userId) throws Exception {
+
+        return meetingMongoDao.getMeetingSignFormByMeetingIdAndUserId(meetingId, userId);
     }
 }

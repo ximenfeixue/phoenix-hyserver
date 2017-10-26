@@ -2,6 +2,7 @@ package com.ginkgocap.ywxt.controller.meeting;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -17,6 +18,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.ginkgocap.parasol.file.service.FileIndexService;
+import com.ginkgocap.ywxt.payment.model.PayOrder;
+import com.ginkgocap.ywxt.payment.model.request.PayRequest;
+import com.ginkgocap.ywxt.payment.model.response.PayResponse;
+import com.ginkgocap.ywxt.payment.service.PayOrderService;
+import com.ginkgocap.ywxt.payment.service.PayService;
+import com.ginkgocap.ywxt.payment.utils.PayStatus;
 import com.ginkgocap.ywxt.service.meeting.*;
 import com.ginkgocap.ywxt.user.service.corporation.CorporationRelationService;
 import com.ginkgocap.ywxt.utils.*;
@@ -34,6 +41,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
+import org.apache.velocity.runtime.parser.node.MathUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -129,6 +137,11 @@ public class MeetingController extends BaseController {
 	private CorporationRelationService corporationRelationService;
 	@Autowired
 	private Cache cache;
+	@Autowired
+	private PayService payService;
+	@Autowired
+	private PayOrderService payOrderService;
+
 	private static int  expiredTime = 60 * 60 * 24 * 7;
 
 	/*
@@ -178,23 +191,6 @@ public class MeetingController extends BaseController {
 		model.put("notification", notificationMap);
 		return model;
 	}
-
-	/**
-	 * 名称: addMettingGet 描述: 新增会议
-	 *
-	 * @param request
-	 *            请求
-	 * @param response
-	 *            响应
-	 * @return model
-	 * @throws IOException
-	 */
-/*	@ResponseBody
-	@RequestMapping(value = "/add.json", method = RequestMethod.GET)
-	public Map<String, Object> addMettingGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-		Map<String, Object> model = addMetting(request, response);
-		return model;
-	}*/
 
 	/**
 	 * 名称: addMetting 描述: 新增会议
@@ -587,20 +583,29 @@ public class MeetingController extends BaseController {
 					Long id = Long.valueOf(idStr);
 					Long memberId = Long.valueOf(memberIdStr);
 					meetingObj = meetingService.getMeetingByIdAndMemberId(id, memberId);
-					// 当会议被禁用 返回 该会议已被禁用
-					if (1 == meetingObj.getDisable()) {
+					if (1 == meetingObj.getIsDelete()) {
 						notificationMap.put("notifCode", "0002");
-						notificationMap.put("notifInfo", "该会议已被禁用");
+						notificationMap.put("notifInfo", "该活动已被删除");
 						model.put("notification", notificationMap);
 						model.put("responseData", responseDataMap);
 						return model;
 					}
-
-					boolean flag = true;
+					// 当会议被禁用 返回 该会议已被禁用
+					if (1 == meetingObj.getDisable()) {
+						notificationMap.put("notifCode", "0002");
+						notificationMap.put("notifInfo", "该活动已被禁用，不允许查看");
+						model.put("notification", notificationMap);
+						model.put("responseData", responseDataMap);
+						return model;
+					}
 					List<MeetingMember> mlist = meetingObj.getListMeetingMember();
+					// 是否需要支付
+					byte isPay = meetingObj.getIsPay();
+					boolean flag = true;
 					for (MeetingMember mm : mlist) {
-						if (mm.getMemberId().equals(memberId))
+						if (mm.getMemberId().equals(memberId)) {
 							flag = false;
+						}
 					}
 					if (memberId.equals(1l)) {
 						flag = false;
@@ -608,7 +613,7 @@ public class MeetingController extends BaseController {
 					// 私密会议不允许非成员查看
 					if (flag && meetingObj.getSecrecy()) {
 						notificationMap.put("notifCode", "0002");
-						notificationMap.put("notifInfo", "非会议成员不可以查看私密会议");
+						notificationMap.put("notifInfo", "该活动为私密，不允许查看");
 						model.put("notification", notificationMap);
 						model.put("responseData", responseDataMap);
 						return model;
@@ -3113,25 +3118,118 @@ public class MeetingController extends BaseController {
 		return InterfaceResult.getSuccessInterfaceResultInstance(signUpFormList);
 	}
 
+	/**
+	 * 支付
+	 * @param request
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/payment", method = RequestMethod.POST)
+	public InterfaceResult meetingPay(HttpServletRequest request) {
+
+		// meetingId, web, type,
+		User user = this.getUser(request);
+		long userId = user.getId();
+		String userName = user.getName();
+		String mobile = user.getMobile();
+		String requestJson = "";
+		MeetingSignUpFormQuery meetingSignUpFormQuery = null;
+		try {
+			requestJson = this.getJsonParamStr(request);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		if (StringUtils.isBlank(requestJson)) {
+			return InterfaceResult.getInterfaceResultInstance(CommonResultCode.PARAMS_EXCEPTION);
+		}
+		MeetingPayQuery meetingPayQuery = GsonUtils.StringToObject(MeetingPayQuery.class, requestJson);
+		Long meetingId = meetingPayQuery.getMeetingId();
+		Integer type = meetingPayQuery.getType();
+		Integer web = meetingPayQuery.getWeb();
+		if (null == meetingId || null == type || null == web) {
+			return InterfaceResult.getInterfaceResultInstance(CommonResultCode.PARAMS_EXCEPTION);
+		}
+		Meeting meeting = meetingService.getById(meetingId);
+		if (null == meeting) {
+			return InterfaceResult.getInterfaceResultInstance(CommonResultCode.PARAMS_EXCEPTION, "当前活动不存在或已删除");
+		}
+		try {
+			meetingSignUpFormQuery = meetingMongoService.getMeetingSignFormByMeetingIdAndUserId(meetingId, userId);
+		} catch (Exception e) {
+			e.printStackTrace();
+			logger.error("invoke meetingMongoService failed! method : {getMeetingSignFormByMeetingIdAndUserId}. meetingId : " + meetingId + "userId: " + userId);
+		}
+		if (null != meetingSignUpFormQuery) {
+			String orderNumber = meetingSignUpFormQuery.getOrderNumber();
+			if (StringUtils.isNotBlank(orderNumber)) {
+				PayOrder payOrder = payOrderService.getPayOrder(orderNumber);
+				if (payOrder.getStatus() == PayStatus.PAY_SUCCESS.getValue()) {
+					return InterfaceResult.getInterfaceResultInstance(CommonResultCode.PARAMS_EXCEPTION, "您已支付成功，可以直接进入活动");
+				}
+			}
+		}
+		BigDecimal payMoney = meeting.getPayMoney();
+		Long createId = meeting.getCreateId();
+		payMoney = payMoney.multiply(new BigDecimal(100));
+		PayRequest payRequest = createPayRequest(payMoney.intValue(), web.intValue(), type.intValue(), userId, meetingId, mobile, userName, createId);
+		PayResponse payResponse = null;
+		try {
+			payResponse = payService.request(payRequest);
+		} catch (Exception e) {
+			logger.error("invoke payService failed! method : {request}");
+			return InterfaceResult.getInterfaceResultInstance(CommonResultCode.PARAMS_EXCEPTION, "支付模块挂掉了");
+		}
+		if (null != payResponse) {
+			String payOrderNo = payResponse.getPayOrderNo();
+			if (null != meetingSignUpFormQuery) {
+				meetingSignUpFormQuery.setOrderNumber(payOrderNo);
+				try {
+					meetingMongoService.saveMeetingSignForm(meetingSignUpFormQuery);
+				} catch (Exception e) {
+					logger.error("invoke meetingMongoService failed! method : {saveMeetingSignForm}. meetingId : " + meetingId + "userId: " + userId);
+				}
+			}
+		}
+		return InterfaceResult.getSuccessInterfaceResultInstance(payResponse);
+	}
+
+	public static PayRequest createPayRequest(int money, int web, int type, long userId, long sourceId,
+											  String mobile, String userName, long createId) {
+
+		PayRequest payRequest = new PayRequest();
+		payRequest.setDetail("4"); // 活动："4"
+		payRequest.setExtra(""); // 传""
+		payRequest.setOrderType(4); // 活动会议4
+		payRequest.setPayAmount(money); // 充值金额,精确到分
+		payRequest.setPayType(type); // 1.微信 2.支付宝
+		payRequest.setSourceId(sourceId); // 活动或会议的Id
+		payRequest.setSourceType(4); // 4
+		payRequest.setSubject("Gintong"); //Gintong
+		payRequest.setTradeType(web); // 支付类型：1.app, 2.web
+		payRequest.setUserId(userId); // 发起人 userId
+		payRequest.setMobile(mobile); // 发起人手机号
+		payRequest.setUserName(userName); // 发起人名称
+		payRequest.setToUserId(createId); // 创建活动的人
+		return payRequest;
+	}
+
 	private void setChatListToCache(final List<Social> chat,final long userId) {
 		logger.info("set chat list to cached. userId: " + userId);
 		cache.setByRedis(chatListKey(userId), chat, expiredTime);
 	}
-	
+
 	private List<Social> getChatListFromCache(final long userId) {
 		logger.info("get chat list from cached. userId: " + userId);
 		return (List<Social>)cache.getByRedis(chatListKey(userId));
 	}
-	
+
 	private String chatListKey(long userId)	{
 		return "chat_list_" + userId + "_";
 	}
-
-    private void setChatMapListToCache(final Map<Integer,List<Social>> chatListMap,final long userId) {
+	private void setChatMapListToCache(final Map<Integer,List<Social>> chatListMap,final long userId) {
         logger.info("set chat map list to cached. userId: " + userId);
         cache.setByRedis(chatMapListKey(userId), chatListMap, expiredTime);
     }
-
     private Map<Integer,List<Social>> getChatMapListFromCache(final long userId) {
         logger.info("get chat map list from cached. userId: " + userId);
         return (Map<Integer,List<Social>>)cache.getByRedis(chatMapListKey(userId));

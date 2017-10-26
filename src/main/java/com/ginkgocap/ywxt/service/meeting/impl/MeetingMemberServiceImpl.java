@@ -9,6 +9,7 @@ package com.ginkgocap.ywxt.service.meeting.impl;
 import java.util.Date;
 import java.util.List;
 
+import com.ginkgocap.ywxt.utils.type.ExcuteMeetSignType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,6 +43,8 @@ public class MeetingMemberServiceImpl implements MeetingMemberService{
 	private MeetingNoticeDao meetingNoticeDao;
 	@Autowired
 	private MeetingSignLabelDataDao meetingSignLabelDataDao;
+	// 不需要审核状态
+	private static final Byte reviewFlag = 0;
 	/**
 	 * 名称: getById
 	 * 描述: 根据id查找
@@ -178,7 +181,7 @@ public class MeetingMemberServiceImpl implements MeetingMemberService{
 	 */
 	@Transactional(rollbackFor=Exception.class)
 	public void signUp(Meeting meeting,MeetingMember meetingMember,User user) throws Exception{
-		meetingMemberDao.saveOrUpdate(meetingMember);
+
 		// 添加报名记录表
 		MeetingNotice meetingNotice = new MeetingNotice();
 		// 封装创建人
@@ -189,8 +192,13 @@ public class MeetingMemberServiceImpl implements MeetingMemberService{
 		meetingNotice.setMeetingId(meeting.getId());
 		// 封装通知内容
 		meetingNotice.setNoticeContent(user.getName()+"报名参加"+meeting.getMeetingName());
-		// 封装通知类型
-		meetingNotice.setNoticeType(NoticeType.SIGN_UP_APPLY.code());
+		// 封装通知类型 (若不需要审核则 NO_REVIEW_MEETING，审核则 SIGN_UP_APPLY)
+		if (reviewFlag.equals(meeting.getReviewFlag())) {
+			meetingMember.setExcuteMeetSign(ExcuteMeetSignType.AGREE_SIGN_UP.code());
+			meetingNotice.setNoticeType(NoticeType.NO_REVIEW_MEETING.code());
+		} else {
+			meetingNotice.setNoticeType(NoticeType.SIGN_UP_APPLY.code());
+		}
 		meetingNotice.setIsShow(1);
 		// 封装通知接收人
 		meetingNotice.setReceiver(meeting.getCreateId());
@@ -202,8 +210,10 @@ public class MeetingMemberServiceImpl implements MeetingMemberService{
 		// 封装通知字段
 		NoticeField noticeField = new NoticeField();
 		noticeField.setField(user.getId()+Constant.NOTICE_CONTENT_SPLIT_CHAR+user.getName());
-//		添加通知
+		// 添加通知
 		addNotice(user,meetingNotice,noticeField,user.getName()+"报名参加"+meeting.getMeetingName(),new Date());
+		// 保存成员
+		meetingMemberDao.saveOrUpdate(meetingMember);
 	}
 	/**
 	 * 名称: signUpReview
@@ -296,7 +306,7 @@ public class MeetingMemberServiceImpl implements MeetingMemberService{
 	public void addNotice(User user,MeetingNotice meetingNotice,NoticeField noticeField,String content,Date date){
 		meetingNoticeDao.addNotice(meetingNotice,noticeField);
 		//推送报名通知  
-		UserBean userBean=new UserBean();
+		UserBean userBean = new UserBean();
 		userBean.setId(user.getId());
 		userBean.setName(user.getName());
 		String dateStr=DateUtil.convertDateToStringForChina(new Date());
@@ -325,14 +335,14 @@ public class MeetingMemberServiceImpl implements MeetingMemberService{
 	 */
 	@Transactional(rollbackFor=Exception.class)
 	public void changeAttendMeetStatus(Long meetingId,Long memberId,Integer type,User user) throws Exception{
-		Meeting meeting =meetingDao.getById(meetingId);
-		if(Utils.isNullOrEmpty(meeting)){
+		Meeting meeting = meetingDao.getById(meetingId);
+		if (Utils.isNullOrEmpty(meeting)){
 			throw new Exception("会议不存在");
 		}
-		List<MeetingMember> list=this.getByMeetingIdAndMemberId(meetingId, memberId);
+		List<MeetingMember> list = this.getByMeetingIdAndMemberId(meetingId, memberId);
 		
-		if(!Utils.isNullOrEmpty(list)){
-			MeetingMember meetingMember=list.get(0);
+		if (!Utils.isNullOrEmpty(list)) {
+			MeetingMember meetingMember = list.get(0);
 			if(!Utils.isNullOrEmpty(meetingMember)){
 				// 封装通知列表
 				MeetingNotice meetingNotice = new MeetingNotice();
@@ -351,43 +361,43 @@ public class MeetingMemberServiceImpl implements MeetingMemberService{
 				// 封装更新时间
 				meetingNotice.setUpdateTime(new Date());
 				// 封装通知字段
-				NoticeField noticeField=new NoticeField();
+				NoticeField noticeField = new NoticeField();
 				noticeField.setField(user.getName());
 				//添加通知
-				String content="";
+				String content = "";
 				// 接受邀请
-				if(AttendMeetStatusType.ACCEPT_INVITATION.code()==type){//接受邀请
+				if (AttendMeetStatusType.ACCEPT_INVITATION.code() == type){//接受邀请
 					// 封装通知内容
-					content=user.getName()+"接受了您的邀请";
+					content = user.getName() + "接受了您的邀请";
 					meetingNotice.setNoticeContent(content);
 					// 封装通知类型
 					meetingNotice.setNoticeType(NoticeType.ACCEPT_INVITATION.code());
 					meetingMember.setAttendMeetStatus(type);
 					this.saveOrUpdate(meetingMember);
-				}else if(AttendMeetStatusType.REFUSE_INVITATION.code()==type){// 拒绝邀请
+				} else if (AttendMeetStatusType.REFUSE_INVITATION.code() == type){// 拒绝邀请
 					meetingMember.setAttendMeetStatus(type);	
 					// 封装通知内容
-					content=user.getName()+"拒绝了您的邀请";
+					content=user.getName() + "拒绝了您的邀请";
 					meetingNotice.setNoticeContent(content);
 					// 封装通知类型
 					meetingNotice.setNoticeType(NoticeType.REFUSE_INVITATION.code());
 					meetingMember.setAttendMeetStatus(type);
 					this.saveOrUpdate(meetingMember);
-				}else if(AttendMeetStatusType.CANCEL_SIGN_UP.code()==type
+				} else if (AttendMeetStatusType.CANCEL_SIGN_UP.code()==type
 						|| AttendMeetStatusType.QUIT_MEETING.code()==type){//取消报名，退出会议
 					// 取消参会
 					if(meeting.getMeetingStatus() <= 2){
 						meetingMemberDao.delete(meetingMember.getId());
-					}else if(meeting.getMeetingStatus() == 3){
+					} else if (meeting.getMeetingStatus() == 3){
 						throw new Exception("会议已经结束不能取消参会");
 					}
 					// 封装通知类型
 					if(AttendMeetStatusType.CANCEL_SIGN_UP.code()==type) {
 						meetingNotice.setNoticeType(NoticeType.CANCEL_SIGN_UP.code());
-						content = user.getName()+"取消报名";
+						content = user.getName() + "取消报名";
 					} else {
 						meetingNotice.setNoticeType(NoticeType.QUIT_MEETING.code());
-						content = user.getName()+"退出了会议";
+						content = user.getName() + "退出了会议";
 					}
 					// 封装通知内容
 					meetingNotice.setNoticeContent(content);

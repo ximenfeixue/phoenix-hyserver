@@ -31,4 +31,21 @@ public interface MeetingMongoDao {
      * @throws Exception
      */
     long countMeetingSignFormListByMeetingId(Long meetingId) throws Exception;
+
+    /**
+     * 通过 meetingId userId 删除报名信息
+     * @param meetingId
+     * @param userId
+     * @throws Exception
+     */
+    void deleteMeetingByIdAndUserId(long meetingId, long userId) throws Exception;
+
+    /**
+     * 获取报名信息
+     * @param meetingId
+     * @param userId
+     * @return
+     * @throws Exception
+     */
+    MeetingSignUpFormQuery getMeetingSignFormByMeetingIdAndUserId(long meetingId, long userId) throws Exception;
 }

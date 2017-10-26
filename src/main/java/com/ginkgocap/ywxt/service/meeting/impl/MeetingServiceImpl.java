@@ -14,10 +14,15 @@ import com.ginkgocap.parasol.file.model.FileIndex;
 import com.ginkgocap.parasol.file.service.FileIndexService;
 import com.ginkgocap.ywxt.dao.meeting.*;
 import com.ginkgocap.ywxt.model.meeting.*;
+import com.ginkgocap.ywxt.payment.model.PayOrder;
+import com.ginkgocap.ywxt.payment.service.PayOrderService;
+import com.ginkgocap.ywxt.payment.service.PayService;
+import com.ginkgocap.ywxt.payment.utils.PayStatus;
 import com.ginkgocap.ywxt.utils.pic.DefaultPic;
 import com.ginkgocap.ywxt.vo.query.meeting.*;
 import com.gintong.frame.util.dto.InterfaceResult;
 import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.collections.CollectionUtils;
 import org.h2.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -102,6 +107,10 @@ public class MeetingServiceImpl extends BaseServiceImpl<Meeting, Long> implement
 	private MeetingMemberService meetingMemberService;
 	@Autowired
 	private UserConfigService userConfigService;
+	@Autowired
+	private PayOrderService payOrderService;
+	@Autowired
+	private PayService payService;
 
 	@Value("${nginx.root}")
 	private String nginxRoot;
@@ -842,6 +851,9 @@ public class MeetingServiceImpl extends BaseServiceImpl<Meeting, Long> implement
 	 */
 	@Transactional(readOnly = true)
 	public MeetingQuery getMeetingByIdAndMemberId(Long id, Long memberId) throws IllegalAccessException, InvocationTargetException, FileIndexServiceException {
+
+		List<PayOrder> payOrderList = null;
+		PayOrder payOrder = null;
 		MeetingQuery meetingObj = new MeetingQuery();
 		// 封装会议基本信息
 		if (!Utils.isNullOrEmpty(id)) {
@@ -871,9 +883,43 @@ public class MeetingServiceImpl extends BaseServiceImpl<Meeting, Long> implement
 					for (MeetingMember meetingMember : listMember) {
 						if (!isNullOrEmpty(meetingMember) && !isNullOrEmpty(meetingMember.getMemberId())) {
 							userIdList.add(meetingMember.getMemberId());
+							if (meetingMember.getMemberId() == memberId && 1 == meetingObj.getIsPay()) {
+								// 修改成员状态
+								try {
+									payOrderList =	payOrderService.getPayOrderByUserIdAndSourceId(memberId, meeting.getId());
+								} catch (Exception e) {
+
+								}
+								// 获取最新的订单信息
+								if (CollectionUtils.isNotEmpty(payOrderList)) {
+									payOrder = payOrderList.get(0);
+									if (payOrder.getStatus() == PayStatus.PAY_SUCCESS.getValue()) {
+										// 邀请情况 在支付成功后成员类型还是未答复状态，修改为已接受
+										if (0 == meetingMember.getAttendMeetType() && 0 == meetingMember.getAttendMeetStatus()) {
+											meetingMember.setAttendMeetStatus(1);
+											try {
+												meetingMemberService.saveOrUpdate(meetingMember);
+											} catch (Exception e) {
+												e.printStackTrace();
+											}
+										}
+										// 报名情况 在支付成功后成员类型还是未处理状态，修改为同意报名
+										if (1 == meetingMember.getAttendMeetType() && 1 != meetingMember.getExcuteMeetSign() &&
+												2 != meetingMember.getExcuteMeetSign()) {
+											meetingMember.setExcuteMeetSign(1);
+											try {
+												meetingMemberService.saveOrUpdate(meetingMember);
+											} catch (Exception e) {
+												e.printStackTrace();
+											}
+										}
+									}
+								}
+							}
 						}
 					}
 				}
+				listMember = meetingMemberDao.getByMeetingId(id);
 				if (!userIdList.isEmpty()) {
 					Map<String, User> userMap = userDao.getUserMapByIds(userIdList);
 					if (!isNullOrEmpty(meeting) && !isNullOrEmpty(meeting.getCreateId())) {

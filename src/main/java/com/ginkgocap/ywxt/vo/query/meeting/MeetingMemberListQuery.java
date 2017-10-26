@@ -110,6 +110,10 @@ public class MeetingMemberListQuery implements Serializable {
 	private byte isPay;
 	//支付金额
 	private BigDecimal payMoney;
+	// 公开活动 0 ：默认不需要审核 1：需要审核
+	private Byte reviewFlag;
+	// 签到提醒时间 （0 —— 120）
+	private Integer signReminderTime;
 	
 	public java.lang.Long getId() {
 		return this.id;
@@ -516,5 +520,21 @@ public class MeetingMemberListQuery implements Serializable {
 
 	public void setPayMoney(BigDecimal payMoney) {
 		this.payMoney = payMoney;
+	}
+
+	public Byte getReviewFlag() {
+		return reviewFlag;
+	}
+
+	public void setReviewFlag(Byte reviewFlag) {
+		this.reviewFlag = reviewFlag;
+	}
+
+	public Integer getSignReminderTime() {
+		return signReminderTime;
+	}
+
+	public void setSignReminderTime(Integer signReminderTime) {
+		this.signReminderTime = signReminderTime;
 	}
 }
