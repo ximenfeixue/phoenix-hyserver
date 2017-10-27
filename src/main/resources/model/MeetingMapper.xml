@@ -51,7 +51,7 @@ PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
 			create_id AS createId,create_name AS createName,task_id AS taskId,create_time AS createTime,
 			update_time AS updateTime,group_id AS groupId,industry,is_delete AS isDelete,formated_desc AS formatedDesc,
 			create_user_type AS createUserType, top AS top, disable AS disable, is_pay AS isPay, pay_money AS payMoney,
-			send_flag AS sendFalg, review_flag as reviewFlag, sign_reminder_time AS signReminderTime
+			send_flag AS sendFalg, review_flag as reviewFlag, sign_reminder_time AS signReminderTime, is_sign AS isSign
 		]]>
 	</sql>
 
