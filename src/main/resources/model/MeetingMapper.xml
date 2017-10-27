@@ -162,7 +162,7 @@ PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
 	        pay_money = #{payMoney},
 	        send_flag = #{sendFalg},
 	        review_flag = #{reviewFlag},
-	        sign_reminder_time = #{signReminderTime}
+	        sign_reminder_time = #{signReminderTime},
 	        is_sign = #{isSign}
         WHERE id = #{id} 
     ]]>
