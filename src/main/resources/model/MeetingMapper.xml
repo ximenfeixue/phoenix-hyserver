@@ -38,6 +38,7 @@ PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
 		<result property="sendFalg" column="send_flag"/>
 		<result property="reviewFlag" column="review_flag"/>
 		<result property="signReminderTime" column="sign_reminder_time"/>
+		<result property="isSign" column="is_sign"/>
 	</resultMap>
 	
 	<sql id="columns">
@@ -88,7 +89,8 @@ PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
         	pay_money,
         	send_flag,
         	sign_reminder_time,
-        	review_flag
+        	review_flag,
+        	is_sign
         ) VALUES (
         	#{id},
         	#{meetingName},
@@ -121,7 +123,8 @@ PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
         	#{payMoney},
         	#{sendFalg},
         	#{signReminderTime},
-        	#{reviewFlag}
+        	#{reviewFlag},
+        	#{isSign}
         )
         
     ]]>
@@ -160,6 +163,7 @@ PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
 	        send_flag = #{sendFalg},
 	        review_flag = #{reviewFlag},
 	        sign_reminder_time = #{signReminderTime}
+	        is_sign = #{isSign}
         WHERE id = #{id} 
     ]]>
 	</update>

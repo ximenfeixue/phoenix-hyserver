@@ -38,7 +38,7 @@ public class MeetingMember extends BaseEntity implements java.io.Serializable,Co
     //参会状态 0.未答复 1接受邀请 2拒绝邀请， 4 报名 5取消报名
 	private Integer attendMeetStatus;
 	//是否签到 0：未签，1：已签
-	private Integer isSign;
+	private Integer isSign = 0;
 	//签到距离      2千米以内显示距离，2千米以外显示地区
 	private String signDistance;
 	//参会方式 0邀请，1报名

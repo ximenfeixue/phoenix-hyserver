@@ -121,6 +121,8 @@ public class MeetingServiceImpl extends BaseServiceImpl<Meeting, Long> implement
 
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 
+	private static final Byte reviewFlag = 0;
+
 	/**
 	 * 名称: getById 描述: 根据id查找
 	 * 
@@ -903,9 +905,9 @@ public class MeetingServiceImpl extends BaseServiceImpl<Meeting, Long> implement
 												e.printStackTrace();
 											}
 										}
-										// 报名情况 在支付成功后成员类型还是未处理状态，修改为同意报名
+										// 报名情况 在支付成功后成员类型还是未处理状态，且不需要审核的报名, 修改为同意报名
 										if (1 == meetingMember.getAttendMeetType() && 1 != meetingMember.getExcuteMeetSign() &&
-												2 != meetingMember.getExcuteMeetSign()) {
+												2 != meetingMember.getExcuteMeetSign() && reviewFlag == meeting.getReviewFlag()) {
 											meetingMember.setExcuteMeetSign(1);
 											try {
 												meetingMemberService.saveOrUpdate(meetingMember);
