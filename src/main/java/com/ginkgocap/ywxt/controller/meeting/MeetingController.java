@@ -3192,12 +3192,13 @@ public class MeetingController extends BaseController {
 				}
 			}
 		}
-		// web 端报名时，需要将成员放到活动中
+		// web 端报名时，①需要将成员放到活动中 ②将通知放到 队列中
 		if (2 == web && null != sourceType && 1 == sourceType.intValue()) {
 			List<MeetingMember> meetingMemberList = meetingMemberService.getByMeetingIdAndMemberId(meetingId, userId);
 			if (CollectionUtils.isEmpty(meetingMemberList)) {
 				try {
 					saveMeetingMember(user, meetingId);
+                    saveMeetingNotice(user, meeting);
 				} catch (Exception e) {
 					logger.error("invoke meetingMemberService failed! method : {saveOrUpdate}. userId :" + userId);
 				}

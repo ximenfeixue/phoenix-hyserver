@@ -24,13 +24,13 @@ public class DataSyncMongoDaoImpl implements DataSyncMongoDao {
     @Override
     public void saveDataSync(DataSync data) {
 
-        mongoTemplate.save(data);
+        mongoTemplate.save(data, "dataSync");
     }
 
     @Override
     public void batchSaveDataSync(List<DataSync> dataList) {
 
-        mongoTemplate.save(dataList);
+        mongoTemplate.save(dataList, "dataSync");
     }
 
     @Override
