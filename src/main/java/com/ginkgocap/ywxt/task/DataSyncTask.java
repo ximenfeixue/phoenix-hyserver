@@ -9,8 +9,12 @@ import com.ginkgocap.ywxt.payment.service.PayOrderService;
 import com.ginkgocap.ywxt.payment.utils.PayStatus;
 import com.ginkgocap.ywxt.service.meeting.DataSyncService;
 import com.ginkgocap.ywxt.service.meeting.MeetingNoticeService;
+import com.ginkgocap.ywxt.service.meeting.MeetingService;
 import com.ginkgocap.ywxt.user.model.User;
 import com.ginkgocap.ywxt.utils.Constant;
+import com.ginkgocap.ywxt.utils.GinTongInterface;
+import com.ginkgocap.ywxt.utils.ThreadPoolUtils;
+import com.ginkgocap.ywxt.utils.type.AttendMeetStatusType;
 import com.ginkgocap.ywxt.utils.type.NoticeReceiverType;
 import com.ginkgocap.ywxt.utils.type.NoticeType;
 import org.apache.commons.collections.CollectionUtils;
@@ -19,6 +23,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -44,6 +49,9 @@ public class DataSyncTask implements Runnable{
     @Autowired
     private MeetingNoticeService meetingNoticeService;
 
+    @Autowired
+    private MeetingService meetingService;
+
     @Override
     public void run() {
         List<PayOrder> payOrderList = null;
@@ -66,7 +74,27 @@ public class DataSyncTask implements Runnable{
                             if (CollectionUtils.isNotEmpty(payOrderList)) {
                                 PayOrder payOrder = payOrderList.get(0);
                                 if (payOrder.getStatus() == PayStatus.PAY_SUCCESS.getValue()) {
+                                    // 支付成功发通知
                                     result = addMeetingNotice(meetingNotice);
+                                    // 若该报名通知的活动不需要审核，则将该成员加到畅聊里
+                                    if (meetingNotice.getNoticeType() == NoticeType.NO_REVIEW_MEETING.code()) {
+                                        if (meetingId != null) {
+                                            Meeting meeting = meetingService.getById(meetingId);
+                                            if (meeting != null) {
+                                                final String groupId = meeting.getGroupId();
+                                                final Long userId = meetingNotice.getCreateId();
+                                                final long creatorUserId = meeting.getCreateId();
+                                                ThreadPoolUtils.getExecutorService().execute(new Runnable() {
+                                                    @Override
+                                                    public void run() {
+                                                        GinTongInterface.invite2MUC(creatorUserId, Arrays.asList(userId), groupId);
+                                                    }
+                                                });
+                                            } else {
+                                                logger.info("该活动不存在或已删除");
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         }
