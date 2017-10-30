@@ -854,6 +854,7 @@ public class MeetingServiceImpl extends BaseServiceImpl<Meeting, Long> implement
 	@Transactional(readOnly = true)
 	public MeetingQuery getMeetingByIdAndMemberId(Long id, Long memberId) throws IllegalAccessException, InvocationTargetException, FileIndexServiceException {
 
+	    logger.info("getMeetingByIdAndMemberId start ------------");
 		List<PayOrder> payOrderList = null;
 		PayOrder payOrder = null;
 		MeetingQuery meetingObj = new MeetingQuery();
