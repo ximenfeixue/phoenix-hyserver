@@ -887,10 +887,11 @@ public class MeetingServiceImpl extends BaseServiceImpl<Meeting, Long> implement
 							userIdList.add(meetingMember.getMemberId());
 							if (meetingMember.getMemberId() == memberId && 1 == meetingObj.getIsPay()) {
 								// 修改成员状态
+                                logger.info("修改成员状态 userId : {} meetingId :{}" + memberId + meeting.getId());
 								try {
 									payOrderList =	payOrderService.getPayOrderByUserIdAndSourceId(memberId, meeting.getId());
 								} catch (Exception e) {
-
+									logger.error("invoke payOrderService failed! method getPayOrderByUserIdAndSourceId. userId : {} , meetingId :{}" + memberId + meeting.getId());
 								}
 								// 获取最新的订单信息
 								if (CollectionUtils.isNotEmpty(payOrderList)) {
@@ -908,6 +909,7 @@ public class MeetingServiceImpl extends BaseServiceImpl<Meeting, Long> implement
 										// 报名情况 在支付成功后成员类型还是未处理状态，且不需要审核的报名, 修改为同意报名
 										if (1 == meetingMember.getAttendMeetType() && 1 != meetingMember.getExcuteMeetSign() &&
 												2 != meetingMember.getExcuteMeetSign() && reviewFlag == meeting.getReviewFlag()) {
+											logger.info("修改报名不需要审核的活动成员............. userId : " + meetingMember.getMemberId());
 											meetingMember.setExcuteMeetSign(1);
 											try {
 												meetingMemberService.saveOrUpdate(meetingMember);
@@ -916,6 +918,8 @@ public class MeetingServiceImpl extends BaseServiceImpl<Meeting, Long> implement
 											}
 										}
 									}
+								} else {
+									logger.info("没查到该用户的支付订单.....");
 								}
 							}
 						}

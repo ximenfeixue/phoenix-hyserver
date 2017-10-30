@@ -1005,6 +1005,7 @@ public class MeetingMemberController extends BaseController {
 						return model;
 					}
 				}
+				// 报名审核 有单独接口 signUpReview.json  （在 AttendMeetStatusType.SIGN_UP.code() == type 的情况）
 				if (Utils.isAllNotNullOrEmpty(meetingIdStr, memberIdStr, type)) {
 					if(AttendMeetStatusType.ACCEPT_INVITATION.code() == Integer.valueOf(type) || AttendMeetStatusType.REFUSE_INVITATION.code() == Integer.valueOf(type)){
 						// 只有未开始和进行中的会议可以接受邀请或者拒绝邀请
