@@ -31,7 +31,7 @@ public class DataSyncMongoDaoImpl implements DataSyncMongoDao {
         try {
             String id = MeetingFilePrimaryKey.getPrimaryKey();
             data.setId(id);
-            mongoTemplate.insert(data, "dataSync");
+            mongoTemplate.save(data, "dataSync");
         } catch (Exception e) {
             e.printStackTrace();
         }
