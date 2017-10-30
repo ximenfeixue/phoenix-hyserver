@@ -208,9 +208,7 @@ public class MeetingController extends BaseController {
 		try {
 			debugStr+="1";
 			requestJson = getJsonParamStr(request);
-
 			debugStr+="12";
-			
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

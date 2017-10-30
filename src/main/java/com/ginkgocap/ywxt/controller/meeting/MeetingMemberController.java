@@ -19,10 +19,12 @@ import com.ginkgocap.ywxt.payment.service.PayOrderService;
 import com.ginkgocap.ywxt.payment.utils.BeanUtil;
 import com.ginkgocap.ywxt.payment.utils.PayStatus;
 import com.ginkgocap.ywxt.service.meeting.*;
+import com.ginkgocap.ywxt.service.meeting.impl.MeetingNotifyService;
 import com.ginkgocap.ywxt.utils.*;
 import com.ginkgocap.ywxt.vo.query.meeting.*;
 import com.gintong.frame.util.dto.CommonResultCode;
 import com.gintong.frame.util.dto.InterfaceResult;
+import com.gintong.ywxt.im.service.MessageNotifyService;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
@@ -101,6 +103,8 @@ public class MeetingMemberController extends BaseController {
 	private MeetingMongoService meetingMongoService;
 	@Resource
 	private PayOrderService payOrderService;
+    @Autowired
+    private MeetingNotifyService meetingNotifyService;
 
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -116,8 +120,7 @@ public class MeetingMemberController extends BaseController {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/add.json", method = {RequestMethod.POST, RequestMethod.GET})
-	public InterfaceResult addMettingMember(HttpServletRequest request,
-			HttpServletResponse response) {
+	public InterfaceResult addMettingMember(HttpServletRequest request,	HttpServletResponse response) {
 		// 获取json参数串
 		String requestJson = "";
 		InterfaceResult result = null;
@@ -154,14 +157,13 @@ public class MeetingMemberController extends BaseController {
 				result.setResponseData(responseDataMap);
 				return result;
 			}
-			List<MeetingMember> list = meetingMemberService.getByMeetingIdAndMemberId(
-					meetingId, meetingMember.getMemberId());
+			List<MeetingMember> list = meetingMemberService.getByMeetingIdAndMemberId(meetingId, meetingMember.getMemberId());
 			if (!isNullOrEmpty(list) || list.size() > 0) {
 				MeetingMember meetingMemberTemp = list.get(0);
-				if(!isNullOrEmpty(meetingMemberTemp)){
+				if(!isNullOrEmpty(meetingMemberTemp)) {
 					meetingMember.setId(meetingMemberTemp.getId());
 					// 用户已经报名参会
-					if(AttendMeetType.SIGN_UP.code() == meetingMemberTemp.getAttendMeetType()){
+					if(AttendMeetType.SIGN_UP.code() == meetingMemberTemp.getAttendMeetType()) {
 						// 用户已经报名参会，且被审核通过
 						if(meetingMemberTemp.getExcuteMeetSign() == ExcuteMeetSignType.AGREE_SIGN_UP.code()){
 							result = InterfaceResult.getInterfaceResultInstance(CommonResultCode.PARAMS_EXCEPTION, "该用户已经参加了该会议");
@@ -209,6 +211,9 @@ public class MeetingMemberController extends BaseController {
 				meetingMember.setMemberType(1);
 				meetingMemberService.saveOrUpdate(meetingMember);
 				meetingMember.setAttendMeetTime(new Date());
+                //send invitation
+                meetingNotifyService.addInvitationNotify(meetingMember.getMemberId(), meeting.getCreateId(),
+                        meeting.getCreateName(), meeting.getId(), meeting.getMeetingName(), meeting.getStartTime().getTime());
 				logger.info("操作成功");
 			}
 		} catch (Exception e) {
