@@ -625,6 +625,7 @@ public class MeetingMemberController extends BaseController {
 			}
 			if (payOrder.getStatus() != PayStatus.PAY_SUCCESS.getValue()) {
 				// 支付失败则删除 报名信息
+				logger.info("----支付未成功-----");
 				meetingSignLabelDataService.deleteByMeetingIdAndMemberId(meetingId, memberId);
 				try {
 					meetingMongoService.deleteMeetingByIdAndUserId(meetingId, memberId);

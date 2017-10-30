@@ -24,7 +24,7 @@ public class DataSyncMongoDaoImpl implements DataSyncMongoDao {
     @Override
     public void saveDataSync(DataSync data) {
 
-        mongoTemplate.save(data, "dataSync");
+        mongoTemplate.insert(data, "dataSync");
     }
 
     @Override
