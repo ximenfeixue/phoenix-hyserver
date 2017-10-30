@@ -2,6 +2,7 @@ package com.ginkgocap.ywxt.dao.meeting.impl;
 
 import com.ginkgocap.ywxt.dao.meeting.DataSyncMongoDao;
 import com.ginkgocap.ywxt.model.meeting.DataSync;
+import com.ginkgocap.ywxt.utils.MeetingFilePrimaryKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +29,8 @@ public class DataSyncMongoDaoImpl implements DataSyncMongoDao {
     public void saveDataSync(DataSync data) {
 
         try {
+            String id = MeetingFilePrimaryKey.getPrimaryKey();
+            data.setId(id);
             mongoTemplate.insert(data, "dataSync");
         } catch (Exception e) {
             e.printStackTrace();
@@ -41,7 +44,7 @@ public class DataSyncMongoDaoImpl implements DataSyncMongoDao {
     }
 
     @Override
-    public boolean deleteDataSync(Object id) {
+    public boolean deleteDataSync(String id) {
 
         DataSync dataSync = null;
         Query query = new Query(Criteria.where("_id").is(id));

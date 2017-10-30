@@ -128,7 +128,7 @@ public class DataSyncTask implements Runnable{
             dataSyncService.saveDataSync(data);
             addQueue(data);
         } catch (Exception ex) {
-            logger.error("save sync data failed: dataSync: {}",data);
+            logger.error("save sync data failed: dataSync: {}", data.getId());
             return false;
         }
         return true;

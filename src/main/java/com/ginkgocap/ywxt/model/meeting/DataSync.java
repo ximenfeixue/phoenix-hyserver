@@ -12,7 +12,7 @@ public class DataSync<T> implements Serializable {
     /**
      * 唯一 主键
      */
-    private Object id;
+    private String id;
     /**
      * 同步数据 对象
      */
@@ -28,11 +28,11 @@ public class DataSync<T> implements Serializable {
         this.data = data;
     }
 
-    public Object getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Object id) {
+    public void setId(String id) {
         this.id = id;
     }
 }

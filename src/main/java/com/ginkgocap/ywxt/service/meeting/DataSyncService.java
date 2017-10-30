@@ -13,7 +13,7 @@ public interface DataSyncService {
 
     void batchSaveDataSync(List<DataSync> dataList);
 
-    boolean deleteDataSync(final Object id);
+    boolean deleteDataSync(final String id);
 
     List<DataSync> getDataSyncList();
 }

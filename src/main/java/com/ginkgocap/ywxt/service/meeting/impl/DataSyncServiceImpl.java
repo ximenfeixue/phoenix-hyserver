@@ -28,7 +28,7 @@ public class DataSyncServiceImpl implements DataSyncService {
     }
 
     @Override
-    public boolean deleteDataSync(Object id) {
+    public boolean deleteDataSync(String id) {
         return dataSyncMongoDao.deleteDataSync(id);
     }
 
