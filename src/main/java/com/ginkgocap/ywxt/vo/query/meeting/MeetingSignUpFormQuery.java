@@ -30,6 +30,8 @@ public class MeetingSignUpFormQuery implements Serializable{
     private Byte friendStatus;
     // 报名人 行业
     private String industry;
+    // 订单号
+    private String orderNumber;
 
     public Long getCreateTime() {
         return createTime;
@@ -93,5 +95,13 @@ public class MeetingSignUpFormQuery implements Serializable{
 
     public void setMeetingId(Long meetingId) {
         this.meetingId = meetingId;
+    }
+
+    public String getOrderNumber() {
+        return orderNumber;
+    }
+
+    public void setOrderNumber(String orderNumber) {
+        this.orderNumber = orderNumber;
     }
 }

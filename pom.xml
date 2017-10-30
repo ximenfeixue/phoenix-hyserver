@@ -580,12 +580,18 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-		<!--  -->
+		<!-- util -->
 		<dependency>
 			<groupId>com.gintong.frame</groupId>
 			<artifactId>phoenix-frame-util</artifactId>
 			<version>${frame.util.version}</version>
 		</dependency>
+		<!-- 支付 -->
+        <dependency>
+            <groupId>com.ginkgocap.ywxt</groupId>
+            <artifactId>phoenix-payment-api</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
 	</dependencies>
 	<build>
 		<finalName>phoenix-hyserver</finalName>

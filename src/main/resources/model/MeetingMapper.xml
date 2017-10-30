@@ -36,6 +36,9 @@ PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
 		<result property="isPay" column="is_pay"/>
 		<result property="payMoney" column="pay_money"/>
 		<result property="sendFalg" column="send_flag"/>
+		<result property="reviewFlag" column="review_flag"/>
+		<result property="signReminderTime" column="sign_reminder_time"/>
+		<result property="isSign" column="is_sign"/>
 	</resultMap>
 	
 	<sql id="columns">
@@ -48,7 +51,7 @@ PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
 			create_id AS createId,create_name AS createName,task_id AS taskId,create_time AS createTime,
 			update_time AS updateTime,group_id AS groupId,industry,is_delete AS isDelete,formated_desc AS formatedDesc,
 			create_user_type AS createUserType, top AS top, disable AS disable, is_pay AS isPay, pay_money AS payMoney,
-			send_flag AS sendFalg
+			send_flag AS sendFalg, review_flag as reviewFlag, sign_reminder_time AS signReminderTime, is_sign AS isSign
 		]]>
 	</sql>
 
@@ -84,7 +87,10 @@ PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
         	disable,
         	is_pay,
         	pay_money,
-        	send_flag
+        	send_flag,
+        	sign_reminder_time,
+        	review_flag,
+        	is_sign
         ) VALUES (
         	#{id},
         	#{meetingName},
@@ -115,7 +121,10 @@ PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
         	#{disable},
         	#{isPay},
         	#{payMoney},
-        	#{sendFalg}
+        	#{sendFalg},
+        	#{signReminderTime},
+        	#{reviewFlag},
+        	#{isSign}
         )
         
     ]]>
@@ -151,7 +160,10 @@ PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
 	        disable = #{disable},
 	        is_pay = #{isPay},
 	        pay_money = #{payMoney},
-	        send_flag = #{sendFalg}
+	        send_flag = #{sendFalg},
+	        review_flag = #{reviewFlag},
+	        sign_reminder_time = #{signReminderTime},
+	        is_sign = #{isSign}
         WHERE id = #{id} 
     ]]>
 	</update>
@@ -333,6 +345,8 @@ PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
 			m.group_id AS groupId,
 			m.top AS top,
 			m.disable AS disable,
+			m.review_flag AS reviewFlag,
+			m.sign_reminder_time AS signReminderTime,
 			p.pic_path AS path
 		FROM tb_meeting AS m 
 		INNER JOIN tb_meeting_member AS mm 

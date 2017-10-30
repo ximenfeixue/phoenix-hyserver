@@ -183,4 +183,5 @@
         <property name="nfsHome" value="${nfs.home}"/>
         <property name="nginxRoot" value="${nginx.root}"/>
     </bean>
+    <bean id="dataSyncScheduler" class="com.ginkgocap.ywxt.task.DataSyncScheduler"/>
 </beans>

@@ -2,6 +2,7 @@
 package com.ginkgocap.ywxt.controller.meeting;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -9,17 +10,26 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.ginkgocap.ywxt.payment.model.PayOrder;
+import com.ginkgocap.ywxt.payment.service.PayOrderService;
+import com.ginkgocap.ywxt.payment.utils.BeanUtil;
+import com.ginkgocap.ywxt.payment.utils.PayStatus;
 import com.ginkgocap.ywxt.service.meeting.*;
-import com.ginkgocap.ywxt.vo.query.meeting.MeetingCustom;
-import com.ginkgocap.ywxt.vo.query.meeting.MeetingSignUpFormQuery;
+import com.ginkgocap.ywxt.utils.*;
+import com.ginkgocap.ywxt.vo.query.meeting.*;
+import com.gintong.frame.util.dto.CommonResultCode;
+import com.gintong.frame.util.dto.InterfaceResult;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
+import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
+import org.openqa.selenium.By;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,10 +54,6 @@ import com.ginkgocap.ywxt.person.model.WorkExperience;
 import com.ginkgocap.ywxt.person.service.PersonService;
 import com.ginkgocap.ywxt.user.model.User;
 import com.ginkgocap.ywxt.user.service.UserService;
-import com.ginkgocap.ywxt.utils.DateUtil;
-import com.ginkgocap.ywxt.utils.GinTongInterface;
-import com.ginkgocap.ywxt.utils.ThreadPoolUtils;
-import com.ginkgocap.ywxt.utils.Utils;
 import com.ginkgocap.ywxt.utils.type.AttendMeetStatusType;
 import com.ginkgocap.ywxt.utils.type.AttendMeetType;
 import com.ginkgocap.ywxt.utils.type.DefaultSignUpMeetingLabelType;
@@ -56,8 +62,6 @@ import com.ginkgocap.ywxt.utils.type.MeetingStatusType;
 import com.ginkgocap.ywxt.utils.type.NoticeReceiverType;
 import com.ginkgocap.ywxt.utils.type.NoticeType;
 import com.ginkgocap.ywxt.utils.type.SexType;
-import com.ginkgocap.ywxt.vo.query.meeting.MeetingSignLabelDataQuery;
-import com.ginkgocap.ywxt.vo.query.meeting.UserBean;
 //import com.gintong.easemob.server.httpclient.api.EasemobChatGroupsHandler;
 
 /**
@@ -95,35 +99,28 @@ public class MeetingMemberController extends BaseController {
 	private ImRecordmessageService imRecordmessageService;
 	@Autowired
 	private MeetingMongoService meetingMongoService;
-	
+	@Resource
+	private PayOrderService payOrderService;
+
 	private final Logger logger = LoggerFactory.getLogger(getClass());
-	
-	/**
-	 * 名称: addMettingMemberGet 描述: 当面邀请
-	 * 
-	 * @param request 请求
-	 * @param response 响应
-	 * @return model
-	 */
-	@ResponseBody
-	@RequestMapping(value = "/add.json", method = RequestMethod.GET)
-	public Map<String, Object> addMettingMemberGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-		Map<String, Object> model = addMettingMember(request, response);
-		return model;
-	}
+
+	private final Byte reviewFlag = 0;
+
 
 	/**
 	 * 名称: addMettingMember 描述: 当面邀请
-	 * 
+	 * 先判断是否需要支付 通过订单号
 	 * @param request 请求
 	 * @param response 响应
 	 * @return model
 	 */
 	@ResponseBody
-	@RequestMapping(value = "/add.json", method = RequestMethod.POST)
-	public Map<String, Object> addMettingMember(HttpServletRequest request,	HttpServletResponse response) {
+	@RequestMapping(value = "/add.json", method = {RequestMethod.POST, RequestMethod.GET})
+	public InterfaceResult addMettingMember(HttpServletRequest request,
+			HttpServletResponse response) {
 		// 获取json参数串
 		String requestJson = "";
+		InterfaceResult result = null;
 		try {
 			requestJson = getJsonParamStr(request);
 		} catch (IOException e) {
@@ -131,149 +128,100 @@ public class MeetingMemberController extends BaseController {
 			e.printStackTrace();
 		}
 		// 封装 response
-		Map<String, Object> model = new HashMap<String, Object>();
 		Map<String, Object> responseDataMap = new HashMap<String, Object>();
-		Map<String, Object> notificationMap = new HashMap<String, Object>();
 		User user = getUser(request);
-		if (!isNullOrEmpty(user) && !isNullOrEmpty(requestJson)) {
-			try {
-				JSONObject j = JSONObject.fromObject(requestJson);
-				// json 转为对象
-				MeetingMember meetingMember = (MeetingMember) JSONObject.toBean(j, MeetingMember.class);
-				if (isNullOrEmpty(meetingMember) || isNullOrEmpty(meetingMember.getMeetingId())) {
-					responseDataMap.put("succeed", false);
-					notificationMap.put("notifCode", "0002");
-					notificationMap.put("notifInfo", "参数异常!");
-				} else {
-					Meeting meeting = meetingService.getById(meetingMember.getMeetingId());
-					if (isNullOrEmpty(meeting)) {
-						responseDataMap.put("succeed", false);
-						notificationMap.put("notifCode", "0002");
-						notificationMap.put("notifInfo", "会议不存在");
-					} else {
-						String homePage = "";
-						List<MeetingPic> listMeetingPic = meetingPicService.getByModuleId(meetingMember.getMeetingId(), MeetingPic.MODULE_TYPE_MEETING);
-						if(!Utils.isNullOrEmpty(listMeetingPic)) {
-							for(MeetingPic meetingPic : listMeetingPic) {
-								if(!Utils.isNullOrEmpty(meetingPic)	&& !Utils.isNullOrEmpty(meetingPic.getIshomePage())
-										&& (1==meetingPic.getIshomePage().intValue())) {
-									homePage = meetingPic.getPicPath();
-									break;
-								}
-							}
-						}
-						if (!isNullOrEmpty(meetingMember.getId())) {
-							responseDataMap.put("succeed", false);
-							notificationMap.put("notifCode", "0002");
-							notificationMap.put("notifInfo", "参数异常，id不应有值");
-						} else {
-							List<MeetingMember> list = meetingMemberService.getByMeetingIdAndMemberId(
-											meetingMember.getMeetingId(),
-											meetingMember.getMemberId());
-							if (!isNullOrEmpty(list) || list.size() > 0) {
-								MeetingMember meetingMemberTemp=list.get(0);
-								if(!isNullOrEmpty(meetingMemberTemp)){
-									meetingMember.setId(meetingMemberTemp.getId());
-									// 用户已经报名参会
-									if(AttendMeetType.SIGN_UP.code()==meetingMemberTemp.getAttendMeetType()){
-										// 用户已经报名参会，且被审核通过
-										if(meetingMemberTemp.getExcuteMeetSign()==ExcuteMeetSignType.AGREE_SIGN_UP.code()){
-											responseDataMap.put("succeed", true);
-											notificationMap.put("notifCode", "0002");
-											notificationMap.put("notifInfo", "该用户已经参加了该会议");
-										}else{
-											// 用户已经报名参会，且被审核拒绝或者未审核
-											meetingMember.setId(meetingMemberTemp.getId());
-											meetingMember.setAttendMeetType(0);
-											meetingMember.setMemberMeetStatus(1);
-											meetingMember.setMemberType(1);
-											meetingMember.setAttendMeetTime(new Date());
-											meetingMemberService.saveOrUpdate(meetingMember);
-											responseDataMap.put("succeed", true);
-											logger.info("操作成功");
-											notificationMap.put("notifCode", "0001");
-											notificationMap.put("notifInfo", "hello mobile app!");
-											//增加动态
-											/*
-											List<Long> listUserId = new ArrayList<Long>();
-											listUserId.add(meetingMember.getMemberId());
-			 								this.insertNewsAndRelation(meeting, homePage, user, listUserId);*/
-										}
-										// 用户被邀请参会
-									}else if(AttendMeetType.INVITATION.code()==meetingMemberTemp.getAttendMeetType()){
-										// 用户被邀请参会 并且已经接受邀请
-										if(AttendMeetStatusType.ACCEPT_INVITATION.code()==meetingMemberTemp.getAttendMeetStatus()){
-											responseDataMap.put("succeed", true);
-											notificationMap.put("notifCode", "0002");
-											notificationMap.put("notifInfo", "该用户已经参加了该会议");
-										}else{
-											// 用户被邀请参会，没有接受邀请
-											meetingMember.setId(meetingMemberTemp.getId());
-											meetingMember.setAttendMeetType(0);
-											meetingMember.setMemberMeetStatus(1);
-											meetingMember.setMemberType(1);
-											meetingMember.setAttendMeetTime(new Date());
-											meetingMemberService.saveOrUpdate(meetingMember);
-											responseDataMap.put("succeed", true);
-											logger.info("操作成功");
-											notificationMap.put("notifCode", "0001");
-											notificationMap.put("notifInfo", "hello mobile app!");
-										}
-									}
-								} else {
-									logger.error("MeetingMember垃圾数据:meeting_id="+meetingMember.getMeetingId()+",member_id="+meetingMember.getMemberId());
-									responseDataMap.put("succeed", false);
-									notificationMap.put("notifCode", "0002");
-									notificationMap.put("notifInfo", "该用户已经参加了该会议");
-								}
-							} else {
-								meetingMember.setAttendMeetStatus(0);
-								meetingMember.setAttendMeetType(0);
-								meetingMember.setMemberMeetStatus(0);
-								meetingMember.setMemberType(1);
-								meetingMemberService.saveOrUpdate(meetingMember);
-								meetingMember.setAttendMeetTime(new Date());
-								responseDataMap.put("succeed", true);
-								notificationMap.put("notifCode", "0001");
-								notificationMap.put("notifInfo", "hello mobile app!");
-								logger.info("操作成功");
-								
-								/**
-								 * 集成环信：往会议中添加新成员,只有接受邀请的才能注册到环信
-								 */
-								//TODO (keifer) 需要测试
-								/*final String chatGroupId = meeting.getGroupId();
-								final Long addMemberId = meetingMember.getMemberId();
-								executorService.execute(new Runnable() {
-									@Override
-									public void run() {
-										addUsersToChatGroups(chatGroupId,addMemberId);
-									}
-								});*/
-								
-								//增加动态
-								/*List<Long> listUserId = new ArrayList<Long>();
-								listUserId.add(meetingMember.getMemberId());
-								this.insertNewsAndRelation(meeting, homePage, user, listUserId);*/
-							}
-						}
-					}
-				}
-			} catch (Exception e) {
-				responseDataMap.put("succeed", false);
-				notificationMap.put("notifCode", "0002");
-				notificationMap.put("notifInfo", "参数异常");
-				logger.error("当面邀请失败", e);
-			}
-		} else {
+		if (null == user || StringUtils.isBlank(requestJson)) {
+			result = InterfaceResult.getInterfaceResultInstance(CommonResultCode.PARAMS_EXCEPTION, "当面邀请失败");
 			responseDataMap.put("succeed", false);
-			notificationMap.put("notifCode", "0002");
-			notificationMap.put("notifInfo", "参数异常");
-			logger.error("传入参数异常");
+			result.setResponseData(responseDataMap);
+			return result;
 		}
-		model.put("responseData", responseDataMap);
-		model.put("notification", notificationMap);
-		return model;
+		JSONObject j = JSONObject.fromObject(requestJson);
+		// json 转为对象
+		MeetingMember meetingMember = (MeetingMember) JSONObject.toBean(j, MeetingMember.class);
+		if (isNullOrEmpty(meetingMember) || isNullOrEmpty(meetingMember.getMeetingId())) {
+			result = InterfaceResult.getInterfaceResultInstance(CommonResultCode.PARAMS_EXCEPTION);
+			responseDataMap.put("succeed", false);
+			result.setResponseData(responseDataMap);
+			return result;
+		}
+		long meetingId = meetingMember.getMeetingId();
+		Meeting meeting = meetingService.getById(meetingId);
+		try {
+			if (isNullOrEmpty(meeting)) {
+				result = InterfaceResult.getInterfaceResultInstance(CommonResultCode.PARAMS_EXCEPTION, "会议不存在");
+				responseDataMap.put("succeed", false);
+				result.setResponseData(responseDataMap);
+				return result;
+			}
+			List<MeetingMember> list = meetingMemberService.getByMeetingIdAndMemberId(
+					meetingId, meetingMember.getMemberId());
+			if (!isNullOrEmpty(list) || list.size() > 0) {
+				MeetingMember meetingMemberTemp = list.get(0);
+				if(!isNullOrEmpty(meetingMemberTemp)){
+					meetingMember.setId(meetingMemberTemp.getId());
+					// 用户已经报名参会
+					if(AttendMeetType.SIGN_UP.code() == meetingMemberTemp.getAttendMeetType()){
+						// 用户已经报名参会，且被审核通过
+						if(meetingMemberTemp.getExcuteMeetSign() == ExcuteMeetSignType.AGREE_SIGN_UP.code()){
+							result = InterfaceResult.getInterfaceResultInstance(CommonResultCode.PARAMS_EXCEPTION, "该用户已经参加了该会议");
+							responseDataMap.put("succeed", false);
+							result.setResponseData(responseDataMap);
+							return result;
+						}
+						// 用户已经报名参会，且被审核拒绝或者未审核
+						meetingMember.setId(meetingMemberTemp.getId());
+						meetingMember.setAttendMeetType(0);
+						meetingMember.setMemberMeetStatus(1);
+						meetingMember.setMemberType(1);
+						meetingMember.setAttendMeetTime(new Date());
+						meetingMemberService.saveOrUpdate(meetingMember);
+						logger.info("操作成功");
+						// 用户被邀请参会
+					} else if (AttendMeetType.INVITATION.code() == meetingMemberTemp.getAttendMeetType()){
+						// 用户被邀请参会 并且已经接受邀请
+						if (AttendMeetStatusType.ACCEPT_INVITATION.code() == meetingMemberTemp.getAttendMeetStatus()){
+							result = InterfaceResult.getInterfaceResultInstance(CommonResultCode.PARAMS_EXCEPTION, "该用户已经参加了该会议");
+							responseDataMap.put("succeed", false);
+							result.setResponseData(responseDataMap);
+							return result;
+						}
+						// 用户被邀请参会，没有接受邀请
+						meetingMember.setId(meetingMemberTemp.getId());
+						meetingMember.setAttendMeetType(0);
+						meetingMember.setMemberMeetStatus(1);
+						meetingMember.setMemberType(1);
+						meetingMember.setAttendMeetTime(new Date());
+						meetingMemberService.saveOrUpdate(meetingMember);
+						logger.info("操作成功");
+					}
+				} else {
+					logger.error("MeetingMember垃圾数据:meeting_id=" + meetingId+",member_id=" + meetingMember.getMemberId());
+					result = InterfaceResult.getInterfaceResultInstance(CommonResultCode.PARAMS_EXCEPTION, "该用户已经参加了该会议");
+					responseDataMap.put("succeed", false);
+					result.setResponseData(responseDataMap);
+					return result;
+				}
+			} else {
+				meetingMember.setAttendMeetStatus(0);
+				meetingMember.setAttendMeetType(0);
+				meetingMember.setMemberMeetStatus(0);
+				meetingMember.setMemberType(1);
+				meetingMemberService.saveOrUpdate(meetingMember);
+				meetingMember.setAttendMeetTime(new Date());
+				logger.info("操作成功");
+			}
+		} catch (Exception e) {
+			logger.error("当面邀请失败", e);
+			result = InterfaceResult.getInterfaceResultInstance(CommonResultCode.PARAMS_EXCEPTION, "当面邀请失败");
+			responseDataMap.put("succeed", false);
+			result.setResponseData(responseDataMap);
+			return result;
+		}
+		result = InterfaceResult.getInterfaceResultInstance(CommonResultCode.SUCCESS);
+		responseDataMap.put("succeed", true);
+		result.setResponseData(responseDataMap);
+		return result;
 	}
 
 	/*
@@ -380,7 +328,7 @@ public class MeetingMemberController extends BaseController {
 								notificationMap.put("notifCode", "0002");
 								notificationMap.put("notifInfo", "您没有参加该会议");
 							} else {
-								if (!isNullOrEmpty(meetingMember.getIsSign())&&meetingMember.getIsSign() == 1) {
+								if (!isNullOrEmpty(meetingMember.getIsSign()) && meetingMember.getIsSign() == 1) {
 									responseDataMap.put("succeed", true);
 									notificationMap.put("notifCode", "0001");
 									notificationMap.put("notifInfo", "签到成功");
@@ -630,9 +578,140 @@ public class MeetingMemberController extends BaseController {
 		return model;
 	}
 
-	
-	
-	
+	/**
+	 * @Date 2017/10/24
+	 * 报名活动, 先检查是否付费成功，失败则删掉报名相关信息
+	 * 若当前活动不需要审核，则报名成功直接等待进入活动
+	 * @param request
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/signUpMeeting", method = RequestMethod.POST)
+	public InterfaceResult signUpMeeting(HttpServletRequest request) {
+
+		User user = this.getUser(request);
+		String requestJson = null;
+		PayOrder payOrder = null;
+		Long memberId = user.getId();
+		String picPath = user.getPicPath();
+		String userName = user.getName();
+		try {
+			requestJson = getJsonParamStr(request);
+		} catch (IOException e) {
+			logger.error("传入参数异常");
+			e.printStackTrace();
+		}
+		MeetingSignQuery meetingSignQuery = GsonUtils.StringToObject(MeetingSignQuery.class, requestJson);
+		final Long meetingId = meetingSignQuery.getMeetingId();
+		Meeting meeting = meetingService.getById(meetingId);
+		Integer count = meetingMemberService.getSignUpMemberCount(meetingId);
+		if (!isNullOrEmpty(meeting.getMemberCount()) && meeting.getMemberCount() > 0 && meeting.getMemberCount() <= count) {
+			return InterfaceResult.getInterfaceResultInstance(CommonResultCode.PARAMS_EXCEPTION, "报名人数已满额，不能加入活动");
+		}
+		// 获取订单号
+		String orderNumber = meetingSignQuery.getOrderNumber();
+		if (StringUtils.isNotBlank(orderNumber)) {
+			try {
+				payOrder = payOrderService.getPayOrder(orderNumber);
+			} catch (Exception e) {
+				logger.error("invoke payOrderService failed! method :{getPayOrder}. userId : " + memberId);
+				return InterfaceResult.getInterfaceResultInstance(CommonResultCode.PARAMS_EXCEPTION, "支付模块挂掉了");
+			}
+			if (payOrder == null || payOrder.getUserId() != memberId) {
+				return InterfaceResult.getInterfaceResultInstance(CommonResultCode.PARAMS_EXCEPTION, "没查到该订单信息");
+			}
+			if (payOrder.getStatus() != PayStatus.PAY_SUCCESS.getValue()) {
+				// 支付失败则删除 报名信息
+				logger.info("----支付未成功-----");
+				meetingSignLabelDataService.deleteByMeetingIdAndMemberId(meetingId, memberId);
+				try {
+					meetingMongoService.deleteMeetingByIdAndUserId(meetingId, memberId);
+				} catch (Exception e) {
+					logger.error("invoke meetingMongoService failed! method :{deleteMeetingByIdAndUserId}. userId : " + memberId + " meetingId ：" + meetingId);
+				}
+				return InterfaceResult.getInterfaceResultInstance(CommonResultCode.PARAMS_EXCEPTION, "该订单还未支付成功");
+			}
+		} else {
+			logger.info("该活动是免费报名的！ meetingId : []" + meetingId);
+		}
+		List<MeetingMember> list = meetingMemberService.getByMeetingIdAndMemberId(meetingId, memberId);
+		if (!isNullOrEmpty(list)) {
+			MeetingMember meetingMember = list.get(0);
+			if (!isNullOrEmpty(meetingMember)) {
+				if (meetingMember.getAttendMeetType() == 0) {
+					if (AttendMeetStatusType.REFUSE_INVITATION.code() != meetingMember.getAttendMeetStatus()) {
+						return InterfaceResult.getInterfaceResultInstance(CommonResultCode.PARAMS_EXCEPTION, "会议举办方已经邀请您参会，无需报名");
+					} else {
+						// 报名
+						try {
+							signUp(meetingMember.getId(), userName, picPath, memberId, user, meeting);
+						} catch (Exception e) {
+							e.printStackTrace();
+							logger.error(e.getMessage(), "报名失败！ userId : " + memberId);
+							return InterfaceResult.getInterfaceResultInstance(CommonResultCode.PARAMS_EXCEPTION, "报名失败！");
+						}
+					}
+				} else if (meetingMember.getAttendMeetType() == 1 && meetingMember.getExcuteMeetSign() == 2){
+					// 报名
+					try {
+						signUp(meetingMember.getId(), userName, picPath, memberId, user, meeting);
+					} catch (Exception e) {
+						e.printStackTrace();
+						logger.error(e.getMessage(), "报名失败！ userId : " + memberId);
+						return InterfaceResult.getInterfaceResultInstance(CommonResultCode.PARAMS_EXCEPTION, "报名失败！");
+					}
+				} else {
+					return InterfaceResult.getInterfaceResultInstance(CommonResultCode.PARAMS_EXCEPTION, "等待审核或者您已经参会");
+				}
+			}
+		} else {
+			// 报名
+			try {
+				signUp(null, userName, picPath, memberId, user, meeting);
+			} catch (Exception e) {
+				e.printStackTrace();
+				logger.error(e.getMessage(), "报名失败！ userId : " + memberId);
+				return InterfaceResult.getInterfaceResultInstance(CommonResultCode.PARAMS_EXCEPTION, "报名失败！");
+			}
+		}
+		// 若当前活动不需要审核，则报名成功直接等待进入活动
+		if (reviewFlag.equals(meeting.getReviewFlag())) {
+			addMUC(meeting, memberId);
+		}
+		return InterfaceResult.getSuccessInterfaceResultInstance(true);
+	}
+
+	/**
+	 * 若当前活动不需要审核，则报名成功直接等待进入活动
+	 */
+	private void addMUC(Meeting meeting, Long memberId) {
+
+		/**
+		 * 集成环信：会议添加成员
+		 */
+		final Long userId = memberId;
+		final Long creatorUserId = meeting.getCreateId();
+		final String groupId = meeting.getGroupId();
+		ThreadPoolUtils.getExecutorService().execute(new Runnable() {
+			@Override
+			public void run() {
+				//2016-03-03 tanm 将操作环信的部分改为操作畅聊
+				GinTongInterface.invite2MUC(creatorUserId, Arrays.asList(Long.valueOf(userId)), groupId);
+			}
+		});
+		//增加ImRecordmessage记录
+		ImRecordmessage recordMessageBean = new ImRecordmessage();
+		recordMessageBean.setUserId(Integer.valueOf(memberId.toString()));
+		recordMessageBean.setMucId(Integer.valueOf(String.valueOf(meeting.getId())));
+		recordMessageBean.setMucCreateUserId(Integer.valueOf(String.valueOf(meeting.getCreateId())));
+		recordMessageBean.setType(3);//标示会议
+		recordMessageBean.setNewCount(0);
+		recordMessageBean.setMucStartDate(meeting.getStartTime());
+		recordMessageBean.setMessageStartTime(new Date());
+		recordMessageBean.setStatus(String.valueOf(meeting.getMeetingStatus()));
+		imRecordmessageService.saveOrUpdate(recordMessageBean);
+	}
+
 	/**
 	 * 名称: signUpMeetingGet 描述: 报名会议
 	 *
@@ -809,8 +888,9 @@ public class MeetingMemberController extends BaseController {
 		meetingMemberService.signUp(meeting, meetingMember, user);
 	}
 
+
 	/**
-	 * 名称: changeAttendMeetStatusGet 描述: 改变成员参会状态: 0未答复1接受邀请（取消报名）2拒绝邀请，5取消报名
+	 * 名称: changeAttendMeetStatusGet 描述: 改变成员参会状态: 0未答复 1接受邀请（取消报名）2拒绝邀请，5取消报名 6.退出活动
 	 *
 	 * @param request 请求
 	 * @param response 响应
@@ -847,6 +927,7 @@ public class MeetingMemberController extends BaseController {
 		Map<String, Object> model = new HashMap<String, Object>();
 		Map<String, Object> responseDataMap = new HashMap<String, Object>();
 		Map<String, Object> notificationMap = new HashMap<String, Object>();
+		PayOrder payOrder = null;
 		if (!isNullOrEmpty(requestJson)) {
 			try {
 				User user = getUser(request);
@@ -856,71 +937,123 @@ public class MeetingMemberController extends BaseController {
 				String groupId = getStringJsonValueByKey(j, "groupId");
 				// 会议成员id
 				String memberIdStr = getStringJsonValueByKey(j, "memberId");
-				// type 操作类型：0.未答复 1接受邀请2拒绝邀请， 4 报名 5取消报名
+				// type 操作类型：0.未答复 1.接受邀请 2.拒绝邀请， 4.报名 5.取消报名 6.退出活动
 				String type = getStringJsonValueByKey(j, "type");
-
-				if (Utils.isAllNotNullOrEmpty(meetingIdStr, memberIdStr, type)) {
-					Meeting meeting = meetingService.getById(Long.valueOf(meetingIdStr));
-					if (isNullOrEmpty(meeting)) {
+				// orderNumber 订单号
+				String orderNumber = getStringJsonValueByKey(j, "orderNumber");
+				long meetingId = Long.valueOf(meetingIdStr);
+				Integer count = meetingMemberService.getSignUpMemberCount(meetingId);
+				long memberId = Long.valueOf(memberIdStr);
+				Meeting meeting = meetingService.getById(meetingId);
+				if (null == meeting) {
+					responseDataMap.put("succeed", false);
+					notificationMap.put("notifCode", "0002");
+					notificationMap.put("notifInfo", "会议不存在");
+					model.put("responseData", responseDataMap);
+					model.put("notification", notificationMap);
+					return model;
+				}
+				if (!isNullOrEmpty(meeting.getMemberCount()) && meeting.getMemberCount() > 0 && meeting.getMemberCount() <= count) {
+					responseDataMap.put("succeed", false);
+					notificationMap.put("notifCode", "0002");
+					notificationMap.put("notifInfo", "报名人数已满额，不能加入活动");
+					model.put("responseData", responseDataMap);
+					model.put("notification", notificationMap);
+					return model;
+				}
+				if (StringUtils.isNotBlank(orderNumber)) {
+					try {
+						payOrder = payOrderService.getPayOrder(orderNumber);
+					} catch (Exception e) {
+						logger.error("invoke payOrderService failed! method :{getPayOrder}. userId : " + memberId);
 						responseDataMap.put("succeed", false);
 						notificationMap.put("notifCode", "0002");
-						notificationMap.put("notifInfo", "会议不存在!");
-					} else {
-						if(AttendMeetStatusType.ACCEPT_INVITATION.code()==Integer.valueOf(type)||AttendMeetStatusType.REFUSE_INVITATION.code()==Integer.valueOf(type)){
-							// 只有未开始和进行中的会议可以接受邀请或者拒绝邀请
-							if(MeetingStatusType.NOT_BEGIN.code()==meeting.getMeetingStatus()||MeetingStatusType.IN_MEETING.code()==meeting.getMeetingStatus()){
+						notificationMap.put("notifInfo", "支付模块挂掉了");
+						model.put("responseData", responseDataMap);
+						model.put("notification", notificationMap);
+						return model;
+					}
+					if (payOrder == null || payOrder.getUserId() != memberId) {
+						responseDataMap.put("succeed", false);
+						notificationMap.put("notifCode", "0002");
+						notificationMap.put("notifInfo", "没查到该订单信息");
+						model.put("responseData", responseDataMap);
+						model.put("notification", notificationMap);
+						return model;
+					}
+					if (payOrder.getStatus() != PayStatus.PAY_SUCCESS.getValue()) {
+						// 支付失败则删除 报名信息
+						meetingSignLabelDataService.deleteByMeetingIdAndMemberId(meetingId, memberId);
+						try {
+							meetingMongoService.deleteMeetingByIdAndUserId(meetingId, memberId);
+						} catch (Exception e) {
+							logger.error("invoke meetingMongoService failed! method :{deleteMeetingByIdAndUserId}. userId : " + memberId + " meetingId ：" + meetingId);
+						}
+						responseDataMap.put("succeed", false);
+						notificationMap.put("notifCode", "0002");
+						notificationMap.put("notifInfo", "该订单还未支付成功");
+						model.put("responseData", responseDataMap);
+						model.put("notification", notificationMap);
+						return model;
+					}
+				}
+				// 报名审核 有单独接口 signUpReview.json  （在 AttendMeetStatusType.SIGN_UP.code() == type 的情况）
+				if (Utils.isAllNotNullOrEmpty(meetingIdStr, memberIdStr, type)) {
+					if(AttendMeetStatusType.ACCEPT_INVITATION.code() == Integer.valueOf(type) || AttendMeetStatusType.REFUSE_INVITATION.code() == Integer.valueOf(type)){
+						// 只有未开始和进行中的会议可以接受邀请或者拒绝邀请
+						if(MeetingStatusType.NOT_BEGIN.code() == meeting.getMeetingStatus() || MeetingStatusType.IN_MEETING.code() == meeting.getMeetingStatus()){
 
-							    meetingMemberService.changeAttendMeetStatus(Long.valueOf(meetingIdStr), Long.valueOf(memberIdStr), Integer.valueOf(type), user);
-								responseDataMap.put("succeed", true);
-								notificationMap.put("notifCode", "0001");
-								notificationMap.put("notifInfo", "hello mobile app!");
-								final String group_Id = StringUtils.isBlank(groupId) ? meeting.getGroupId() : groupId;//解决客户端发送groupId丢失的问题
-								/**
-                                 * 集成环信：会议添加成员
-                                 */
-								final String userId = memberIdStr;
-								final long creatorUserId = meeting.getCreateId();
-								if (AttendMeetStatusType.REFUSE_INVITATION.code() != Integer.valueOf(type)) {
-                                    ThreadPoolUtils.getExecutorService().execute(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            //2016-03-03 tanm 将操作环信的部分改为操作畅聊
-                                            GinTongInterface.invite2MUC(creatorUserId, Arrays.asList(Long.valueOf(userId)), group_Id);
-                                        }
-                                    });
-                                }
-								//增加ImRecordmessage记录
-								ImRecordmessage recordMessageBean = new ImRecordmessage();
-								recordMessageBean.setUserId(Integer.valueOf(memberIdStr));
-								recordMessageBean.setMucId(Integer.valueOf(String.valueOf(meeting.getId())));
-								recordMessageBean.setMucCreateUserId(Integer.valueOf(String.valueOf(meeting.getCreateId())));
-								recordMessageBean.setType(3);//标示会议
-								recordMessageBean.setNewCount(0);
-								recordMessageBean.setMucStartDate(meeting.getStartTime());
-								recordMessageBean.setMessageStartTime(new Date());
-								recordMessageBean.setStatus(String.valueOf(meeting.getMeetingStatus()));
-								imRecordmessageService.saveOrUpdate(recordMessageBean);
-							}else{
-								responseDataMap.put("succeed", false);
-								notificationMap.put("notifCode", "0002");
-								notificationMap.put("notifInfo", "只有未开始和进行中的会议可以接受邀请或者拒绝邀请!");
+							meetingMemberService.changeAttendMeetStatus(Long.valueOf(meetingIdStr), Long.valueOf(memberIdStr), Integer.valueOf(type), user);
+
+							responseDataMap.put("succeed", true);
+							notificationMap.put("notifCode", "0001");
+							notificationMap.put("notifInfo", "hello mobile app!");
+							final String group_Id = StringUtils.isBlank(groupId) ? meeting.getGroupId() : groupId;//解决客户端发送groupId丢失的问题
+							/**
+							 * 集成环信：会议添加成员
+							 */
+							final String userId = memberIdStr;
+							final long creatorUserId = meeting.getCreateId();
+							if (AttendMeetStatusType.REFUSE_INVITATION.code() != Integer.valueOf(type)) {
+								ThreadPoolUtils.getExecutorService().execute(new Runnable() {
+									@Override
+									public void run() {
+										//2016-03-03 tanm 将操作环信的部分改为操作畅聊
+										GinTongInterface.invite2MUC(creatorUserId, Arrays.asList(Long.valueOf(userId)), group_Id);
+									}
+								});
 							}
-						}else if(AttendMeetStatusType.CANCEL_SIGN_UP.code()==Integer.valueOf(type)
-								|| AttendMeetStatusType.QUIT_MEETING.code()==Integer.valueOf(type)){//取消报名、退出会议
-							if(MeetingStatusType.NOT_BEGIN.code()==meeting.getMeetingStatus()
-									|| MeetingStatusType.IN_MEETING.code()==meeting.getMeetingStatus()){
-								meetingMemberService.changeAttendMeetStatus(
-										Long.valueOf(meetingIdStr),
-										Long.valueOf(memberIdStr),
-										Integer.valueOf(type), user);
-								responseDataMap.put("succeed", true);
-								notificationMap.put("notifCode", "0001");
-								notificationMap.put("notifInfo", "hello mobile app!");
-							}else{
-								responseDataMap.put("succeed", false);
-								notificationMap.put("notifCode", "0002");
-								notificationMap.put("notifInfo", "只有未开始和进行中的会议可以退出!");
-							}
+							//增加ImRecordmessage记录
+							ImRecordmessage recordMessageBean = new ImRecordmessage();
+							recordMessageBean.setUserId(Integer.valueOf(memberIdStr));
+							recordMessageBean.setMucId(Integer.valueOf(String.valueOf(meeting.getId())));
+							recordMessageBean.setMucCreateUserId(Integer.valueOf(String.valueOf(meeting.getCreateId())));
+							recordMessageBean.setType(3);//标示会议
+							recordMessageBean.setNewCount(0);
+							recordMessageBean.setMucStartDate(meeting.getStartTime());
+							recordMessageBean.setMessageStartTime(new Date());
+							recordMessageBean.setStatus(String.valueOf(meeting.getMeetingStatus()));
+							imRecordmessageService.saveOrUpdate(recordMessageBean);
+						} else {
+							responseDataMap.put("succeed", false);
+							notificationMap.put("notifCode", "0002");
+							notificationMap.put("notifInfo", "只有未开始和进行中的会议可以接受邀请或者拒绝邀请!");
+						}
+					} else if (AttendMeetStatusType.CANCEL_SIGN_UP.code() == Integer.valueOf(type)
+							|| AttendMeetStatusType.QUIT_MEETING.code() == Integer.valueOf(type)){//取消报名、退出会议
+						if (MeetingStatusType.NOT_BEGIN.code() == meeting.getMeetingStatus()
+								|| MeetingStatusType.IN_MEETING.code() == meeting.getMeetingStatus()){
+							meetingMemberService.changeAttendMeetStatus(
+									Long.valueOf(meetingIdStr),
+									Long.valueOf(memberIdStr),
+									Integer.valueOf(type), user);
+							responseDataMap.put("succeed", true);
+							notificationMap.put("notifCode", "0001");
+							notificationMap.put("notifInfo", "hello mobile app!");
+						} else {
+							responseDataMap.put("succeed", false);
+							notificationMap.put("notifCode", "0002");
+							notificationMap.put("notifInfo", "只有未开始和进行中的会议可以退出!");
 						}
 					}
 				} else {
@@ -929,7 +1062,6 @@ public class MeetingMemberController extends BaseController {
 					notificationMap.put("notifCode", "0002");
 					notificationMap.put("notifInfo", "会议id或者会议成员id为空!");
 				}
-
 			} catch (Exception e) {
 				logger.error("操作异常");
 				responseDataMap.put("succeed", false);
@@ -1342,6 +1474,7 @@ public class MeetingMemberController extends BaseController {
 			throws IOException {
 		// 获取json参数串
 		String requestJson = "";
+		String orderNumber = null;
 		try {
 			requestJson = getJsonParamStr(request);
 		} catch (IOException e) {
@@ -1367,15 +1500,63 @@ public class MeetingMemberController extends BaseController {
 			// 获取用户必填信息
 			JSONObject j = JSONObject.fromObject(requestJson);
 			JSONArray jsonArray = j.getJSONArray("listMeetingSignLabelDataQuery");
-			String meetingId = getStringJsonValueByKey(j, "meetingId");
+			String meetingIdStr = getStringJsonValueByKey(j, "meetingId");
+			Long meetingId = Long.valueOf(meetingIdStr);
+			Meeting meeting = meetingService.getById(meetingId);
+			if (null == meeting) {
+				responseDataMap.put("succeed", false);
+				notificationMap.put("notifCode", "0002");
+				notificationMap.put("notifInfo", "当前活动不存在或已删除");
+				return model;
+			}
+			byte isPay = meeting.getIsPay();
 			List<MeetingSignLabelDataQuery> signLabelDataList = JSONArray.toList(jsonArray, MeetingSignLabelDataQuery.class);
 			if(null != signLabelDataList && signLabelDataList.size() > 0){
 				MeetingSignLabelDataQuery meetingSignLabelDataQuery = signLabelDataList.get(0);
 				if(!Utils.isNullOrEmpty(meetingSignLabelDataQuery)) {
 					//删除已填写的报名信息
 					MeetingSignLabel meetingSignLabel = meetingSignLabelService.getById(meetingSignLabelDataQuery.getMslabelId());
-					if(!Utils.isNullOrEmpty(meetingSignLabel) && !Utils.isNullOrEmpty(user)) {
-						meetingSignLabelDataService.deleteByMeetingIdAndMemberId(meetingSignLabel.getMeetingId(), user.getId());
+					MeetingSignUpFormQuery meetingSignUpForm = meetingMongoService.getMeetingSignFormByMeetingIdAndUserId(meetingId, user.getId());
+					if (null != meetingSignUpForm) {
+						orderNumber = meetingSignUpForm.getOrderNumber();
+					}
+					if (!Utils.isNullOrEmpty(meetingSignLabel) && !Utils.isNullOrEmpty(user)) {
+						// 有报名信息 则核查该活动是否已成功报过名
+						List<MeetingMember> meetingMemberList = meetingMemberService.getByMeetingIdAndMemberId(meetingId, user.getId());
+						if (CollectionUtils.isNotEmpty(meetingMemberList) && null != orderNumber) {
+							MeetingMember meetingMember = meetingMemberList.get(0);
+							// 没删除
+							if (2 != meetingMember.getMemberMeetStatus()) {
+								// 邀请情况
+								if (0 == meetingMember.getAttendMeetType() && 1 == meetingMember.getAttendMeetStatus()) {
+									// 需要付费
+									if (1 == isPay) {
+										PayOrder payOrder = payOrderService.getPayOrder(orderNumber);
+										if (payOrder.getStatus() == PayStatus.PAY_SUCCESS.getValue()) {
+											responseDataMap.put("succeed", false);
+											notificationMap.put("notifCode", "0002");
+											notificationMap.put("notifInfo", "您已成功报名，不需要再填写报名信息");
+											return model;
+										}
+									}
+								}
+								// 报名情况
+								if (1 == meetingMember.getAttendMeetType() && 1 == meetingMember.getExcuteMeetSign()){
+									// 需要付费
+									if (1 == isPay) {
+										PayOrder payOrder = payOrderService.getPayOrder(orderNumber);
+										if (payOrder.getStatus() == PayStatus.PAY_SUCCESS.getValue()) {
+											responseDataMap.put("succeed", false);
+											notificationMap.put("notifCode", "0002");
+											notificationMap.put("notifInfo", "您已成功报名，不需要再填写报名信息");
+											return model;
+										}
+									}
+								}
+							}
+						}
+						meetingSignLabelDataService.deleteByMeetingIdAndMemberId(meetingId, user.getId());
+						meetingMongoService.deleteMeetingByIdAndUserId(meetingId, user.getId());
 					}
 				}
 				//保存新的报名信息
@@ -1628,7 +1809,7 @@ public class MeetingMemberController extends BaseController {
 		return logger;
 	}
 
-	private void saveDataToMongo(User user, String meetingId, List<MeetingSignLabelDataQuery> signLabelDataList) {
+	private void saveDataToMongo(User user, Long meetingId, List<MeetingSignLabelDataQuery> signLabelDataList) {
 		List<MeetingCustom> meetingCustomList = new ArrayList<MeetingCustom>();
 		if (CollectionUtils.isNotEmpty(signLabelDataList)) {
 			for (MeetingSignLabelDataQuery signLabel : signLabelDataList) {
@@ -1641,7 +1822,7 @@ public class MeetingMemberController extends BaseController {
 			}
 		}
 		MeetingSignUpFormQuery signUpForm = new MeetingSignUpFormQuery();
-		signUpForm.setMeetingId(Long.valueOf(meetingId));
+		signUpForm.setMeetingId(meetingId);
 		signUpForm.setCreateTime(System.currentTimeMillis());
 		signUpForm.setIndustry(user.getIndustry());
 		signUpForm.setUserId(user.getId());

@@ -2,6 +2,7 @@ package com.ginkgocap.ywxt.controller.meeting;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -17,14 +18,26 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.ginkgocap.parasol.file.service.FileIndexService;
+import com.ginkgocap.ywxt.model.meeting.*;
+import com.ginkgocap.ywxt.payment.model.PayOrder;
+import com.ginkgocap.ywxt.payment.model.request.PayRequest;
+import com.ginkgocap.ywxt.payment.model.response.PayResponse;
+import com.ginkgocap.ywxt.payment.service.PayOrderService;
+import com.ginkgocap.ywxt.payment.service.PayService;
+import com.ginkgocap.ywxt.payment.utils.PayStatus;
 import com.ginkgocap.ywxt.service.meeting.*;
+import com.ginkgocap.ywxt.task.DataSyncTask;
 import com.ginkgocap.ywxt.user.service.corporation.CorporationRelationService;
 import com.ginkgocap.ywxt.utils.*;
+import com.ginkgocap.ywxt.utils.type.ExcuteMeetSignType;
+import com.ginkgocap.ywxt.utils.type.NoticeReceiverType;
+import com.ginkgocap.ywxt.utils.type.NoticeType;
 import com.ginkgocap.ywxt.vo.query.meeting.*;
 import com.gintong.frame.util.dto.CommonResultCode;
 import com.gintong.frame.util.dto.InterfaceResult;
 import com.gintong.ywxt.im.model.SocialStatus;
 import com.gintong.ywxt.im.service.SocialStatusService;
+import com.mchange.lang.ByteUtils;
 import net.sf.ezmorph.object.DateMorpher;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -34,6 +47,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
+import org.apache.velocity.runtime.parser.node.MathUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,20 +63,6 @@ import com.ginkgocap.ywxt.cache.Cache;
 import com.ginkgocap.ywxt.common.base.BaseController;
 import com.ginkgocap.ywxt.file.model.FileIndex;
 //import com.ginkgocap.ywxt.file.service.FileIndexService;
-import com.ginkgocap.ywxt.model.meeting.ChatMini;
-import com.ginkgocap.ywxt.model.meeting.Meeting;
-import com.ginkgocap.ywxt.model.meeting.MeetingData;
-import com.ginkgocap.ywxt.model.meeting.MeetingMember;
-import com.ginkgocap.ywxt.model.meeting.MeetingNotice;
-import com.ginkgocap.ywxt.model.meeting.MeetingOrgan;
-import com.ginkgocap.ywxt.model.meeting.MeetingPeople;
-import com.ginkgocap.ywxt.model.meeting.MeetingPic;
-import com.ginkgocap.ywxt.model.meeting.MeetingSignLabel;
-import com.ginkgocap.ywxt.model.meeting.MeetingTime;
-import com.ginkgocap.ywxt.model.meeting.MeetingTopic;
-import com.ginkgocap.ywxt.model.meeting.MeetingVo;
-import com.ginkgocap.ywxt.model.meeting.SocialListReq;
-import com.ginkgocap.ywxt.model.meeting.TopicChat;
 import com.ginkgocap.ywxt.user.model.User;
 import com.ginkgocap.ywxt.user.service.UserService;
 import com.ginkgocap.ywxt.util.HttpClientHelper;
@@ -129,7 +129,16 @@ public class MeetingController extends BaseController {
 	private CorporationRelationService corporationRelationService;
 	@Autowired
 	private Cache cache;
+	@Autowired
+	private PayService payService;
+	@Autowired
+	private PayOrderService payOrderService;
+	@Autowired
+	private DataSyncTask dataSyncTask;
+
 	private static int  expiredTime = 60 * 60 * 24 * 7;
+	// 不需要审核状态
+	private static final Byte reviewFlag = 0;
 
 	/*
 	 * 在社交列表中移除单聊、群聊、会议
@@ -178,23 +187,6 @@ public class MeetingController extends BaseController {
 		model.put("notification", notificationMap);
 		return model;
 	}
-
-	/**
-	 * 名称: addMettingGet 描述: 新增会议
-	 *
-	 * @param request
-	 *            请求
-	 * @param response
-	 *            响应
-	 * @return model
-	 * @throws IOException
-	 */
-/*	@ResponseBody
-	@RequestMapping(value = "/add.json", method = RequestMethod.GET)
-	public Map<String, Object> addMettingGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-		Map<String, Object> model = addMetting(request, response);
-		return model;
-	}*/
 
 	/**
 	 * 名称: addMetting 描述: 新增会议
@@ -587,25 +579,37 @@ public class MeetingController extends BaseController {
 					Long id = Long.valueOf(idStr);
 					Long memberId = Long.valueOf(memberIdStr);
 					meetingObj = meetingService.getMeetingByIdAndMemberId(id, memberId);
-					// 当会议被禁用 返回 该会议已被禁用
-					if (1 == meetingObj.getDisable()) {
+					if (1 == meetingObj.getIsDelete()) {
 						notificationMap.put("notifCode", "0002");
-						notificationMap.put("notifInfo", "该会议已被禁用");
+						notificationMap.put("notifInfo", "该活动已被删除");
 						model.put("notification", notificationMap);
 						model.put("responseData", responseDataMap);
 						return model;
 					}
-
-					boolean flag = true;
+					// 当会议被禁用 返回 该会议已被禁用
+					if (1 == meetingObj.getDisable()) {
+						notificationMap.put("notifCode", "0002");
+						notificationMap.put("notifInfo", "该活动已被禁用，不允许查看");
+						model.put("notification", notificationMap);
+						model.put("responseData", responseDataMap);
+						return model;
+					}
 					List<MeetingMember> mlist = meetingObj.getListMeetingMember();
+					// 是否需要支付
+					byte isPay = meetingObj.getIsPay();
+					boolean flag = true;
 					for (MeetingMember mm : mlist) {
-						if (mm.getMemberId().equals(memberId))
+						if (mm.getMemberId().equals(memberId)) {
 							flag = false;
+						}
+					}
+					if (memberId.equals(1l)) {
+						flag = false;
 					}
 					// 私密会议不允许非成员查看
-					if (flag && meetingObj.getSecrecy() && !memberId.equals(1)) {
+					if (flag && meetingObj.getSecrecy()) {
 						notificationMap.put("notifCode", "0002");
-						notificationMap.put("notifInfo", "非会议成员不可以查看私密会议");
+						notificationMap.put("notifInfo", "该活动为私密，不允许查看");
 						model.put("notification", notificationMap);
 						model.put("responseData", responseDataMap);
 						return model;
@@ -3110,25 +3114,188 @@ public class MeetingController extends BaseController {
 		return InterfaceResult.getSuccessInterfaceResultInstance(signUpFormList);
 	}
 
+	/**
+	 * 支付
+	 * 若是 web 则需要在支付时就将成员放入互动中
+	 * meetingId 活动 id
+	 * type 支付类型  1.微信 2.支付宝
+	 * web 是否 web 端登录  1.app, 2.web
+	 * @param request
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/payment", method = RequestMethod.POST)
+	public InterfaceResult meetingPay(HttpServletRequest request) {
+
+		// meetingId, web, type,
+		User user = this.getUser(request);
+		long userId = user.getId();
+		String userName = user.getName();
+		String mobile = user.getMobile();
+		String requestJson = "";
+		MeetingSignUpFormQuery meetingSignUpFormQuery = null;
+		try {
+			requestJson = this.getJsonParamStr(request);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		if (StringUtils.isBlank(requestJson)) {
+			return InterfaceResult.getInterfaceResultInstance(CommonResultCode.PARAMS_EXCEPTION);
+		}
+		MeetingPayQuery meetingPayQuery = GsonUtils.StringToObject(MeetingPayQuery.class, requestJson);
+		Long meetingId = meetingPayQuery.getMeetingId();
+		Integer type = meetingPayQuery.getType();
+		Integer web = meetingPayQuery.getWeb();
+		Byte sourceType = meetingPayQuery.getSourceType();
+		if (null == meetingId || null == type || null == web) {
+			return InterfaceResult.getInterfaceResultInstance(CommonResultCode.PARAMS_EXCEPTION);
+		}
+		Meeting meeting = meetingService.getById(meetingId);
+		if (null == meeting) {
+			return InterfaceResult.getInterfaceResultInstance(CommonResultCode.PARAMS_EXCEPTION, "当前活动不存在或已删除");
+		}
+		try {
+			meetingSignUpFormQuery = meetingMongoService.getMeetingSignFormByMeetingIdAndUserId(meetingId, userId);
+		} catch (Exception e) {
+			e.printStackTrace();
+			logger.error("invoke meetingMongoService failed! method : {getMeetingSignFormByMeetingIdAndUserId}. meetingId : " + meetingId + "userId: " + userId);
+		}
+		if (null != meetingSignUpFormQuery) {
+			String orderNumber = meetingSignUpFormQuery.getOrderNumber();
+			if (StringUtils.isNotBlank(orderNumber)) {
+				PayOrder payOrder = payOrderService.getPayOrder(orderNumber);
+				if (payOrder.getStatus() == PayStatus.PAY_SUCCESS.getValue()) {
+					return InterfaceResult.getInterfaceResultInstance(CommonResultCode.PARAMS_EXCEPTION, "您已支付成功，可以直接进入活动");
+				}
+			}
+		}
+		BigDecimal payMoney = meeting.getPayMoney();
+		Long createId = meeting.getCreateId();
+		payMoney = payMoney.multiply(new BigDecimal(100));
+		// TODO : 上线 需要修改金额
+		PayRequest payRequest = createPayRequest(1, web.intValue(), type.intValue(), userId, meetingId, mobile, userName, createId);
+		PayResponse payResponse = null;
+		try {
+			payResponse = payService.request(payRequest);
+		} catch (Exception e) {
+			logger.error("invoke payService failed! method : {request}");
+			return InterfaceResult.getInterfaceResultInstance(CommonResultCode.PARAMS_EXCEPTION, "支付模块挂掉了");
+		}
+		if (null != payResponse) {
+			String payOrderNo = payResponse.getPayOrderNo();
+			if (null != meetingSignUpFormQuery) {
+				meetingSignUpFormQuery.setOrderNumber(payOrderNo);
+				try {
+					meetingMongoService.saveMeetingSignForm(meetingSignUpFormQuery);
+				} catch (Exception e) {
+					logger.error("invoke meetingMongoService failed! method : {saveMeetingSignForm}. meetingId : " + meetingId + "userId: " + userId);
+				}
+			}
+		}
+		// web 端报名时，①需要将成员放到活动中 ②将通知放到 队列中
+		if (2 == web && null != sourceType && 1 == sourceType.intValue()) {
+			List<MeetingMember> meetingMemberList = meetingMemberService.getByMeetingIdAndMemberId(meetingId, userId);
+			if (CollectionUtils.isEmpty(meetingMemberList)) {
+				try {
+					saveMeetingMember(user, meetingId);
+                    saveMeetingNotice(user, meeting);
+				} catch (Exception e) {
+					logger.error("invoke meetingMemberService failed! method : {saveOrUpdate}. userId :" + userId);
+				}
+			}
+		}
+		return InterfaceResult.getSuccessInterfaceResultInstance(payResponse);
+	}
+
+	private void saveMeetingMember(User user, long meetingId) throws Exception {
+
+		MeetingMember meetingMember = new MeetingMember();
+		meetingMember.setMeetingId(meetingId);
+		meetingMember.setMemberId(user.getId());
+		meetingMember.setExcuteMeetSign(0);
+		// 默认设置为群众
+		meetingMember.setMemberType(1);
+		meetingMember.setMemberName(user.getName());
+		meetingMember.setMemberPhoto(user.getPicPath());
+		/** 0：默认，1：归档，2：删除 **/
+		meetingMember.setMemberMeetStatus(0);
+		/**
+		 * 参会状态 0.未答复 1接受邀请 2拒绝邀请， 4 报名 5取消报名
+		 */
+		meetingMember.setAttendMeetStatus(4);
+		/** 0 邀请，1 报名 **/
+		meetingMember.setAttendMeetType(1);
+		meetingMember.setAttendMeetTime(new Date());
+		meetingMemberService.saveOrUpdate(meetingMember);
+	}
+
+	private void saveMeetingNotice(User user, Meeting meeting) {
+		// 添加报名记录表
+		MeetingNotice meetingNotice = new MeetingNotice();
+		// 封装创建人
+		meetingNotice.setCreateId(user.getId());
+		meetingNotice.setCreateName(user.getName());
+		meetingNotice.setCreateTime(new Date());
+		// 封装会议ID
+		meetingNotice.setMeetingId(meeting.getId());
+		// 封装通知内容
+		meetingNotice.setNoticeContent(user.getName()+"报名参加"+meeting.getMeetingName());
+		// 封装通知类型 (若不需要审核则 NO_REVIEW_MEETING，审核则 SIGN_UP_APPLY)
+		if (reviewFlag.equals(meeting.getReviewFlag())) {
+			meetingNotice.setNoticeType(NoticeType.NO_REVIEW_MEETING.code());
+		} else {
+			meetingNotice.setNoticeType(NoticeType.SIGN_UP_APPLY.code());
+		}
+		meetingNotice.setIsShow(1);
+		// 封装通知接收人
+		meetingNotice.setReceiver(meeting.getCreateId());
+		meetingNotice.setReceiverName(meeting.getCreateName());
+		// 封装接收人类型
+		meetingNotice.setReceiverType(NoticeReceiverType.CREATER.code());
+		// 封装更新时间
+		meetingNotice.setUpdateTime(new Date());
+		DataSync dataSync = new DataSync();
+		dataSync.setData(meetingNotice);
+		dataSyncTask.saveDataNeedSync(dataSync);
+	}
+
+	public static PayRequest createPayRequest(int money, int web, int type, long userId, long sourceId,
+											  String mobile, String userName, long createId) {
+
+		PayRequest payRequest = new PayRequest();
+		payRequest.setDetail("4"); // 活动："4"
+		payRequest.setExtra(""); // 传""
+		payRequest.setOrderType(4); // 活动会议4
+		payRequest.setPayAmount(money); // 充值金额,精确到分
+		payRequest.setPayType(type); // 1.微信 2.支付宝
+		payRequest.setSourceId(sourceId); // 活动或会议的Id
+		payRequest.setSourceType(4); // 4
+		payRequest.setSubject("Gintong"); //Gintong
+		payRequest.setTradeType(web); // 支付类型：1.app, 2.web
+		payRequest.setUserId(userId); // 发起人 userId
+		payRequest.setMobile(mobile); // 发起人手机号
+		payRequest.setUserName(userName); // 发起人名称
+		payRequest.setToUserId(createId); // 创建活动的人
+		return payRequest;
+	}
+
 	private void setChatListToCache(final List<Social> chat,final long userId) {
 		logger.info("set chat list to cached. userId: " + userId);
 		cache.setByRedis(chatListKey(userId), chat, expiredTime);
 	}
-	
+
 	private List<Social> getChatListFromCache(final long userId) {
 		logger.info("get chat list from cached. userId: " + userId);
 		return (List<Social>)cache.getByRedis(chatListKey(userId));
 	}
-	
+
 	private String chatListKey(long userId)	{
 		return "chat_list_" + userId + "_";
 	}
-
-    private void setChatMapListToCache(final Map<Integer,List<Social>> chatListMap,final long userId) {
+	private void setChatMapListToCache(final Map<Integer,List<Social>> chatListMap,final long userId) {
         logger.info("set chat map list to cached. userId: " + userId);
         cache.setByRedis(chatMapListKey(userId), chatListMap, expiredTime);
     }
-
     private Map<Integer,List<Social>> getChatMapListFromCache(final long userId) {
         logger.info("get chat map list from cached. userId: " + userId);
         return (Map<Integer,List<Social>>)cache.getByRedis(chatMapListKey(userId));

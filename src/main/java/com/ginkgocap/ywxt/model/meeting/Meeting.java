@@ -81,6 +81,12 @@ public class Meeting extends BaseEntity implements Serializable{
 	private BigDecimal payMoney;
 	// 是否会议开始时畅聊
 	private int sendFalg;
+	// 公开活动 0 ：默认不需要审核 1：需要审核
+	private Byte reviewFlag;
+	// 签到提醒时间 （0 —— 120）
+	private Integer signReminderTime;
+	/** 是否签到 默认0：不需要签到，1：需要签到  */
+	private Integer isSign;
 
 	public Meeting() {}
 
@@ -422,5 +428,29 @@ public class Meeting extends BaseEntity implements Serializable{
 
 	public void setSendFalg(int sendFalg) {
 		this.sendFalg = sendFalg;
+	}
+
+	public Byte getReviewFlag() {
+		return reviewFlag;
+	}
+
+	public void setReviewFlag(Byte reviewFlag) {
+		this.reviewFlag = reviewFlag;
+	}
+
+	public Integer getSignReminderTime() {
+		return signReminderTime;
+	}
+
+	public void setSignReminderTime(Integer signReminderTime) {
+		this.signReminderTime = signReminderTime;
+	}
+
+	public Integer getIsSign() {
+		return isSign;
+	}
+
+	public void setIsSign(Integer isSign) {
+		this.isSign = isSign;
 	}
 }

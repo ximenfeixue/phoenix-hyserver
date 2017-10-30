@@ -14,10 +14,15 @@ import com.ginkgocap.parasol.file.model.FileIndex;
 import com.ginkgocap.parasol.file.service.FileIndexService;
 import com.ginkgocap.ywxt.dao.meeting.*;
 import com.ginkgocap.ywxt.model.meeting.*;
+import com.ginkgocap.ywxt.payment.model.PayOrder;
+import com.ginkgocap.ywxt.payment.service.PayOrderService;
+import com.ginkgocap.ywxt.payment.service.PayService;
+import com.ginkgocap.ywxt.payment.utils.PayStatus;
 import com.ginkgocap.ywxt.utils.pic.DefaultPic;
 import com.ginkgocap.ywxt.vo.query.meeting.*;
 import com.gintong.frame.util.dto.InterfaceResult;
 import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.collections.CollectionUtils;
 import org.h2.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -102,6 +107,10 @@ public class MeetingServiceImpl extends BaseServiceImpl<Meeting, Long> implement
 	private MeetingMemberService meetingMemberService;
 	@Autowired
 	private UserConfigService userConfigService;
+	@Autowired
+	private PayOrderService payOrderService;
+	@Autowired
+	private PayService payService;
 
 	@Value("${nginx.root}")
 	private String nginxRoot;
@@ -111,6 +120,8 @@ public class MeetingServiceImpl extends BaseServiceImpl<Meeting, Long> implement
 	}
 
 	private final Logger logger = LoggerFactory.getLogger(getClass());
+
+	private static final Byte reviewFlag = 0;
 
 	/**
 	 * 名称: getById 描述: 根据id查找
@@ -842,6 +853,9 @@ public class MeetingServiceImpl extends BaseServiceImpl<Meeting, Long> implement
 	 */
 	@Transactional(readOnly = true)
 	public MeetingQuery getMeetingByIdAndMemberId(Long id, Long memberId) throws IllegalAccessException, InvocationTargetException, FileIndexServiceException {
+
+		List<PayOrder> payOrderList = null;
+		PayOrder payOrder = null;
 		MeetingQuery meetingObj = new MeetingQuery();
 		// 封装会议基本信息
 		if (!Utils.isNullOrEmpty(id)) {
@@ -871,9 +885,47 @@ public class MeetingServiceImpl extends BaseServiceImpl<Meeting, Long> implement
 					for (MeetingMember meetingMember : listMember) {
 						if (!isNullOrEmpty(meetingMember) && !isNullOrEmpty(meetingMember.getMemberId())) {
 							userIdList.add(meetingMember.getMemberId());
+							if (meetingMember.getMemberId() == memberId && 1 == meetingObj.getIsPay()) {
+								// 修改成员状态
+                                logger.info("修改成员状态 userId : {} meetingId :{}" + memberId + meeting.getId());
+								try {
+									payOrderList =	payOrderService.getPayOrderByUserIdAndSourceId(memberId, meeting.getId());
+								} catch (Exception e) {
+									logger.error("invoke payOrderService failed! method getPayOrderByUserIdAndSourceId. userId : {} , meetingId :{}" + memberId + meeting.getId());
+								}
+								// 获取最新的订单信息
+								if (CollectionUtils.isNotEmpty(payOrderList)) {
+									payOrder = payOrderList.get(0);
+									if (payOrder.getStatus() == PayStatus.PAY_SUCCESS.getValue()) {
+										// 邀请情况 在支付成功后成员类型还是未答复状态，修改为已接受
+										if (0 == meetingMember.getAttendMeetType() && 0 == meetingMember.getAttendMeetStatus()) {
+											meetingMember.setAttendMeetStatus(1);
+											try {
+												meetingMemberService.saveOrUpdate(meetingMember);
+											} catch (Exception e) {
+												e.printStackTrace();
+											}
+										}
+										// 报名情况 在支付成功后成员类型还是未处理状态，且不需要审核的报名, 修改为同意报名
+										if (1 == meetingMember.getAttendMeetType() && 1 != meetingMember.getExcuteMeetSign() &&
+												2 != meetingMember.getExcuteMeetSign() && reviewFlag == meeting.getReviewFlag()) {
+											logger.info("修改报名不需要审核的活动成员............. userId : " + meetingMember.getMemberId());
+											meetingMember.setExcuteMeetSign(1);
+											try {
+												meetingMemberService.saveOrUpdate(meetingMember);
+											} catch (Exception e) {
+												e.printStackTrace();
+											}
+										}
+									}
+								} else {
+									logger.info("没查到该用户的支付订单.....");
+								}
+							}
 						}
 					}
 				}
+				listMember = meetingMemberDao.getByMeetingId(id);
 				if (!userIdList.isEmpty()) {
 					Map<String, User> userMap = userDao.getUserMapByIds(userIdList);
 					if (!isNullOrEmpty(meeting) && !isNullOrEmpty(meeting.getCreateId())) {
@@ -935,7 +987,7 @@ public class MeetingServiceImpl extends BaseServiceImpl<Meeting, Long> implement
 					for (MeetingPic meetingPic : listPic) {
 						if (!Utils.isNullOrEmpty(meetingPic)) {
 							listFileIndexId.add(meetingPic.getFileIndexId());
-							if (1 == meetingPic.getIshomePage()) {
+							if (meetingPic.getIshomePage() != null && 1 == meetingPic.getIshomePage()) {
 								meetingObj.setPath(meetingPic.getPicPath());
 							}
 						}
@@ -1136,7 +1188,7 @@ public class MeetingServiceImpl extends BaseServiceImpl<Meeting, Long> implement
 						meetingNoticeDao.saveOrUpdate(meetingNotice);
 					}
 				}
-			} else if (meeting.getMeetingStatus() == 2) {
+			} else if (1 != meeting.getDisable() && meeting.getMeetingStatus() == 2) {
 				throw new Exception("不能删除进行中会议");
 			} else if (meeting.getMeetingStatus() == 3) {
 				// 已结束会议从自己的会议列表移除
@@ -2415,7 +2467,7 @@ public class MeetingServiceImpl extends BaseServiceImpl<Meeting, Long> implement
 					finishedIdList.add("" + meeting.getId().longValue());
 				} else {
 					if (memberId.longValue() == meeting.getCreateId().longValue()) {// 我创建的
-						if (meeting.getMeetingStatus().intValue() == 2) {
+						if (1 != meeting.getDisable() && meeting.getMeetingStatus().intValue() == 2) {
 							throw new Exception("不能删除进行中的会议");
 						} else {
 							cancelNotBenginMeeting(meeting.getId(), memberId);
