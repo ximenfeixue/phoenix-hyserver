@@ -2,6 +2,8 @@ package com.ginkgocap.ywxt.dao.meeting.impl;
 
 import com.ginkgocap.ywxt.dao.meeting.DataSyncMongoDao;
 import com.ginkgocap.ywxt.model.meeting.DataSync;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -16,6 +18,7 @@ import java.util.List;
 @Repository("dataSyncMongoDao")
 public class DataSyncMongoDaoImpl implements DataSyncMongoDao {
 
+    private final Logger logger = LoggerFactory.getLogger(DataSyncMongoDaoImpl.class);
     @Autowired
     private MongoTemplate mongoTemplate;
 
@@ -24,7 +27,11 @@ public class DataSyncMongoDaoImpl implements DataSyncMongoDao {
     @Override
     public void saveDataSync(DataSync data) {
 
-        mongoTemplate.insert(data, "dataSync");
+        try {
+            mongoTemplate.insert(data, "dataSync");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
