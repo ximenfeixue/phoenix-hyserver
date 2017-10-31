@@ -849,11 +849,11 @@ public class MeetingServiceImpl extends BaseServiceImpl<Meeting, Long> implement
 	}
 	/**
 	 * 名称: getMeetingByIdAndMemberId 描述: 根据会议和成员id获取会议详情
-	 * 
+	 * 由于业务需求 有修改操作 需要在该方法修改事务控制，不能设为只读
 	 * @since 2014-09-17
 	 * @author qingc
 	 */
-	@Transactional(readOnly = true)
+	@Transactional
 	public MeetingQuery getMeetingByIdAndMemberId(Long id, Long memberId) throws IllegalAccessException, InvocationTargetException, FileIndexServiceException {
 
 	    logger.info("getMeetingByIdAndMemberId start ------------");
