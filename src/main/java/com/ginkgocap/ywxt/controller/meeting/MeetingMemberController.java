@@ -544,11 +544,9 @@ public class MeetingMemberController extends BaseController {
 										meetingMemberService.signUpReview(1,
 												meeting, meetingMember, user);
 										responseDataMap.put("succeed", true);
-										notificationMap
-												.put("notifCode", "0001");
-										notificationMap.put("notifInfo",
-												"该会议没有接受你的报名");
-										setSessionAndErr(request, response, "0", "该会议没有接受你的报名");
+										notificationMap.put("notifCode", "0001");
+										notificationMap.put("notifInfo", "操作成功");
+										setSessionAndErr(request, response, "0", "操作成功");
 									}
 								}
 
