@@ -1734,7 +1734,19 @@ public class MeetingMemberController extends BaseController {
 										//推送通知
 										String dateStr = DateUtil.convertDateToStringForChina(new Date());
 										GinTongInterface.pushToAttendMeetingMember(userBean, String.valueOf(meeting.getId()), meeting.getCreateName()+"于"+dateStr+"取消了您参加的"+meeting.getMeetingName()+"会议",false,dateStr);
-									} else if(0 == meetingMember.getMemberType().intValue()) {//主讲人
+										// 踢出活动畅聊
+										final String groupId = meeting.getGroupId();
+										final Long userId = Long.valueOf(memberId);
+										final Long operatorUserId = user.getId();
+										ThreadPoolUtils.getExecutorService().execute(new Runnable() {
+											@Override
+											public void run() {
+												if (StringUtils.isNotEmpty(groupId)) {
+													GinTongInterface.removeMuc(operatorUserId, groupId, userId);
+												}
+											}
+										});
+									} else if (0 == meetingMember.getMemberType().intValue()) {//主讲人
 										//删除议题
 										List<MeetingTopic> listMeetingTopic = meetingTopicService.getByMeetingId(Long.parseLong(meetingId));
 										if(!Utils.isNullOrEmpty(listMeetingTopic)) {

@@ -400,7 +400,7 @@ public class MeetingMemberServiceImpl implements MeetingMemberService{
 					}
 					// 封装通知内容
 					meetingNotice.setNoticeContent(content);
-					// 退出活动
+					// 退出活动畅聊
 					final String groupId = meeting.getGroupId();
 					final Long userId = Long.valueOf(memberId);
 					ThreadPoolUtils.getExecutorService().execute(new Runnable() {
