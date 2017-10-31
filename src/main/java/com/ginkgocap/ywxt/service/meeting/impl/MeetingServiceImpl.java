@@ -123,6 +123,8 @@ public class MeetingServiceImpl extends BaseServiceImpl<Meeting, Long> implement
 
 	private static final Byte reviewFlag = 0;
 
+	private static final byte isPay = 1;
+
 	/**
 	 * 名称: getById 描述: 根据id查找
 	 * 
@@ -887,7 +889,7 @@ public class MeetingServiceImpl extends BaseServiceImpl<Meeting, Long> implement
 						if (!isNullOrEmpty(meetingMember) && !isNullOrEmpty(meetingMember.getMemberId())) {
 							userIdList.add(meetingMember.getMemberId());
 							logger.info("--------userId: {}, isPay :{}", meetingMember.getMemberId(), meetingObj.getIsPay());
-							if (meetingMember.getMemberId() == memberId && 1 == meetingObj.getIsPay()) {
+							if (meetingMember.getMemberId().longValue() == memberId.longValue() && isPay == meetingObj.getIsPay()) {
 								// 修改成员状态
                                 logger.info("修改成员状态 userId : {} meetingId :{}", memberId, meeting.getId());
 								try {
