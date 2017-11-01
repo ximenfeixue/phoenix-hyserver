@@ -305,12 +305,14 @@ public class MeetingMemberServiceImpl implements MeetingMemberService{
 	@Transactional(rollbackFor=Exception.class)
 	public void addNotice(User user,MeetingNotice meetingNotice,NoticeField noticeField,String content,Date date){
 		meetingNoticeDao.addNotice(meetingNotice,noticeField);
-		//推送报名通知  
+		//推送报名通知
+		/*
 		UserBean userBean = new UserBean();
 		userBean.setId(user.getId());
 		userBean.setName(user.getName());
 		String dateStr=DateUtil.convertDateToStringForChina(new Date());
 		GinTongInterface.pushToMeetingCreater(userBean, String.valueOf(meetingNotice.getMeetingId()),content,dateStr);
+		*/
 	}
 	/**
 	 * 把报名申请通知设置为不可见

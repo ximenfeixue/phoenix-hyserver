@@ -419,10 +419,11 @@ public class MeetingServiceImpl extends BaseServiceImpl<Meeting, Long> implement
 							recordMessageList.add(recordMessageBean);
 
 							//add invitation
-							MessageNotify notify = meetingNotifyService.newInvitationNotify(meetingMember.getMemberId(),
-									meeting.getCreateId(), meeting.getCreateName(), meeting.getId(), meeting.getMeetingName(),
-									meeting.getStartTime().getTime());
-							notifyList.add(notify);
+                            final long memberId = meetingMember.getMemberId();
+							MessageNotify notify = meetingNotifyService.newInvitationNotify(memberId, meeting);
+                            if (notify != null) {
+                                notifyList.add(notify);
+                            }
 							if (notifyList.size() >= 10) {
 								meetingNotifyService.addInvitationNotify(notifyList);
 								notifyList.clear();

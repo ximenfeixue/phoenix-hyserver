@@ -212,8 +212,7 @@ public class MeetingMemberController extends BaseController {
 				meetingMemberService.saveOrUpdate(meetingMember);
 				meetingMember.setAttendMeetTime(new Date());
                 //send invitation
-                meetingNotifyService.addInvitationNotify(meetingMember.getMemberId(), meeting.getCreateId(),
-                        meeting.getCreateName(), meeting.getId(), meeting.getMeetingName(), meeting.getStartTime().getTime());
+                meetingNotifyService.addInvitationNotify(meetingMember.getMemberId(), meeting);
 				logger.info("操作成功");
 			}
 		} catch (Exception e) {
@@ -891,6 +890,15 @@ public class MeetingMemberController extends BaseController {
 		meetingMember.setAttendMeetTime(new Date());
 		// 报名
 		meetingMemberService.signUp(meeting, meetingMember, user);
+
+        //send notification
+        String fromName = user.getName();
+        final String title = fromName + "报名参加" + meeting.getMeetingName();
+        if (meeting.getReviewFlag() == 0) {
+            meetingNotifyService.addMeetingNotify(user.getId(), fromName, title, meeting);
+        } else if (meeting.getReviewFlag() == 1) {
+            meetingNotifyService.addApplyMeetingNotify(user.getId(), fromName, title, meeting);
+        }
 	}
 
 
