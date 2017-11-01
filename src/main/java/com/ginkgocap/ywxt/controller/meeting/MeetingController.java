@@ -24,6 +24,7 @@ import com.ginkgocap.ywxt.payment.model.request.PayRequest;
 import com.ginkgocap.ywxt.payment.model.response.PayResponse;
 import com.ginkgocap.ywxt.payment.service.PayOrderService;
 import com.ginkgocap.ywxt.payment.service.PayService;
+import com.ginkgocap.ywxt.payment.service.associator.CheckStatusService;
 import com.ginkgocap.ywxt.payment.utils.PayStatus;
 import com.ginkgocap.ywxt.service.meeting.*;
 import com.ginkgocap.ywxt.task.DataSyncTask;
@@ -135,6 +136,8 @@ public class MeetingController extends BaseController {
 	private PayOrderService payOrderService;
 	@Autowired
 	private DataSyncTask dataSyncTask;
+	@Autowired
+	private CheckStatusService checkStatusService;
 
 	private static int  expiredTime = 60 * 60 * 24 * 7;
 	// 不需要审核状态
@@ -572,6 +575,7 @@ public class MeetingController extends BaseController {
 				String idStr = getStringJsonValueByKey(j, "id");
 				// 会议成员id
 				String memberIdStr = getStringJsonValueByKey(j, "memberId");
+				String version = getStringJsonValueByKey(j, "version");
 				if (Utils.isNullOrEmpty(memberIdStr)) {
 					memberIdStr = "0";// 外部访问，默认为金桐脑
 				}
@@ -635,6 +639,11 @@ public class MeetingController extends BaseController {
 						}
 						// 增加已读会议数量
 						meetingCountService.addReadCount(id);
+					}
+					if (StringUtils.isNotEmpty(version)) {
+						boolean status = checkStatusService.checkStatus(version);
+						if (!status)
+							meetingObj.setIsPay((byte)0);
 					}
 				}
 			} catch (Exception e) {
