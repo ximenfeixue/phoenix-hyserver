@@ -491,4 +491,9 @@ public class MeetingMemberServiceImpl implements MeetingMemberService{
 	public void deleteAttendMeetingBatch(List<Long> attendIdList) {
 		meetingMemberDao.deleteAttendMeetingBatch(attendIdList);
 	}
+
+	@Override
+	public Integer getAttendMeetingCount(Long meetingId) {
+		return meetingMemberDao.getAttendMeetingCount(meetingId);
+	}
 }

@@ -948,7 +948,7 @@ public class MeetingMemberController extends BaseController {
 				// orderNumber 订单号
 				String orderNumber = getStringJsonValueByKey(j, "orderNumber");
 				long meetingId = Long.valueOf(meetingIdStr);
-				Integer count = meetingMemberService.getSignUpMemberCount(meetingId);
+				Integer count = meetingMemberService.getAttendMeetingCount(meetingId);
 				long memberId = Long.valueOf(memberIdStr);
 				Meeting meeting = meetingService.getById(meetingId);
 				if (null == meeting) {
@@ -962,7 +962,7 @@ public class MeetingMemberController extends BaseController {
 				if (!isNullOrEmpty(meeting.getMemberCount()) && meeting.getMemberCount() > 0 && meeting.getMemberCount() <= count) {
 					responseDataMap.put("succeed", false);
 					notificationMap.put("notifCode", "0002");
-					notificationMap.put("notifInfo", "报名人数已满额，不能加入活动");
+					notificationMap.put("notifInfo", "参会人数已满额，不能加入活动");
 					model.put("responseData", responseDataMap);
 					model.put("notification", notificationMap);
 					return model;

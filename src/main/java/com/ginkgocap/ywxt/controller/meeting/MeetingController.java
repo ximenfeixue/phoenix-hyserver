@@ -3164,6 +3164,10 @@ public class MeetingController extends BaseController {
 		if (null == meeting) {
 			return InterfaceResult.getInterfaceResultInstance(CommonResultCode.PARAMS_EXCEPTION, "当前活动不存在或已删除");
 		}
+		Integer count = meetingMemberService.getAttendMeetingCount(meetingId);
+		if (!isNullOrEmpty(meeting.getMemberCount()) && meeting.getMemberCount() > 0 && meeting.getMemberCount() <= count) {
+			return InterfaceResult.getInterfaceResultInstance(CommonResultCode.PARAMS_EXCEPTION, "参会人数已满额，不能加入活动");
+		}
 		try {
 			meetingSignUpFormQuery = meetingMongoService.getMeetingSignFormByMeetingIdAndUserId(meetingId, userId);
 		} catch (Exception e) {
