@@ -154,6 +154,10 @@ public class MeetingMemberController extends BaseController {
 				result.setResponseData(responseDataMap);
 				return result;
 			}
+			Integer count = meetingMemberService.getAttendMeetingCount(meetingId);
+			if (!isNullOrEmpty(meeting.getMemberCount()) && meeting.getMemberCount() > 0 && meeting.getMemberCount() <= count) {
+				return InterfaceResult.getInterfaceResultInstance(CommonResultCode.PARAMS_EXCEPTION, "参会人数已满额，不能再邀请喽");
+			}
 			List<MeetingMember> list = meetingMemberService.getByMeetingIdAndMemberId(
 					meetingId, meetingMember.getMemberId());
 			if (!isNullOrEmpty(list) || list.size() > 0) {
