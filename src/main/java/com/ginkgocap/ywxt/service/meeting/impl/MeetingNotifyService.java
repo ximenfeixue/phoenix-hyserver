@@ -2,6 +2,7 @@ package com.ginkgocap.ywxt.service.meeting.impl;
 
 import com.ginkgocap.ywxt.model.meeting.Meeting;
 import com.ginkgocap.ywxt.task.DataSyncScheduler;
+import com.gintong.ywxt.im.constant.MessageNotifyResType;
 import com.gintong.ywxt.im.constant.MessageNotifyType;
 import com.gintong.ywxt.im.model.MessageNotify;
 import com.gintong.ywxt.im.service.MessageNotifyService;
@@ -59,7 +60,8 @@ public class MeetingNotifyService {
         notify.setFromId(fromId);
         notify.setFromName(fromName);
         notify.setResId(meetingId);
-        //notify.setResTitle(title);
+        notify.setResTitle(title);
+        notify.setResType(MessageNotifyResType.EResActivity.value());
         notify.setType(MessageNotifyType.EActivityInvite.value());
         String content = "{\"meetingId\":" + meetingId + ",\"title\":\"" + title + "\",\"time\":" + time + "}";
         notify.setContent(content);
@@ -95,7 +97,8 @@ public class MeetingNotifyService {
         notify.setFromId(fromId);
         notify.setFromName(fromName);
         notify.setResId(meetingId);
-        //notify.setResTitle(meetingTitle);
+        notify.setResTitle(meetingTitle);
+        notify.setResType(MessageNotifyResType.EResActivity.value());
         notify.setType(MessageNotifyType.EActivityApply.value());
         String content = "{\"meetingId\":" + meetingId + ",\"groupId\":" + meeting.getGroupId() + ",\"memberId\":" + fromId + "}";
         notify.setContent(content);
@@ -131,7 +134,8 @@ public class MeetingNotifyService {
         notify.setFromId(fromId);
         notify.setFromName(fromName);
         notify.setResId(meetingId);
-        //notify.setResTitle(meetingTitle);
+        notify.setResTitle(meetingTitle);
+        notify.setResType(MessageNotifyResType.EResActivity.value());
         notify.setType(MessageNotifyType.EActivity.value());
         String content = "{\"meetingId\":" + meetingId + ",\"title\":\"" + meetingTitle + "\"}";
         notify.setContent(content);
