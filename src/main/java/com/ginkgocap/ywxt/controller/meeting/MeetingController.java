@@ -30,9 +30,7 @@ import com.ginkgocap.ywxt.service.meeting.*;
 import com.ginkgocap.ywxt.task.DataSyncTask;
 import com.ginkgocap.ywxt.user.service.corporation.CorporationRelationService;
 import com.ginkgocap.ywxt.utils.*;
-import com.ginkgocap.ywxt.utils.type.ExcuteMeetSignType;
-import com.ginkgocap.ywxt.utils.type.NoticeReceiverType;
-import com.ginkgocap.ywxt.utils.type.NoticeType;
+import com.ginkgocap.ywxt.utils.type.*;
 import com.ginkgocap.ywxt.vo.query.meeting.*;
 import com.gintong.frame.util.dto.CommonResultCode;
 import com.gintong.frame.util.dto.InterfaceResult;
@@ -67,7 +65,6 @@ import com.ginkgocap.ywxt.file.model.FileIndex;
 import com.ginkgocap.ywxt.user.model.User;
 import com.ginkgocap.ywxt.user.service.UserService;
 import com.ginkgocap.ywxt.util.HttpClientHelper;
-import com.ginkgocap.ywxt.utils.type.SocialType;
 import com.ginkgocap.ywxt.vo.query.community.Community;
 import com.ginkgocap.ywxt.vo.query.social.CommunityNewCount;
 import com.ginkgocap.ywxt.vo.query.social.Social;
@@ -604,7 +601,10 @@ public class MeetingController extends BaseController {
 					boolean flag = true;
 					for (MeetingMember mm : mlist) {
 						if (mm.getMemberId().equals(memberId)) {
-							flag = false;
+							if ((mm.getAttendMeetStatus() == AttendMeetStatusType.ACCEPT_INVITATION.code() ||
+									mm.getExcuteMeetSign() == ExcuteMeetSignType.AGREE_SIGN_UP.code())) {
+								flag = false;
+							}
 						}
 					}
 					if (memberId.equals(1l)) {
