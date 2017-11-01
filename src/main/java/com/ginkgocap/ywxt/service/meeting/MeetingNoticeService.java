@@ -158,4 +158,5 @@ public interface MeetingNoticeService {
 	 * @return
 	 */
 	public Integer updateMeetingIdRead(List<Long> ids);
+
 }
