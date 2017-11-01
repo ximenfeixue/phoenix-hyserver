@@ -640,6 +640,7 @@ public class MeetingController extends BaseController {
 						// 增加已读会议数量
 						meetingCountService.addReadCount(id);
 					}
+					// TODO 上线修改IOS支付不审核通过设为免费
 					if (StringUtils.isNotEmpty(version)) {
 						boolean status = checkStatusService.checkStatus(version);
 						if (!status)
