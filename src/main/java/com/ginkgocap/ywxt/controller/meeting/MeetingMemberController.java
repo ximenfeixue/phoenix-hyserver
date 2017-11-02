@@ -438,7 +438,7 @@ public class MeetingMemberController extends BaseController {
 				// 会议id
 				String meetingIdStr = getStringJsonValueByKey(j, "meetingId");
 				//群组id
-				final String groupId = getStringJsonValueByKey(j, "groupId");
+				//final String groupId = getStringJsonValueByKey(j, "groupId");
 				// 会议成员id
 				String memberIdStr = getStringJsonValueByKey(j, "memberId");
 				User user = getUser(request);
@@ -523,6 +523,7 @@ public class MeetingMemberController extends BaseController {
 										 	*/
 											final Long userId = meetingMember.getMemberId();
 											final Long creatorUserId = meeting.getCreateId();
+											final String groupId = meeting.getGroupId();
 											ThreadPoolUtils.getExecutorService().execute(new Runnable() {
 												@Override
 												public void run() {
