@@ -601,10 +601,7 @@ public class MeetingController extends BaseController {
 					boolean flag = true;
 					for (MeetingMember mm : mlist) {
 						if (mm.getMemberId().equals(memberId)) {
-							if ((mm.getAttendMeetStatus() == AttendMeetStatusType.ACCEPT_INVITATION.code() ||
-									mm.getExcuteMeetSign() == ExcuteMeetSignType.AGREE_SIGN_UP.code())) {
-								flag = false;
-							}
+							flag = false;
 						}
 					}
 					if (memberId.equals(1l)) {
