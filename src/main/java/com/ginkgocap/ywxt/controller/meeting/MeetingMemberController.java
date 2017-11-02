@@ -1020,7 +1020,7 @@ public class MeetingMemberController extends BaseController {
 							responseDataMap.put("succeed", true);
 							notificationMap.put("notifCode", "0001");
 							notificationMap.put("notifInfo", "hello mobile app!");
-							final String group_Id = StringUtils.isBlank(groupId) ? meeting.getGroupId() : groupId;//解决客户端发送groupId丢失的问题
+							final String group_Id = meeting.getGroupId();//解决客户端发送groupId丢失的问题
 							/**
 							 * 集成环信：会议添加成员
 							 */
