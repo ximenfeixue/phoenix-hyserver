@@ -833,7 +833,7 @@ PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
 					m.meeting_address_pos_x AS meetingAddressPosX,
 					m.meeting_address_pos_y AS meetingAddressPosY,
 					m.top,
-					m.disable,
+					m.disable as disable,
 					m.is_pay AS isPay,
 					m.pay_money AS payMoney,
 					m.is_secrecy AS isSecrecy,
@@ -862,10 +862,10 @@ PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
 					m.meeting_address_pos_x AS meetingAddressPosX,
 					m.meeting_address_pos_y AS meetingAddressPosY,
 					m.top,
-					m.disable,
-					m.is_secrecy AS isSecrecy,
+					m.disable as disable,
 					m.is_pay AS isPay,
 					m.pay_money AS payMoney,
+					m.is_secrecy AS isSecrecy,
 					p.pic_path AS path,
 					CASE m.meeting_status WHEN 3 THEN -1 ELSE m.meeting_status END AS orderType
 				FROM tb_meeting m
@@ -905,10 +905,10 @@ PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
 					m.meeting_address_pos_x AS meetingAddressPosX,
 					m.meeting_address_pos_y AS meetingAddressPosY,
 					m.top,
-					m.disable,
-					m.is_secrecy AS isSecrecy,
+					m.disable as disable,
 					m.is_pay AS isPay,
 					m.pay_money AS payMoney,
+					m.is_secrecy AS isSecrecy,
 					p.pic_path AS path,
 					CASE m.meeting_status WHEN 3 THEN -1 ELSE m.meeting_status END AS orderType
 				FROM tb_meeting m
