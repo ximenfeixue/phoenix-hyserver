@@ -963,14 +963,6 @@ public class MeetingMemberController extends BaseController {
 					model.put("notification", notificationMap);
 					return model;
 				}
-				if (!isNullOrEmpty(meeting.getMemberCount()) && meeting.getMemberCount() > 0 && meeting.getMemberCount() <= count) {
-					responseDataMap.put("succeed", false);
-					notificationMap.put("notifCode", "0002");
-					notificationMap.put("notifInfo", "参会人数已满额，不能加入活动");
-					model.put("responseData", responseDataMap);
-					model.put("notification", notificationMap);
-					return model;
-				}
 				if (StringUtils.isNotBlank(orderNumber)) {
 					try {
 						payOrder = payOrderService.getPayOrder(orderNumber);
@@ -1012,7 +1004,17 @@ public class MeetingMemberController extends BaseController {
 					if(AttendMeetStatusType.ACCEPT_INVITATION.code() == Integer.valueOf(type) || AttendMeetStatusType.REFUSE_INVITATION.code() == Integer.valueOf(type)){
 						// 只有未开始和进行中的会议可以接受邀请或者拒绝邀请
 						if(MeetingStatusType.NOT_BEGIN.code() == meeting.getMeetingStatus() || MeetingStatusType.IN_MEETING.code() == meeting.getMeetingStatus()){
-
+							// 接受邀请进入活动时，确定参会人数
+							if (AttendMeetStatusType.ACCEPT_INVITATION.code() == Integer.valueOf(type)) {
+								if (!isNullOrEmpty(meeting.getMemberCount()) && meeting.getMemberCount() > 0 && meeting.getMemberCount() <= count) {
+									responseDataMap.put("succeed", false);
+									notificationMap.put("notifCode", "0002");
+									notificationMap.put("notifInfo", "参会人数已满额，不能加入活动");
+									model.put("responseData", responseDataMap);
+									model.put("notification", notificationMap);
+									return model;
+								}
+							}
 							meetingMemberService.changeAttendMeetStatus(Long.valueOf(meetingIdStr), Long.valueOf(memberIdStr), Integer.valueOf(type), user);
 
 							responseDataMap.put("succeed", true);
