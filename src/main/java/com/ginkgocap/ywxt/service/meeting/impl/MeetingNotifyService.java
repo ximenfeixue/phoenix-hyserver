@@ -6,6 +6,7 @@ import com.gintong.ywxt.im.constant.MessageNotifyResType;
 import com.gintong.ywxt.im.constant.MessageNotifyType;
 import com.gintong.ywxt.im.model.MessageNotify;
 import com.gintong.ywxt.im.service.MessageNotifyService;
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -28,6 +29,7 @@ public class MeetingNotifyService {
             MessageNotify notify = newInvitationNotify(toId, meeting);
             if (notify != null) {
                 messageNotifyService.sendMessageNotify(notify);
+                logger.info("send notify success.");
             }
         } catch (Exception ex) {
             logger.error("send messageNotify failed. error: " + ex.getMessage());
@@ -35,8 +37,13 @@ public class MeetingNotifyService {
     }
 
     public void addInvitationNotify(List<MessageNotify> notifyList) {
+        if (CollectionUtils.isEmpty(notifyList)) {
+            logger.error("notifyList size is 0, so skip to send.");
+            return;
+        }
         try {
             messageNotifyService.sendMessageNotify(notifyList);
+            logger.info("send notify success, size: " + notifyList.size());
         } catch (Exception ex) {
             logger.error("send messageNotify failed. error: " + ex.getMessage());
         }
