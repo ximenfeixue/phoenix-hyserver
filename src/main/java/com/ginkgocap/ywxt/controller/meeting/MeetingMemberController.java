@@ -502,7 +502,7 @@ public class MeetingMemberController extends BaseController {
 										}
 									}
 									if ("1".equals(reviewStatus)) {
-										Integer count = meetingMemberService.getSignUpMemberCount(meetingId);
+										Integer count = meetingMemberService.getAttendMeetingCount(meetingId);
 										// 同意报名
 										if (!isNullOrEmpty(meeting.getMemberCount())
 												&& meeting.getMemberCount() > 0
@@ -609,7 +609,7 @@ public class MeetingMemberController extends BaseController {
 		MeetingSignQuery meetingSignQuery = GsonUtils.StringToObject(MeetingSignQuery.class, requestJson);
 		final Long meetingId = meetingSignQuery.getMeetingId();
 		Meeting meeting = meetingService.getById(meetingId);
-		Integer count = meetingMemberService.getSignUpMemberCount(meetingId);
+		Integer count = meetingMemberService.getAttendMeetingCount(meetingId);
 		if (!isNullOrEmpty(meeting.getMemberCount()) && meeting.getMemberCount() > 0 && meeting.getMemberCount() <= count) {
 			return InterfaceResult.getInterfaceResultInstance(CommonResultCode.PARAMS_EXCEPTION, "报名人数已满额，不能加入活动");
 		}
