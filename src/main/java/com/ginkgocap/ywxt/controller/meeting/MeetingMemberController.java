@@ -466,8 +466,7 @@ public class MeetingMemberController extends BaseController {
 							setSessionAndErr(request, response, "-1", "该用户没有参加该会议");
 						} else {
 							MeetingMember meetingMember = list.get(0);
-							if (isNullOrEmpty(meetingMember)
-									|| isNullOrEmpty(meetingMember.getId())) {
+							if (isNullOrEmpty(meetingMember) || isNullOrEmpty(meetingMember.getId())) {
 								responseDataMap.put("succeed", false);
 								notificationMap.put("notifCode", "0002");
 								notificationMap.put("notifInfo", "该用户没有参加该会议");
@@ -539,17 +538,21 @@ public class MeetingMemberController extends BaseController {
 											recordMessageBean.setMessageStartTime(new Date());
 											recordMessageBean.setStatus(String.valueOf(meeting.getMeetingStatus()));
 											imRecordmessageService.saveOrUpdate(recordMessageBean);
+
+                                            //add meeting notification
+                                            meetingNotifyService.deleteMeetingNotify(memberId, meeting.getCreateId(), meetingId);
+                                            meetingNotifyService.addAgreeMeetingNotify(meeting, meetingMember);
 										}
 									} else if ("2".equals(reviewStatus)) {
 										meetingMember.setExcuteMeetSign(ExcuteMeetSignType.REFUSE_SIGN_UP.code());
-										meetingMemberService.signUpReview(1,
-												meeting, meetingMember, user);
+										meetingMemberService.signUpReview(1, meeting, meetingMember, user);
 										responseDataMap.put("succeed", true);
-										notificationMap
-												.put("notifCode", "0001");
-										notificationMap.put("notifInfo",
-												"该会议没有接受你的报名");
+										notificationMap.put("notifCode", "0001");
+										notificationMap.put("notifInfo", "该会议没有接受你的报名");
 										setSessionAndErr(request, response, "0", "该会议没有接受你的报名");
+                                        //add meeting notification
+                                        meetingNotifyService.deleteMeetingNotify(memberId, meeting.getCreateId(), meetingId);
+                                        meetingNotifyService.addRefuseMeetingNotify(meeting, meetingMember);
 									}
 								}
 
@@ -895,7 +898,7 @@ public class MeetingMemberController extends BaseController {
         String fromName = user.getName();
         final String title = fromName + "报名参加" + meeting.getMeetingName();
         if (meeting.getReviewFlag() == 0) {
-            meetingNotifyService.addMeetingNotify(user.getId(), fromName, title, meeting);
+            meetingNotifyService.addMeetingNotify(meeting.getCreateId(), user.getId(), fromName, title, meeting);
         } else if (meeting.getReviewFlag() == 1) {
             meetingNotifyService.addApplyMeetingNotify(user.getId(), fromName, title, meeting);
         }
@@ -1021,7 +1024,7 @@ public class MeetingMemberController extends BaseController {
 							responseDataMap.put("succeed", true);
 							notificationMap.put("notifCode", "0001");
 							notificationMap.put("notifInfo", "hello mobile app!");
-							final String group_Id = StringUtils.isBlank(groupId) ? meeting.getGroupId() : groupId;//解决客户端发送groupId丢失的问题
+							final String group_Id = meeting.getGroupId();//解决客户端发送groupId丢失的问题
 							/**
 							 * 集成环信：会议添加成员
 							 */

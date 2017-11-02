@@ -1,6 +1,7 @@
 package com.ginkgocap.ywxt.service.meeting.impl;
 
 import com.ginkgocap.ywxt.model.meeting.Meeting;
+import com.ginkgocap.ywxt.model.meeting.MeetingMember;
 import com.ginkgocap.ywxt.task.DataSyncScheduler;
 import com.gintong.ywxt.im.constant.MessageNotifyResType;
 import com.gintong.ywxt.im.constant.MessageNotifyType;
@@ -50,16 +51,16 @@ public class MeetingNotifyService {
     }
 
     public MessageNotify newInvitationNotify(long toId, Meeting meeting) {
-        final long fromId = meeting.getCreateId();
+        long fromId = meeting.getCreateId();
         if (toId == fromId) {
             logger.error("can't invite self, userId: " + fromId);
             return null;
         }
 
-        final String fromName = meeting.getCreateName();
-        final String title = meeting.getMeetingName();
-        final long meetingId = meeting.getId();
-        final long time = meeting.getStartTime().getTime();
+        String fromName = meeting.getCreateName();
+        String title = meeting.getMeetingName();
+        long meetingId = meeting.getId();
+        long time = meeting.getStartTime().getTime();
 
         MessageNotify notify = new MessageNotify();
         notify.setToId(toId);
@@ -88,15 +89,15 @@ public class MeetingNotifyService {
     }
 
     public MessageNotify newApplyMeetingNotify(long fromId, String fromName, String title, Meeting meeting) {
-        final long toId = meeting.getCreateId();
+        long toId = meeting.getCreateId();
         if (toId == fromId) {
             logger.error("can't apply self, userId: " + fromId);
             return null;
         }
 
-        final String meetingTitle = meeting.getMeetingName();
-        final long meetingId = meeting.getId();
-        //final long time = meeting.getStartTime().getTime();
+        String meetingTitle = meeting.getMeetingName();
+        long meetingId = meeting.getId();
+        //long time = meeting.getStartTime().getTime();
 
         MessageNotify notify = new MessageNotify();
         notify.setToId(toId);
@@ -113,9 +114,25 @@ public class MeetingNotifyService {
         return notify;
     }
 
-    public void addMeetingNotify(long fromId, String fromName, String title, Meeting meeting) {
+    public void addAgreeMeetingNotify(Meeting meeting, MeetingMember member) {
+        String title = "您 同意了" + member.getMemberName() + "的报名";
+        addMeetingNotify(meeting.getCreateId(), meeting.getCreateId(), meeting.getCreateName(), title, meeting);
+
+        title = meeting.getCreateName() + "同意了您的报名";
+        addMeetingNotify(member.getMemberId(), meeting.getCreateId(), meeting.getCreateName(), title, meeting);
+    }
+
+    public void addRefuseMeetingNotify(Meeting meeting, MeetingMember member) {
+        String title = "您 拒绝了" + member.getMemberName() + "的报名";
+        addMeetingNotify(meeting.getCreateId(), meeting.getCreateId(), meeting.getCreateName(), title, meeting);
+
+        title = meeting.getCreateName() + "拒绝了您的报名";
+        addMeetingNotify(member.getMemberId(), meeting.getCreateId(), meeting.getCreateName(), title, meeting);
+    }
+
+    public void addMeetingNotify(long toId, long fromId, String fromName, String title, Meeting meeting) {
         try {
-            MessageNotify notify = newMeetingNotify(fromId, fromName, title, meeting);
+            MessageNotify notify = newMeetingNotify(toId, fromId, fromName, title, meeting);
             if (notify != null) {
                 messageNotifyService.sendMessageNotify(notify);
             }
@@ -124,16 +141,14 @@ public class MeetingNotifyService {
         }
     }
 
-    public MessageNotify newMeetingNotify(long fromId, String fromName, String title, Meeting meeting) {
-        final long toId = meeting.getCreateId();
-        if (toId == fromId) {
-            logger.error("can't send notify to self, userId: " + fromId);
-            return null;
-        }
-
-        final String meetingTitle = meeting.getMeetingName();
-        final long meetingId = meeting.getId();
-        //final long time = meeting.getStartTime().getTime();
+    public MessageNotify newMeetingNotify(long toId, long fromId, String fromName, String title, Meeting meeting) {
+//        if (toId == fromId) {
+//            logger.error("can't send notify to self, userId: " + fromId);
+//            return null;
+//        }
+        String meetingTitle = meeting.getMeetingName();
+        long meetingId = meeting.getId();
+        //long time = meeting.getStartTime().getTime();
 
         MessageNotify notify = new MessageNotify();
         notify.setToId(toId);
@@ -148,6 +163,24 @@ public class MeetingNotifyService {
         notify.setContent(content);
 
         return notify;
+    }
+
+    public int deleteMeetingNotify(long fromId, long toId, long meetingId) {
+        return deleteMeetingNotify(fromId, toId, meetingId, MessageNotifyType.EActivityApply.value());
+    }
+
+    public int deleteMeetingNotify(long fromId, long toId, long meetingId, int type) {
+        if (toId <= 0 || meetingId <= 0) {
+            logger.error("userId or meetingId is invalidated.");
+            return -1;
+        }
+
+        try {
+            return messageNotifyService.deleteByFromIdToIdResIdType(fromId, toId, meetingId, type);
+        } catch (Exception ex) {
+            logger.error("invoke deleteByToIdResIdType failed. toId: " + toId + " meetingId: " + meetingId + " type: " + type);
+            return -1;
+        }
     }
 
 }
