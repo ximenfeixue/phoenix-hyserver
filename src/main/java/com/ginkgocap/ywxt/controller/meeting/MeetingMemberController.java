@@ -806,8 +806,7 @@ public class MeetingMemberController extends BaseController {
 									} else {
 										responseDataMap.put("succeed", false);
 										notificationMap.put("notifCode", "0002");
-										notificationMap.put("notifInfo",
-												"会议举办方已经邀请您参会，无需报名");
+										notificationMap.put("notifInfo", "会议举办方已经邀请您参会，无需报名");
 									}
 								} else if (meetingMember.getAttendMeetType() == 1 && meetingMember.getExcuteMeetSign() == 2){
 									User user = getUser(request);
@@ -815,8 +814,7 @@ public class MeetingMemberController extends BaseController {
 									signUp(meetingMember.getId(),memberName, memberPhoto, memberId, user, meeting);
 									responseDataMap.put("succeed", true);
 									notificationMap.put("notifCode", "0001");
-									notificationMap.put("notifInfo",
-											"hello mobile app!");
+									notificationMap.put("notifInfo", "hello mobile app!");
 								} else {
 									responseDataMap.put("succeed", false);
 									notificationMap.put("notifCode", "0002");
@@ -828,8 +826,7 @@ public class MeetingMemberController extends BaseController {
 								signUp(meetingMember.getId(),memberName, memberPhoto, memberId, user, meeting);
 								responseDataMap.put("succeed", true);
 								notificationMap.put("notifCode", "0001");
-								notificationMap.put("notifInfo",
-										"hello mobile app!");
+								notificationMap.put("notifInfo", "hello mobile app!");
 							}
 						} else {
 							User user = getUser(request);
@@ -837,8 +834,7 @@ public class MeetingMemberController extends BaseController {
 							signUp(null,memberName, memberPhoto, memberId, user, meeting);
 							responseDataMap.put("succeed", true);
 							notificationMap.put("notifCode", "0001");
-							notificationMap.put("notifInfo",
-									"hello mobile app!");
+							notificationMap.put("notifInfo", "hello mobile app!");
 
 						}
 					}
