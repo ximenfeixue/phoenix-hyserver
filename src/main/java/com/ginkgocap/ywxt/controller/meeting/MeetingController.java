@@ -602,6 +602,16 @@ public class MeetingController extends BaseController {
 					for (MeetingMember mm : mlist) {
 						if (mm.getMemberId().equals(memberId)) {
 							flag = false;
+							if (isPay == 1) {
+								// 报名查询
+								List<PayOrder> payOrders = payOrderService.getPayOrderByUserIdAndSourceId(memberId, id);
+								if (CollectionUtils.isNotEmpty(payOrders)) {
+									PayOrder payOrder = payOrders.get(0);
+									if (payOrder.getStatus() == PayStatus.PAY_SUCCESS.getValue()) {
+										meetingObj.setPayStatus(Byte.valueOf("1"));
+									}
+								}
+							}
 						}
 					}
 					if (memberId.equals(1l)) {
@@ -643,6 +653,7 @@ public class MeetingController extends BaseController {
 						if (!status)
 							meetingObj.setIsPay((byte)0);
 					}
+
 				}
 			} catch (Exception e) {
 				logger.error("查询会议详情失败", e);
@@ -3209,6 +3220,7 @@ public class MeetingController extends BaseController {
 			if (CollectionUtils.isEmpty(meetingMemberList)) {
 				try {
 					saveMeetingMember(user, meetingId);
+					// 通知保存到队列中 待支付成功才发送通知
                     saveMeetingNotice(user, meeting);
 				} catch (Exception e) {
 					logger.error("invoke meetingMemberService failed! method : {saveOrUpdate}. userId :" + userId);
