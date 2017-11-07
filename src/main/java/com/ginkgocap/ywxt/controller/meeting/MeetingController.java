@@ -3165,6 +3165,7 @@ public class MeetingController extends BaseController {
 		Integer type = meetingPayQuery.getType();
 		Integer web = meetingPayQuery.getWeb();
 		Byte sourceType = meetingPayQuery.getSourceType();
+		String openId = meetingPayQuery.getOpenId();
 		if (null == meetingId || null == type || null == web) {
 			return InterfaceResult.getInterfaceResultInstance(CommonResultCode.PARAMS_EXCEPTION);
 		}
@@ -3195,7 +3196,7 @@ public class MeetingController extends BaseController {
 		Long createId = meeting.getCreateId();
 		payMoney = payMoney.multiply(new BigDecimal(100));
 		// TODO : 上线 需要修改金额
-		PayRequest payRequest = createPayRequest(payMoney.intValue(), web.intValue(), type.intValue(), userId, meetingId, mobile, userName, createId);
+		PayRequest payRequest = createPayRequest(payMoney.intValue(), web.intValue(), type.intValue(), userId, meetingId, mobile, userName, createId,openId);
 		PayResponse payResponse = null;
 		try {
 			payResponse = payService.request(payRequest);
@@ -3283,7 +3284,7 @@ public class MeetingController extends BaseController {
 	}
 
 	public static PayRequest createPayRequest(int money, int web, int type, long userId, long sourceId,
-											  String mobile, String userName, long createId) {
+											  String mobile, String userName, long createId,String openId) {
 
 		PayRequest payRequest = new PayRequest();
 		payRequest.setDetail("4"); // 活动："4"
@@ -3299,6 +3300,7 @@ public class MeetingController extends BaseController {
 		payRequest.setMobile(mobile); // 发起人手机号
 		payRequest.setUserName(userName); // 发起人名称
 		payRequest.setToUserId(createId); // 创建活动的人
+		payRequest.setOpenId(openId);
 		return payRequest;
 	}
 

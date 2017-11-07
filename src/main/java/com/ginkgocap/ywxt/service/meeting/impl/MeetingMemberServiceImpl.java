@@ -327,7 +327,7 @@ public class MeetingMemberServiceImpl implements MeetingMemberService{
 	}
 	/**
 	 * 名称: changeAttendMeetStatus
-	 * 描述: 改变成员参会状态 ：0.未答复 1接受邀请2拒绝邀请，  5取消报名
+	 * 描述: 改变成员参会状态 ：0.未答复 1接受邀请 2拒绝邀请，  5取消报名
 	 * @since  2014-09-18
 	 * @author qingc
 	 * @throws Exception 
