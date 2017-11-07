@@ -895,7 +895,7 @@ public class MeetingMemberController extends BaseController {
 
         //send notification
         String fromName = user.getName();
-        final String title = fromName + "报名参加" + meeting.getMeetingName();
+        final String title = fromName + " 报名参加 " + meeting.getMeetingName();
         if (meeting.getReviewFlag() == 0) {
             meetingNotifyService.addMeetingNotify(meeting.getCreateId(), user.getId(), fromName, title, meeting);
         } else if (meeting.getReviewFlag() == 1) {

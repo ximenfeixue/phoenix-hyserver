@@ -115,18 +115,18 @@ public class MeetingNotifyService {
     }
 
     public void addAgreeMeetingNotify(Meeting meeting, MeetingMember member) {
-        String title = "您 同意了" + member.getMemberName() + "的报名";
+        String title = "您 同意了 " + member.getMemberName() + " 的报名";
         addMeetingNotify(meeting.getCreateId(), meeting.getCreateId(), meeting.getCreateName(), title, meeting);
 
-        title = meeting.getCreateName() + "同意了您的报名";
+        title = meeting.getCreateName() + " 同意了您的报名";
         addMeetingNotify(member.getMemberId(), meeting.getCreateId(), meeting.getCreateName(), title, meeting);
     }
 
     public void addRefuseMeetingNotify(Meeting meeting, MeetingMember member) {
-        String title = "您 拒绝了" + member.getMemberName() + "的报名";
+        String title = "您 拒绝了 " + member.getMemberName() + " 的报名";
         addMeetingNotify(meeting.getCreateId(), meeting.getCreateId(), meeting.getCreateName(), title, meeting);
 
-        title = meeting.getCreateName() + "拒绝了您的报名";
+        title = meeting.getCreateName() + " 拒绝了您的报名";
         addMeetingNotify(member.getMemberId(), meeting.getCreateId(), meeting.getCreateName(), title, meeting);
     }
 
