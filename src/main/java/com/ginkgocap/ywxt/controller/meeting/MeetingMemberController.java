@@ -1215,8 +1215,7 @@ public class MeetingMemberController extends BaseController {
 
 				if (Utils.isAllNotNullOrEmpty(meetingIdStr)) {
 					Long meetingId = Long.valueOf(meetingIdStr);
-					List<MeetingMember> listMember = meetingMemberService
-							.getVisitantByMeetingId(meetingId);
+					List<MeetingMember> listMember = meetingMemberService.getVisitantByMeetingId(meetingId);
 					responseDataMap.put("listMeetingMember", listMember);
 				} else {
 					logger.error("会议id为空");
@@ -1232,8 +1231,7 @@ public class MeetingMemberController extends BaseController {
 			}
 		} else {
 			logger.error("传入参数异常");
-			responseDataMap.put("listMeetingMember",
-					new ArrayList<MeetingMember>());
+			responseDataMap.put("listMeetingMember", new ArrayList<MeetingMember>());
 		}
 		notificationMap.put("notifCode", "0001");
 		notificationMap.put("notifInfo", "hello mobile app!");
@@ -1251,8 +1249,7 @@ public class MeetingMemberController extends BaseController {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/getRequiredSignupInfo.json", method = RequestMethod.GET)
-	public Map<String, Object> getRequiredSignupInfoGet(
-			HttpServletRequest request, HttpServletResponse response)
+	public Map<String, Object> getRequiredSignupInfoGet(HttpServletRequest request, HttpServletResponse response)
 			throws IOException {
 		Map<String, Object> model = getRequiredSignupInfo(request, response);
 		return model;
