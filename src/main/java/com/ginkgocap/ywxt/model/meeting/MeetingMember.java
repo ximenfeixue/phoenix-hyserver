@@ -27,7 +27,7 @@ public class MeetingMember extends BaseEntity implements java.io.Serializable,Co
 	private Long memberId;
     //会议序号
 	private Long meetingId;
-    //会议角色 0：嘉宾，1：群众
+    //会议角色 0：嘉宾，1：群众 2：创建者
 	private Integer memberType;
     //人员姓名
 	private String memberName;

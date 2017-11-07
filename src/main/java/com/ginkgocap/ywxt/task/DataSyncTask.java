@@ -10,6 +10,7 @@ import com.ginkgocap.ywxt.payment.utils.PayStatus;
 import com.ginkgocap.ywxt.service.meeting.DataSyncService;
 import com.ginkgocap.ywxt.service.meeting.MeetingNoticeService;
 import com.ginkgocap.ywxt.service.meeting.MeetingService;
+import com.ginkgocap.ywxt.service.meeting.NoticeFieldService;
 import com.ginkgocap.ywxt.user.model.User;
 import com.ginkgocap.ywxt.utils.Constant;
 import com.ginkgocap.ywxt.utils.GinTongInterface;
@@ -18,6 +19,7 @@ import com.ginkgocap.ywxt.utils.type.AttendMeetStatusType;
 import com.ginkgocap.ywxt.utils.type.NoticeReceiverType;
 import com.ginkgocap.ywxt.utils.type.NoticeType;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.poi.hssf.extractor.ExcelExtractor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,6 +53,9 @@ public class DataSyncTask implements Runnable{
 
     @Autowired
     private MeetingService meetingService;
+
+    @Autowired
+    private NoticeFieldService noticeFieldService;
 
     @Override
     public void run() {
@@ -118,6 +123,15 @@ public class DataSyncTask implements Runnable{
         } catch (Exception e) {
             logger.error("invoke meetingNoticeService failed! method :{saveOrUpdate} result --> send notice failed!");
             return false;
+        }
+        NoticeField noticeField = new NoticeField();
+        String field = meetingNotice.getCreateId() + Constant.NOTICE_CONTENT_SPLIT_CHAR + meetingNotice.getCreateName();
+        noticeField.setField(field);
+        noticeField.setNoticeId(meetingNotice.getId());
+        try {
+            noticeFieldService.saveOrUpdate(noticeField);
+        } catch (Exception e) {
+            logger.error("invoke meetingNoticeService failed! method :{saveOrUpdate} result --> send notice failed! {}", e.getMessage());
         }
         return true;
     }

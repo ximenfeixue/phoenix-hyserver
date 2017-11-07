@@ -148,5 +148,11 @@ public interface MeetingMemberService {
 	 * @param attendIdList
 	 */
 	public void deleteAttendMeetingBatch(List<Long> attendIdList);
+	/**
+	 * 获取参会人数
+	 * @param meetingId
+	 * @return
+	 */
+	Integer getAttendMeetingCount(Long meetingId);
 
 }

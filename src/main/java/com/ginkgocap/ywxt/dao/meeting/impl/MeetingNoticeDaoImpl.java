@@ -205,10 +205,11 @@ public class MeetingNoticeDaoImpl extends SqlSessionDaoSupport implements Meetin
 	 * @since  2014-09-14
 	 * @author qingc
 	 */
-	public void addNotice(MeetingNotice meetingNotice,NoticeField noticeField){
-		List<MeetingNotice>list= this.getNoticeByProperty( meetingNotice.getReceiverType(),meetingNotice.getReceiver(),meetingNotice.getNoticeType() ,meetingNotice.getIsShow() ,meetingNotice.getMeetingId(),meetingNotice.getCreateId());
-		if(!Utils.isNullOrEmpty(list)&&!Utils.isNullOrEmpty(list.get(0))){
-			MeetingNotice meetingNoticeTemp=list.get(0);
+	public void addNotice(MeetingNotice meetingNotice, NoticeField noticeField){
+		List<MeetingNotice> list = this.getNoticeByProperty(meetingNotice.getReceiverType(), meetingNotice.getReceiver(),
+				meetingNotice.getNoticeType(), meetingNotice.getIsShow(), meetingNotice.getMeetingId(), meetingNotice.getCreateId());
+		if (!Utils.isNullOrEmpty(list) && !Utils.isNullOrEmpty(list.get(0))){
+			MeetingNotice meetingNoticeTemp = list.get(0);
 			if(!Utils.isNullOrEmpty(meetingNoticeTemp.getId())){
 				meetingNotice.setId(meetingNoticeTemp.getId());
 				this.saveOrUpdate(meetingNotice);
@@ -216,7 +217,7 @@ public class MeetingNoticeDaoImpl extends SqlSessionDaoSupport implements Meetin
 				this.deleteByNoticeId(meetingNoticeTemp.getId());
 				this.saveOrUpdate(noticeField);
 			}
-		}else{
+		} else {
 			this.saveOrUpdate(meetingNotice);
 			noticeField.setNoticeId(meetingNotice.getId());
 			this.saveOrUpdate(noticeField);

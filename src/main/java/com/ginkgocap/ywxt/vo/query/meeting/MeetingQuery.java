@@ -15,6 +15,7 @@ import java.util.List;
 import com.ginkgocap.ywxt.model.meeting.*;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
+import org.openqa.selenium.By;
 
 public class MeetingQuery implements Serializable {
     private static final long serialVersionUID = 3148176768559230877L;
@@ -66,6 +67,8 @@ public class MeetingQuery implements Serializable {
 	private Date createTime;
 	/** 删除标识位(0：默认、1：删除)*/
 	private int isDelete = 0;
+	/** 支付状态 0:默认支付失败 1:支付成功 */
+	private Byte payStatus = 0;
 	/**会议成员**/
 	private List<MeetingMember>  listMeetingMember;
 	/**会议成员**/
@@ -666,5 +669,13 @@ public class MeetingQuery implements Serializable {
 
 	public void setIsDelete(int isDelete) {
 		this.isDelete = isDelete;
+	}
+
+	public Byte getPayStatus() {
+		return payStatus;
+	}
+
+	public void setPayStatus(Byte payStatus) {
+		this.payStatus = payStatus;
 	}
 }

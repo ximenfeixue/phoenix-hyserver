@@ -157,7 +157,12 @@ public class MeetingMemberController extends BaseController {
 				result.setResponseData(responseDataMap);
 				return result;
 			}
-			List<MeetingMember> list = meetingMemberService.getByMeetingIdAndMemberId(meetingId, meetingMember.getMemberId());
+			Integer count = meetingMemberService.getAttendMeetingCount(meetingId);
+			if (!isNullOrEmpty(meeting.getMemberCount()) && meeting.getMemberCount() > 0 && meeting.getMemberCount() <= count) {
+				return InterfaceResult.getInterfaceResultInstance(CommonResultCode.PARAMS_EXCEPTION, "参会人数已满额，不能再邀请喽");
+			}
+			List<MeetingMember> list = meetingMemberService.getByMeetingIdAndMemberId(
+					meetingId, meetingMember.getMemberId());
 			if (!isNullOrEmpty(list) || list.size() > 0) {
 				MeetingMember meetingMemberTemp = list.get(0);
 				if(!isNullOrEmpty(meetingMemberTemp)) {
@@ -211,8 +216,6 @@ public class MeetingMemberController extends BaseController {
 				meetingMember.setMemberType(1);
 				meetingMemberService.saveOrUpdate(meetingMember);
 				meetingMember.setAttendMeetTime(new Date());
-                //send invitation
-                meetingNotifyService.addInvitationNotify(meetingMember.getMemberId(), meeting);
 				logger.info("操作成功");
 			}
 		} catch (Exception e) {
@@ -435,7 +438,7 @@ public class MeetingMemberController extends BaseController {
 				// 会议id
 				String meetingIdStr = getStringJsonValueByKey(j, "meetingId");
 				//群组id
-				final String groupId = getStringJsonValueByKey(j, "groupId");
+				//final String groupId = getStringJsonValueByKey(j, "groupId");
 				// 会议成员id
 				String memberIdStr = getStringJsonValueByKey(j, "memberId");
 				User user = getUser(request);
@@ -498,7 +501,7 @@ public class MeetingMemberController extends BaseController {
 										}
 									}
 									if ("1".equals(reviewStatus)) {
-										Integer count = meetingMemberService.getSignUpMemberCount(meetingId);
+										Integer count = meetingMemberService.getAttendMeetingCount(meetingId);
 										// 同意报名
 										if (!isNullOrEmpty(meeting.getMemberCount())
 												&& meeting.getMemberCount() > 0
@@ -519,6 +522,7 @@ public class MeetingMemberController extends BaseController {
 										 	*/
 											final Long userId = meetingMember.getMemberId();
 											final Long creatorUserId = meeting.getCreateId();
+											final String groupId = meeting.getGroupId();
 											ThreadPoolUtils.getExecutorService().execute(new Runnable() {
 												@Override
 												public void run() {
@@ -548,8 +552,8 @@ public class MeetingMemberController extends BaseController {
 										meetingMemberService.signUpReview(1, meeting, meetingMember, user);
 										responseDataMap.put("succeed", true);
 										notificationMap.put("notifCode", "0001");
-										notificationMap.put("notifInfo", "该会议没有接受你的报名");
-										setSessionAndErr(request, response, "0", "该会议没有接受你的报名");
+										notificationMap.put("notifInfo", "操作成功");
+										setSessionAndErr(request, response, "0", "操作成功");
                                         //add meeting notification
                                         meetingNotifyService.deleteMeetingNotify(memberId, meeting.getCreateId(), meetingId);
                                         meetingNotifyService.addRefuseMeetingNotify(meeting, meetingMember);
@@ -611,7 +615,7 @@ public class MeetingMemberController extends BaseController {
 		MeetingSignQuery meetingSignQuery = GsonUtils.StringToObject(MeetingSignQuery.class, requestJson);
 		final Long meetingId = meetingSignQuery.getMeetingId();
 		Meeting meeting = meetingService.getById(meetingId);
-		Integer count = meetingMemberService.getSignUpMemberCount(meetingId);
+		Integer count = meetingMemberService.getAttendMeetingCount(meetingId);
 		if (!isNullOrEmpty(meeting.getMemberCount()) && meeting.getMemberCount() > 0 && meeting.getMemberCount() <= count) {
 			return InterfaceResult.getInterfaceResultInstance(CommonResultCode.PARAMS_EXCEPTION, "报名人数已满额，不能加入活动");
 		}
@@ -953,21 +957,13 @@ public class MeetingMemberController extends BaseController {
 				// orderNumber 订单号
 				String orderNumber = getStringJsonValueByKey(j, "orderNumber");
 				long meetingId = Long.valueOf(meetingIdStr);
-				Integer count = meetingMemberService.getSignUpMemberCount(meetingId);
+				Integer count = meetingMemberService.getAttendMeetingCount(meetingId);
 				long memberId = Long.valueOf(memberIdStr);
 				Meeting meeting = meetingService.getById(meetingId);
 				if (null == meeting) {
 					responseDataMap.put("succeed", false);
 					notificationMap.put("notifCode", "0002");
 					notificationMap.put("notifInfo", "会议不存在");
-					model.put("responseData", responseDataMap);
-					model.put("notification", notificationMap);
-					return model;
-				}
-				if (!isNullOrEmpty(meeting.getMemberCount()) && meeting.getMemberCount() > 0 && meeting.getMemberCount() <= count) {
-					responseDataMap.put("succeed", false);
-					notificationMap.put("notifCode", "0002");
-					notificationMap.put("notifInfo", "报名人数已满额，不能加入活动");
 					model.put("responseData", responseDataMap);
 					model.put("notification", notificationMap);
 					return model;
@@ -1013,7 +1009,17 @@ public class MeetingMemberController extends BaseController {
 					if(AttendMeetStatusType.ACCEPT_INVITATION.code() == Integer.valueOf(type) || AttendMeetStatusType.REFUSE_INVITATION.code() == Integer.valueOf(type)){
 						// 只有未开始和进行中的会议可以接受邀请或者拒绝邀请
 						if(MeetingStatusType.NOT_BEGIN.code() == meeting.getMeetingStatus() || MeetingStatusType.IN_MEETING.code() == meeting.getMeetingStatus()){
-
+							// 接受邀请进入活动时，确定参会人数
+							if (AttendMeetStatusType.ACCEPT_INVITATION.code() == Integer.valueOf(type)) {
+								if (!isNullOrEmpty(meeting.getMemberCount()) && meeting.getMemberCount() > 0 && meeting.getMemberCount() <= count) {
+									responseDataMap.put("succeed", false);
+									notificationMap.put("notifCode", "0002");
+									notificationMap.put("notifInfo", "参会人数已满额，不能加入活动");
+									model.put("responseData", responseDataMap);
+									model.put("notification", notificationMap);
+									return model;
+								}
+							}
 							meetingMemberService.changeAttendMeetStatus(Long.valueOf(meetingIdStr), Long.valueOf(memberIdStr), Integer.valueOf(type), user);
 
 							responseDataMap.put("succeed", true);
@@ -1732,7 +1738,19 @@ public class MeetingMemberController extends BaseController {
 										//推送通知
 										String dateStr = DateUtil.convertDateToStringForChina(new Date());
 										GinTongInterface.pushToAttendMeetingMember(userBean, String.valueOf(meeting.getId()), meeting.getCreateName()+"于"+dateStr+"取消了您参加的"+meeting.getMeetingName()+"会议",false,dateStr);
-									} else if(0 == meetingMember.getMemberType().intValue()) {//主讲人
+										// 踢出活动畅聊
+										final String groupId = meeting.getGroupId();
+										final Long userId = Long.valueOf(memberId);
+										final Long operatorUserId = user.getId();
+										ThreadPoolUtils.getExecutorService().execute(new Runnable() {
+											@Override
+											public void run() {
+												if (StringUtils.isNotEmpty(groupId)) {
+													GinTongInterface.removeMuc(operatorUserId, groupId, userId);
+												}
+											}
+										});
+									} else if (0 == meetingMember.getMemberType().intValue()) {//主讲人
 										//删除议题
 										List<MeetingTopic> listMeetingTopic = meetingTopicService.getByMeetingId(Long.parseLong(meetingId));
 										if(!Utils.isNullOrEmpty(listMeetingTopic)) {

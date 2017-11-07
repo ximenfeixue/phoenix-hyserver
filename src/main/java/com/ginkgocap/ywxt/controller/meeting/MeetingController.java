@@ -24,14 +24,13 @@ import com.ginkgocap.ywxt.payment.model.request.PayRequest;
 import com.ginkgocap.ywxt.payment.model.response.PayResponse;
 import com.ginkgocap.ywxt.payment.service.PayOrderService;
 import com.ginkgocap.ywxt.payment.service.PayService;
+import com.ginkgocap.ywxt.payment.service.associator.CheckStatusService;
 import com.ginkgocap.ywxt.payment.utils.PayStatus;
 import com.ginkgocap.ywxt.service.meeting.*;
 import com.ginkgocap.ywxt.task.DataSyncTask;
 import com.ginkgocap.ywxt.user.service.corporation.CorporationRelationService;
 import com.ginkgocap.ywxt.utils.*;
-import com.ginkgocap.ywxt.utils.type.ExcuteMeetSignType;
-import com.ginkgocap.ywxt.utils.type.NoticeReceiverType;
-import com.ginkgocap.ywxt.utils.type.NoticeType;
+import com.ginkgocap.ywxt.utils.type.*;
 import com.ginkgocap.ywxt.vo.query.meeting.*;
 import com.gintong.frame.util.dto.CommonResultCode;
 import com.gintong.frame.util.dto.InterfaceResult;
@@ -66,7 +65,6 @@ import com.ginkgocap.ywxt.file.model.FileIndex;
 import com.ginkgocap.ywxt.user.model.User;
 import com.ginkgocap.ywxt.user.service.UserService;
 import com.ginkgocap.ywxt.util.HttpClientHelper;
-import com.ginkgocap.ywxt.utils.type.SocialType;
 import com.ginkgocap.ywxt.vo.query.community.Community;
 import com.ginkgocap.ywxt.vo.query.social.CommunityNewCount;
 import com.ginkgocap.ywxt.vo.query.social.Social;
@@ -135,6 +133,8 @@ public class MeetingController extends BaseController {
 	private PayOrderService payOrderService;
 	@Autowired
 	private DataSyncTask dataSyncTask;
+	@Autowired
+	private CheckStatusService checkStatusService;
 
 	private static int  expiredTime = 60 * 60 * 24 * 7;
 	// 不需要审核状态
@@ -570,6 +570,7 @@ public class MeetingController extends BaseController {
 				String idStr = getStringJsonValueByKey(j, "id");
 				// 会议成员id
 				String memberIdStr = getStringJsonValueByKey(j, "memberId");
+				String version = getStringJsonValueByKey(j, "version");
 				if (Utils.isNullOrEmpty(memberIdStr)) {
 					memberIdStr = "0";// 外部访问，默认为金桐脑
 				}
@@ -599,6 +600,16 @@ public class MeetingController extends BaseController {
 					for (MeetingMember mm : mlist) {
 						if (mm.getMemberId().equals(memberId)) {
 							flag = false;
+							if (isPay == 1) {
+								// 报名查询
+								List<PayOrder> payOrders = payOrderService.getPayOrderByUserIdAndSourceId(memberId, id);
+								if (CollectionUtils.isNotEmpty(payOrders)) {
+									PayOrder payOrder = payOrders.get(0);
+									if (payOrder.getStatus() == PayStatus.PAY_SUCCESS.getValue()) {
+										meetingObj.setPayStatus(Byte.valueOf("1"));
+									}
+								}
+							}
 						}
 					}
 					if (memberId.equals(1l)) {
@@ -634,6 +645,13 @@ public class MeetingController extends BaseController {
 						// 增加已读会议数量
 						meetingCountService.addReadCount(id);
 					}
+					// TODO 上线修改IOS支付不审核通过设为免费
+					if (StringUtils.isNotEmpty(version)) {
+						boolean status = checkStatusService.checkStatus(version);
+						if (!status)
+							meetingObj.setIsPay((byte)0);
+					}
+
 				}
 			} catch (Exception e) {
 				logger.error("查询会议详情失败", e);
@@ -3145,12 +3163,17 @@ public class MeetingController extends BaseController {
 		Integer type = meetingPayQuery.getType();
 		Integer web = meetingPayQuery.getWeb();
 		Byte sourceType = meetingPayQuery.getSourceType();
+		String openId = meetingPayQuery.getOpenId();
 		if (null == meetingId || null == type || null == web) {
 			return InterfaceResult.getInterfaceResultInstance(CommonResultCode.PARAMS_EXCEPTION);
 		}
 		Meeting meeting = meetingService.getById(meetingId);
 		if (null == meeting) {
 			return InterfaceResult.getInterfaceResultInstance(CommonResultCode.PARAMS_EXCEPTION, "当前活动不存在或已删除");
+		}
+		Integer count = meetingMemberService.getAttendMeetingCount(meetingId);
+		if (!isNullOrEmpty(meeting.getMemberCount()) && meeting.getMemberCount() > 0 && meeting.getMemberCount() <= count) {
+			return InterfaceResult.getInterfaceResultInstance(CommonResultCode.PARAMS_EXCEPTION, "参会人数已满额，不能加入活动");
 		}
 		try {
 			meetingSignUpFormQuery = meetingMongoService.getMeetingSignFormByMeetingIdAndUserId(meetingId, userId);
@@ -3171,7 +3194,7 @@ public class MeetingController extends BaseController {
 		Long createId = meeting.getCreateId();
 		payMoney = payMoney.multiply(new BigDecimal(100));
 		// TODO : 上线 需要修改金额
-		PayRequest payRequest = createPayRequest(1, web.intValue(), type.intValue(), userId, meetingId, mobile, userName, createId);
+		PayRequest payRequest = createPayRequest(payMoney.intValue(), web.intValue(), type.intValue(), userId, meetingId, mobile, userName, createId,openId);
 		PayResponse payResponse = null;
 		try {
 			payResponse = payService.request(payRequest);
@@ -3196,6 +3219,7 @@ public class MeetingController extends BaseController {
 			if (CollectionUtils.isEmpty(meetingMemberList)) {
 				try {
 					saveMeetingMember(user, meetingId);
+					// 通知保存到队列中 待支付成功才发送通知
                     saveMeetingNotice(user, meeting);
 				} catch (Exception e) {
 					logger.error("invoke meetingMemberService failed! method : {saveOrUpdate}. userId :" + userId);
@@ -3258,7 +3282,7 @@ public class MeetingController extends BaseController {
 	}
 
 	public static PayRequest createPayRequest(int money, int web, int type, long userId, long sourceId,
-											  String mobile, String userName, long createId) {
+											  String mobile, String userName, long createId,String openId) {
 
 		PayRequest payRequest = new PayRequest();
 		payRequest.setDetail("4"); // 活动："4"
@@ -3274,6 +3298,7 @@ public class MeetingController extends BaseController {
 		payRequest.setMobile(mobile); // 发起人手机号
 		payRequest.setUserName(userName); // 发起人名称
 		payRequest.setToUserId(createId); // 创建活动的人
+		payRequest.setOpenId(openId);
 		return payRequest;
 	}
 

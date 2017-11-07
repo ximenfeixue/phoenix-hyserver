@@ -9,7 +9,10 @@ package com.ginkgocap.ywxt.service.meeting.impl;
 import java.util.Date;
 import java.util.List;
 
+import com.ginkgocap.ywxt.utils.*;
 import com.ginkgocap.ywxt.utils.type.ExcuteMeetSignType;
+import org.apache.commons.lang.*;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,10 +27,6 @@ import com.ginkgocap.ywxt.model.meeting.MeetingNotice;
 import com.ginkgocap.ywxt.model.meeting.NoticeField;
 import com.ginkgocap.ywxt.service.meeting.MeetingMemberService;
 import com.ginkgocap.ywxt.user.model.User;
-import com.ginkgocap.ywxt.utils.Constant;
-import com.ginkgocap.ywxt.utils.DateUtil;
-import com.ginkgocap.ywxt.utils.GinTongInterface;
-import com.ginkgocap.ywxt.utils.Utils;
 import com.ginkgocap.ywxt.utils.type.AttendMeetStatusType;
 import com.ginkgocap.ywxt.utils.type.NoticeReceiverType;
 import com.ginkgocap.ywxt.utils.type.NoticeType;
@@ -316,7 +315,7 @@ public class MeetingMemberServiceImpl implements MeetingMemberService{
 	}
 	/**
 	 * 把报名申请通知设置为不可见
-	 * @param field
+	 * @param meetingId
 	 */
 	@Transactional(rollbackFor=Exception.class)
 	public void updateSignUpNoticeStatus(Long createId,Long meetingId){
@@ -330,7 +329,7 @@ public class MeetingMemberServiceImpl implements MeetingMemberService{
 	}
 	/**
 	 * 名称: changeAttendMeetStatus
-	 * 描述: 改变成员参会状态 ：0.未答复 1接受邀请2拒绝邀请，  5取消报名
+	 * 描述: 改变成员参会状态 ：0.未答复 1接受邀请 2拒绝邀请，  5取消报名
 	 * @since  2014-09-18
 	 * @author qingc
 	 * @throws Exception 
@@ -403,6 +402,17 @@ public class MeetingMemberServiceImpl implements MeetingMemberService{
 					}
 					// 封装通知内容
 					meetingNotice.setNoticeContent(content);
+					// 退出活动畅聊
+					final String groupId = meeting.getGroupId();
+					final Long userId = Long.valueOf(memberId);
+					ThreadPoolUtils.getExecutorService().execute(new Runnable() {
+						@Override
+						public void run() {
+							if (StringUtils.isNotEmpty(groupId)) {
+								GinTongInterface.removeMuc(userId, groupId, userId);
+							}
+						}
+					});
 				}
 				addNotice(user, meetingNotice, noticeField, content, new Date());
 			} else {
@@ -482,5 +492,10 @@ public class MeetingMemberServiceImpl implements MeetingMemberService{
 	 */
 	public void deleteAttendMeetingBatch(List<Long> attendIdList) {
 		meetingMemberDao.deleteAttendMeetingBatch(attendIdList);
+	}
+
+	@Override
+	public Integer getAttendMeetingCount(Long meetingId) {
+		return meetingMemberDao.getAttendMeetingCount(meetingId);
 	}
 }

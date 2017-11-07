@@ -128,6 +128,8 @@ public class MeetingServiceImpl extends BaseServiceImpl<Meeting, Long> implement
 
 	private static final Byte reviewFlag = 0;
 
+	private static final byte isPay = 1;
+
 	/**
 	 * 名称: getById 描述: 根据id查找
 	 * 
@@ -869,13 +871,14 @@ public class MeetingServiceImpl extends BaseServiceImpl<Meeting, Long> implement
 	}
 	/**
 	 * 名称: getMeetingByIdAndMemberId 描述: 根据会议和成员id获取会议详情
-	 * 
+	 * 由于业务需求 有修改操作 需要在该方法修改事务控制，不能设为只读
 	 * @since 2014-09-17
 	 * @author qingc
 	 */
-	@Transactional(readOnly = true)
+	@Transactional
 	public MeetingQuery getMeetingByIdAndMemberId(Long id, Long memberId) throws IllegalAccessException, InvocationTargetException, FileIndexServiceException {
 
+	    logger.info("getMeetingByIdAndMemberId start ------------");
 		List<PayOrder> payOrderList = null;
 		PayOrder payOrder = null;
 		MeetingQuery meetingObj = new MeetingQuery();
@@ -907,11 +910,12 @@ public class MeetingServiceImpl extends BaseServiceImpl<Meeting, Long> implement
 					for (MeetingMember meetingMember : listMember) {
 						if (!isNullOrEmpty(meetingMember) && !isNullOrEmpty(meetingMember.getMemberId())) {
 							userIdList.add(meetingMember.getMemberId());
-							if (meetingMember.getMemberId() == memberId && 1 == meetingObj.getIsPay()) {
+							logger.info("--------userId: {}, isPay :{}", meetingMember.getMemberId(), meetingObj.getIsPay());
+							if (meetingMember.getMemberId().longValue() == memberId.longValue() && isPay == meetingObj.getIsPay()) {
 								// 修改成员状态
                                 logger.info("修改成员状态 userId : {} meetingId :{}", memberId, meeting.getId());
 								try {
-									payOrderList =	payOrderService.getPayOrderByUserIdAndSourceId(memberId, meeting.getId());
+									payOrderList = payOrderService.getPayOrderByUserIdAndSourceId(memberId, meeting.getId());
 								} catch (Exception e) {
 									logger.error("invoke payOrderService failed! method getPayOrderByUserIdAndSourceId. userId : {} , meetingId :{}" + memberId + meeting.getId());
 								}
