@@ -489,8 +489,7 @@ public class MeetingMemberController extends BaseController {
 								} else if (meetingMember.getAttendMeetStatus() != 4) {
 									responseDataMap.put("succeed", false);
 									notificationMap.put("notifCode", "0002");
-									notificationMap.put("notifInfo",
-											"该用户报名状态已变更，不需审核");
+									notificationMap.put("notifInfo", "该用户报名状态已变更，不需审核");
 									setSessionAndErr(request, response, "-1", "该用户报名状态已变更，不需审核");
 								} else {
 									if(!isNullOrEmpty(meetingMember)&&!isNullOrEmpty(meetingMember.getMemberId())){
