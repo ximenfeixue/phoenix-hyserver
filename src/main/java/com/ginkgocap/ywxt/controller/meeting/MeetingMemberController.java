@@ -781,8 +781,7 @@ public class MeetingMemberController extends BaseController {
 						responseDataMap.put("succeed", false);
 						notificationMap.put("notifCode", "0002");
 						notificationMap.put("notifInfo", "会议不存在");
-					} else if (!isNullOrEmpty(meeting.getIsSecrecy())
-							&& meeting.getIsSecrecy() == true) {
+					} else if (!isNullOrEmpty(meeting.getIsSecrecy()) && meeting.getIsSecrecy() == true) {
 						responseDataMap.put("succeed", false);
 						notificationMap.put("notifCode", "0002");
 						notificationMap.put("notifInfo", "会议是保密会议，不允许报名");
