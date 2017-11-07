@@ -886,6 +886,8 @@ public class MeetingMemberController extends BaseController {
 		 * 参会状态 0.未答复 1接受邀请 2拒绝邀请， 4 报名 5取消报名
 		 */
 		meetingMember.setAttendMeetStatus(4);
+		/** 如果会议免签  设置成员自动签到 **/
+		meetingMember.setIsSign(meeting.getIsSign() == 1 ? 0 : 1);
 		/** 0 邀请，1 报名 **/
 		meetingMember.setAttendMeetType(1);
 		meetingMember.setAttendMeetTime(new Date());
