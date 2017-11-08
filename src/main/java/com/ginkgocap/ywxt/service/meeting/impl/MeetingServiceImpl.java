@@ -422,7 +422,7 @@ public class MeetingServiceImpl extends BaseServiceImpl<Meeting, Long> implement
 
 							//add invitation
                             final long memberId = meetingMember.getMemberId();
-							MessageNotify notify = meetingNotifyService.newInvitationNotify(memberId, meeting);
+							MessageNotify notify = meetingNotifyService.newInvitationNotify(memberId, user.getPicPath(), meeting);
                             if (notify != null) {
                                 notifyList.add(notify);
                             }

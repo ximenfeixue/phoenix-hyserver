@@ -492,13 +492,20 @@ public class MeetingMemberController extends BaseController {
 									notificationMap.put("notifInfo", "该用户报名状态已变更，不需审核");
 									setSessionAndErr(request, response, "-1", "该用户报名状态已变更，不需审核");
 								} else {
-									if(!isNullOrEmpty(meetingMember)&&!isNullOrEmpty(meetingMember.getMemberId())){
-										Long meetingMemberId=meetingMember.getMemberId();
-										User meetingMemberUser=userService.selectByPrimaryKey(meetingMemberId);
-										if(!isNullOrEmpty(meetingMemberUser)&&!isNullOrEmpty(meetingMemberUser.getName())){
-											meetingMember.setMemberName(meetingMemberUser.getName());
-										}
+									Long meetingMemberId = meetingMember.getMemberId();
+									User meetingMemberUser = userService.getUserById(meetingMemberId);
+									if (meetingMemberUser == null) {
+										responseDataMap.put("succeed", false);
+										notificationMap.put("notifCode", "0002");
+										notificationMap.put("notifInfo", "该用户信息不存在");
+										setSessionAndErr(request, response, "-1", "该用户信息不存在");
+                                        return responseData(model, responseDataMap, notificationMap);
 									}
+
+									if(!isNullOrEmpty(meetingMemberUser.getName())){
+										meetingMember.setMemberName(meetingMemberUser.getName());
+									}
+
 									if ("1".equals(reviewStatus)) {
 										Integer count = meetingMemberService.getAttendMeetingCount(meetingId);
 										// 同意报名
@@ -544,7 +551,7 @@ public class MeetingMemberController extends BaseController {
 
                                             //add meeting notification
                                             meetingNotifyService.deleteMeetingNotify(memberId, meeting.getCreateId(), meetingId);
-                                            meetingNotifyService.addAgreeMeetingNotify(meeting, meetingMember);
+                                            meetingNotifyService.addAgreeMeetingNotify(meeting, meetingMemberUser, user);
 										}
 									} else if ("2".equals(reviewStatus)) {
 										meetingMember.setExcuteMeetSign(ExcuteMeetSignType.REFUSE_SIGN_UP.code());
@@ -555,7 +562,7 @@ public class MeetingMemberController extends BaseController {
 										setSessionAndErr(request, response, "0", "操作成功");
                                         //add meeting notification
                                         meetingNotifyService.deleteMeetingNotify(memberId, meeting.getCreateId(), meetingId);
-                                        meetingNotifyService.addRefuseMeetingNotify(meeting, meetingMember);
+                                        meetingNotifyService.addRefuseMeetingNotify(meeting, meetingMemberUser, user);
 									}
 								}
 
@@ -896,9 +903,9 @@ public class MeetingMemberController extends BaseController {
         String fromName = user.getName();
         final String title = fromName + " 报名参加 " + meeting.getMeetingName();
         if (meeting.getReviewFlag() == 0) {
-            meetingNotifyService.addMeetingNotify(meeting.getCreateId(), user.getId(), fromName, title, meeting);
+            meetingNotifyService.addMeetingNotify(meeting.getCreateId(), user, title, meeting);
         } else if (meeting.getReviewFlag() == 1) {
-            meetingNotifyService.addApplyMeetingNotify(user.getId(), fromName, title, meeting);
+            meetingNotifyService.addApplyMeetingNotify(user, title, meeting);
         }
 	}
 
