@@ -510,6 +510,8 @@ public class MeetingMemberController extends BaseController {
 											notificationMap.put("notifInfo", "报名人数已满额，不能审核");
 											setSessionAndErr(request, response, "-1", "报名人数已满额，不能审核");
 										} else {
+											/** 如果会议免签  设置成员自动签到 **/
+											meetingMember.setIsSign(meeting.getIsSign() == 1 ? 0 : 1);
 											meetingMember.setExcuteMeetSign(ExcuteMeetSignType.AGREE_SIGN_UP.code());
 											meetingMemberService.signUpReview(0, meeting, meetingMember, user);
 											responseDataMap.put("succeed", true);
@@ -886,11 +888,12 @@ public class MeetingMemberController extends BaseController {
 		 * 参会状态 0.未答复 1接受邀请 2拒绝邀请， 4 报名 5取消报名
 		 */
 		meetingMember.setAttendMeetStatus(4);
-		/** 如果会议免签  设置成员自动签到 **/
-		meetingMember.setIsSign(meeting.getIsSign() == 1 ? 0 : 1);
+
 		/** 0 邀请，1 报名 **/
 		meetingMember.setAttendMeetType(1);
 		meetingMember.setAttendMeetTime(new Date());
+		if (meeting.getReviewFlag() == 0 && meeting.getIsSign() == 0)
+			meetingMember.setIsSign(1);
 		// 报名
 		meetingMemberService.signUp(meeting, meetingMember, user);
 
