@@ -374,6 +374,9 @@ public class MeetingMemberServiceImpl implements MeetingMemberService{
 					// 封装通知类型
 					meetingNotice.setNoticeType(NoticeType.ACCEPT_INVITATION.code());
 					meetingMember.setAttendMeetStatus(type);
+					/** 私密的活动免签 接受邀请直接签到 **/
+					if (meeting.getIsSign() == 0 || meeting.getIsSecrecy() == false)
+						meetingMember.setIsSign(1);
 					this.saveOrUpdate(meetingMember);
 				} else if (AttendMeetStatusType.REFUSE_INVITATION.code() == type){// 拒绝邀请
 					meetingMember.setAttendMeetStatus(type);	
