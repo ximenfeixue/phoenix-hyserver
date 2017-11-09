@@ -1885,7 +1885,10 @@ public class MeetingController extends BaseController {
             } else {
                 listResult = this.getChatListFromCache(userId);
             }
-
+            
+            if (CollectionUtils.isEmpty(listResult)) {
+                listResult = new ArrayList<Social>();
+            }
             filterDeletedChatList(listResult, user.getId());
 
             // 获取最新的通知
