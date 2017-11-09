@@ -5,6 +5,8 @@
 */ 
 package com.ginkgocap.ywxt.model.meeting; 
 
+import com.gintong.ywxt.im.model.JTFile;
+
 import java.util.List;
 
 /** 
@@ -28,7 +30,7 @@ public class ChatMini {
 	private long index;        //内部聊天序号
 	private String messageID;  //消息ID串  由客户端生产
 	private int  newCount;     //未读消息数
-	private JTFile  jtFile;    //发送的 附件文件
+	private JTFile jtFile;    //发送的 附件文件
 	private int type;          //文件类型
 	
 	
@@ -116,10 +118,4 @@ public class ChatMini {
 	public void setType(int type) {
 		this.type = type;
 	}
-	
-	
-	
-	
-	
-
 }

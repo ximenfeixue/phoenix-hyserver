@@ -1,5 +1,7 @@
 package com.ginkgocap.ywxt.model.meeting;
 
+import com.gintong.ywxt.im.model.JTFile;
+
 /**
  * 会议传输对象
  * @author edwin

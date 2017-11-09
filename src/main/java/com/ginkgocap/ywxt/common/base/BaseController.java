@@ -1,6 +1,8 @@
 package com.ginkgocap.ywxt.common.base;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -169,6 +171,16 @@ public abstract class BaseController {
 	    response.setHeader("errorCode", errCode);
 	    response.setHeader("errorMessage", Encodes.encodeBase64(errMessage.getBytes()));
 	}
+
+	public Map<String, Object> responseData(Map<String, Object> model, Map<String, Object> responseDataMap, Map<String, Object> notificationMap) {
+		if (model == null) {
+			model = new HashMap<String, Object>();
+		}
+		model.put("responseData", responseDataMap);
+		model.put("notification", notificationMap);
+		return model;
+	}
+
 	/**
 	 * 获取用户
 	 * 
