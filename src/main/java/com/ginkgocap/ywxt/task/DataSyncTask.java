@@ -88,12 +88,15 @@ public class DataSyncTask implements Runnable{
                                     } else {
                                         if (meetingNotice.getNoticeType() == NoticeType.NO_REVIEW_MEETING.code()) {
                                             // 报名活动不需要审核直接审核
+                                            logger.info("进入修改流程。。。。。");
                                             if (payOrder.getUserId() > 0) {
                                                 List<MeetingMember> list = meetingMemberService.getByMeetingIdAndMemberId(meetingId, payOrder.getUserId());
                                                 MeetingMember meetingMember = list.get(0);
                                                 meetingMember.setExcuteMeetSign(1);
                                                 // 会议不需要签到直接签到
                                                 meetingMember.setIsSign(meeting.getIsSign() == 0 ? 1 : 0);
+                                                logger.info("修改成员 " + meetingMember.getMemberName() + "isSign: " + meetingMember.getIsSign() +
+                                                    "excuteMeetSign : " + meetingMember.getExcuteMeetSign());
                                                 meetingMemberService.saveOrUpdate(meetingMember);
                                             }
                                             final String groupId = meeting.getGroupId();
