@@ -1951,6 +1951,7 @@ public class MeetingController extends BaseController {
                 meetingSocial.setNewCount(meetingCount);
             }
             listResult.add(0, meetingSocial);
+
             // String requestJson = getJsonParamStr(request);
             // if(!Utils.isNullOrEmpty(requestJson)) {
             // JSONObject j = JSONObject.fromObject(requestJson);
