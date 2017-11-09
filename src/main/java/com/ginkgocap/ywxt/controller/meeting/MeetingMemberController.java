@@ -1071,9 +1071,7 @@ public class MeetingMemberController extends BaseController {
 							|| AttendMeetStatusType.QUIT_MEETING.code() == Integer.valueOf(type)){//取消报名、退出会议
 						if (MeetingStatusType.NOT_BEGIN.code() == meeting.getMeetingStatus()
 								|| MeetingStatusType.IN_MEETING.code() == meeting.getMeetingStatus()){
-							meetingMemberService.changeAttendMeetStatus(
-									Long.valueOf(meetingIdStr),
-									Long.valueOf(memberIdStr),
+							meetingMemberService.changeAttendMeetStatus(Long.valueOf(meetingIdStr),	Long.valueOf(memberIdStr),
 									Integer.valueOf(type), user);
 							responseDataMap.put("succeed", true);
 							notificationMap.put("notifCode", "0001");
