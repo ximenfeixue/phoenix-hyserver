@@ -90,8 +90,10 @@ public class DataSyncTask implements Runnable{
                                         if (meetingNotice.getNoticeType() == NoticeType.NO_REVIEW_MEETING.code()) {
                                             // 报名活动不需要审核直接审核
                                             logger.info("进入修改流程。。。。。 userId : " + payOrder.getUserId());
+
                                             List<MeetingMember> list = meetingMemberService.getByMeetingIdAndMemberId(meetingId, payOrder.getUserId());
-                                            if (null != list) {
+                                            logger.info("list size  : " +  list.size());
+                                            if (null != list && list.size() > 0) {
                                                 MeetingMember meetingMember = list.get(0);
                                                 meetingMember.setExcuteMeetSign(1);
                                                 // 会议不需要签到直接签到
