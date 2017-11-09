@@ -5,6 +5,8 @@
 */ 
 package com.ginkgocap.ywxt.model.meeting; 
 
+import com.gintong.ywxt.im.model.JTFile;
+
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
@@ -38,7 +40,7 @@ public class MeetingIndex implements Serializable{
 	private long index;        //内部聊天序号
 	private String messageID;  //消息ID串  由客户端生产
 	private int  newCount;     //未读消息数
-	private JTFile  jtFile;
+	private JTFile jtFile;
 	
 	
 	public MeetingIndex() {

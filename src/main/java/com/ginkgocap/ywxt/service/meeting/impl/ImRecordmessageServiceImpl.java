@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.gintong.ywxt.im.model.JTFile;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -281,7 +282,7 @@ public class ImRecordmessageServiceImpl implements ImRecordmessageService {
 					mi.setLast_chat_time(Utils.DateFormat(icm.getTime()));
 					mi.setMessageID(icm.getMessageId());
 
-					com.ginkgocap.ywxt.model.meeting.JTFile jtFile = new com.ginkgocap.ywxt.model.meeting.JTFile();
+					JTFile jtFile = new JTFile();
 					jtFile.setUrl(icm.getJtFileUrl());
 					jtFile.setSuffixName(icm.getJtFileSuffixName());
 					jtFile.setType(StringUtils.isNumeric(icm.getJtFileType() + "") ? Integer.parseInt(icm.getJtFileType() + "") : -1);
@@ -358,7 +359,7 @@ public class ImRecordmessageServiceImpl implements ImRecordmessageService {
 					mi.setMessageType(immess.getMsgType());
 					mi.setLast_chat_time(Utils.DateFormat(immess.getTime()));
 
-					com.ginkgocap.ywxt.model.meeting.JTFile jtFile = new com.ginkgocap.ywxt.model.meeting.JTFile();
+					JTFile jtFile = new JTFile();
 					jtFile.setUrl(immess.getJtFileUrl());
 					jtFile.setSuffixName(immess.getJtFileSuffixName());
 					jtFile.setType(StringUtils.isNumeric(immess.getJtFileType()) ? Integer.parseInt(immess.getJtFileType()) : 0);
@@ -816,7 +817,7 @@ public class ImRecordmessageServiceImpl implements ImRecordmessageService {
 				mi.setMessageType(immess.getMsgType());
 				mi.setLast_chat_time(Utils.DateFormat(immess.getTime()));
 
-				com.ginkgocap.ywxt.model.meeting.JTFile jtFile = new com.ginkgocap.ywxt.model.meeting.JTFile();
+				JTFile jtFile = new JTFile();
 				jtFile.setUrl(immess.getJtFileUrl());
 				jtFile.setSuffixName(immess.getJtFileSuffixName());
 				jtFile.setType(StringUtils.isNumeric(immess.getJtFileType()) ? Integer.parseInt(immess.getJtFileType()) : 0);

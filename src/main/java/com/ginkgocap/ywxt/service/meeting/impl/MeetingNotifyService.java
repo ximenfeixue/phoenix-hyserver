@@ -81,6 +81,9 @@ public class MeetingNotifyService {
 
     public void addApplyMeetingNotify(User applyUser, String title, Meeting meeting) {
         try {
+            if (title == null) {
+                title = applyUser.getName() + " 报名参加 " + meeting.getMeetingName();
+            }
             MessageNotify notify = newApplyMeetingNotify(applyUser, title, meeting);
             if (notify != null) {
                 messageNotifyService.sendMessageNotify(notify);
@@ -136,6 +139,10 @@ public class MeetingNotifyService {
 
     public void addMeetingNotify(long toId, User fromUser, String title, Meeting meeting) {
         try {
+            if (title == null || title.length() <= 0) {
+                logger.error("title is null, so skip. toId: " + toId + " meetingId: " + meeting.getId());
+                return;
+            }
             MessageNotify notify = newMeetingNotify(toId, fromUser, title, meeting);
             if (notify != null) {
                 messageNotifyService.sendMessageNotify(notify);
