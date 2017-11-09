@@ -55,6 +55,7 @@ public class DataSyncTask implements Runnable{
     @Autowired
     private MeetingNotifyService meetingNotifyService;
 
+    @Autowired
     private MeetingMemberService meetingMemberService;
 
     @Override
@@ -140,7 +141,7 @@ public class DataSyncTask implements Runnable{
             logger.error("queues thread interrupted. so exit this thread.");
         } catch (Exception e) {
             e.printStackTrace();
-            logger.error("update member status failed");
+            logger.error("update member status failed" + e.getMessage());
         }
     }
     private boolean addMeetingNotice(MeetingNotice meetingNotice) {
