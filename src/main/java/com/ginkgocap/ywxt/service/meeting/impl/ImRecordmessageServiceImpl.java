@@ -349,11 +349,10 @@ public class ImRecordmessageServiceImpl implements ImRecordmessageService {
 					}
 				}
 
-				ImMucmessage immess = imMucmessageDao.getById(StringUtils.isNumeric(irm.getMucMessageId() + "") ? Long.parseLong(irm
-						.getMucMessageId() + "") : -1);
+				ImMucmessage immess = imMucmessageDao.getById(StringUtils.isNumeric(irm.getMucMessageId() + "") ? Long.parseLong(irm.getMucMessageId() + "") : -1);
 				if (immess != null) {
 					mi.setCommtent(immess.getMsg());
-					mi.setMessageID("server_" + immess.getMessageId());
+					mi.setMessageID(immess.getMessageId());
 					mi.setSenderID(immess.getSenderId());
 					mi.setSenderName(connectionsMiniMap.get(immess.getSenderId()));
 					mi.setMessageType(immess.getMsgType());
@@ -811,7 +810,7 @@ public class ImRecordmessageServiceImpl implements ImRecordmessageService {
 					+ "") : -1);
 			if (immess != null) {
 				mi.setCommtent(immess.getMsg());
-				mi.setMessageID("server_" + immess.getMessageId());
+				mi.setMessageID(immess.getMessageId());
 				mi.setSenderID(immess.getSenderId());
 				mi.setSenderName(connectionsMiniMap.get(immess.getSenderId()));
 				mi.setMessageType(immess.getMsgType());
