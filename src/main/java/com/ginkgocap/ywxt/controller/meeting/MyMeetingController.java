@@ -293,8 +293,7 @@ public class MyMeetingController extends BaseController {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/changeMyMemberMeetStatus.json", method = RequestMethod.POST)
-	public Map<String, Object> changeMyMemberMeetStatus(
-			HttpServletRequest request, HttpServletResponse response) {
+	public Map<String, Object> changeMyMemberMeetStatus(HttpServletRequest request, HttpServletResponse response) {
 		// 获取json参数串
 		String requestJson = "";
 		try {
@@ -318,18 +317,14 @@ public class MyMeetingController extends BaseController {
 				String type = getStringJsonValueByKey(j, "type");
 				if (Utils.isAllNotNullOrEmpty(meetingIdStr, memberIdStr, type)) {
 					if ("0".equals(type)) {//保存我的会议
-						meetingMemberService.changeMyMemberMeetStatus(
-								Long.valueOf(meetingIdStr),
-								Long.valueOf(memberIdStr), 1);
+						meetingMemberService.changeMyMemberMeetStatus(Long.valueOf(meetingIdStr), Long.valueOf(memberIdStr), 1);
 						//增加会议收藏数
 						meetingCountService.addCollectCount(Long.valueOf(meetingIdStr));
 						responseDataMap.put("succeed", true);
 						notificationMap.put("notifCode", "0001");
 						notificationMap.put("notifInfo", "归档成功");
 					} else if ("1".equals(type)) {//删除我的会议
-						meetingMemberService.changeMyMemberMeetStatus(
-								Long.valueOf(meetingIdStr),
-								Long.valueOf(memberIdStr), 2);
+						meetingMemberService.changeMyMemberMeetStatus(Long.valueOf(meetingIdStr), Long.valueOf(memberIdStr), 2);
 						responseDataMap.put("succeed", true);
 						notificationMap.put("notifCode", "0001");
 						notificationMap.put("notifInfo", "删除成功");

@@ -12,7 +12,6 @@ import com.ginkgocap.ywxt.utils.Utils;
  * @author qingc
  *
  */
-@Controller
 public class BaseServiceImpl<T, PK extends Serializable> {
 	
 //	============

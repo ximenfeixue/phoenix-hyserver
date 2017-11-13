@@ -42,7 +42,7 @@ public class DataSyncScheduler implements InitializingBean {
         };
 
         Timer timer = new Timer();
-        int period = 5 * 60 * 1000;
+        int period = 1 * 60 * 1000;
         //// 定制每天的24:00:00执行， 每天的date时刻执行task，每隔5 min 重复执行
         // timer.schedule(task, getDate(24), period);
 

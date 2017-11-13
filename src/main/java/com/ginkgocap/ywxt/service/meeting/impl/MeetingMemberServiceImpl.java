@@ -42,6 +42,9 @@ public class MeetingMemberServiceImpl implements MeetingMemberService{
 	private MeetingNoticeDao meetingNoticeDao;
 	@Autowired
 	private MeetingSignLabelDataDao meetingSignLabelDataDao;
+	@Autowired
+	private MeetingNotifyService meetingNotifyService;
+
 	// 不需要审核状态
 	private static final Byte reviewFlag = 0;
 	/**
@@ -304,12 +307,14 @@ public class MeetingMemberServiceImpl implements MeetingMemberService{
 	@Transactional(rollbackFor=Exception.class)
 	public void addNotice(User user,MeetingNotice meetingNotice,NoticeField noticeField,String content,Date date){
 		meetingNoticeDao.addNotice(meetingNotice,noticeField);
-		//推送报名通知  
+		//推送报名通知
+		/*
 		UserBean userBean = new UserBean();
 		userBean.setId(user.getId());
 		userBean.setName(user.getName());
 		String dateStr=DateUtil.convertDateToStringForChina(new Date());
 		GinTongInterface.pushToMeetingCreater(userBean, String.valueOf(meetingNotice.getMeetingId()),content,dateStr);
+		*/
 	}
 	/**
 	 * 把报名申请通知设置为不可见
@@ -327,7 +332,7 @@ public class MeetingMemberServiceImpl implements MeetingMemberService{
 	}
 	/**
 	 * 名称: changeAttendMeetStatus
-	 * 描述: 改变成员参会状态 ：0.未答复 1接受邀请2拒绝邀请，  5取消报名
+	 * 描述: 改变成员参会状态 ：0.未答复 1接受邀请 2拒绝邀请，  5取消报名
 	 * @since  2014-09-18
 	 * @author qingc
 	 * @throws Exception 
@@ -367,21 +372,26 @@ public class MeetingMemberServiceImpl implements MeetingMemberService{
 				// 接受邀请
 				if (AttendMeetStatusType.ACCEPT_INVITATION.code() == type){//接受邀请
 					// 封装通知内容
-					content = user.getName() + "接受了您的邀请";
+					content = user.getName() + " 接受了您的邀请";
 					meetingNotice.setNoticeContent(content);
 					// 封装通知类型
 					meetingNotice.setNoticeType(NoticeType.ACCEPT_INVITATION.code());
 					meetingMember.setAttendMeetStatus(type);
+					/** 私密的活动免签 接受邀请直接签到 **/
+					if (meeting.getIsSign() == 0 || meeting.getIsSecrecy() == false)
+						meetingMember.setIsSign(1);
 					this.saveOrUpdate(meetingMember);
+					meetingNotifyService.addMeetingNotify(meeting.getCreateId(), user, content, meeting);
 				} else if (AttendMeetStatusType.REFUSE_INVITATION.code() == type){// 拒绝邀请
 					meetingMember.setAttendMeetStatus(type);	
 					// 封装通知内容
-					content=user.getName() + "拒绝了您的邀请";
+					content=user.getName() + " 拒绝了您的邀请";
 					meetingNotice.setNoticeContent(content);
 					// 封装通知类型
 					meetingNotice.setNoticeType(NoticeType.REFUSE_INVITATION.code());
 					meetingMember.setAttendMeetStatus(type);
 					this.saveOrUpdate(meetingMember);
+                    meetingNotifyService.addMeetingNotify(meeting.getCreateId(), user, content, meeting);
 				} else if (AttendMeetStatusType.CANCEL_SIGN_UP.code()==type
 						|| AttendMeetStatusType.QUIT_MEETING.code()==type){//取消报名，退出会议
 					// 取消参会

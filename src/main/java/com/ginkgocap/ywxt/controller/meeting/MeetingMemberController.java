@@ -19,10 +19,12 @@ import com.ginkgocap.ywxt.payment.service.PayOrderService;
 import com.ginkgocap.ywxt.payment.utils.BeanUtil;
 import com.ginkgocap.ywxt.payment.utils.PayStatus;
 import com.ginkgocap.ywxt.service.meeting.*;
+import com.ginkgocap.ywxt.service.meeting.impl.MeetingNotifyService;
 import com.ginkgocap.ywxt.utils.*;
 import com.ginkgocap.ywxt.vo.query.meeting.*;
 import com.gintong.frame.util.dto.CommonResultCode;
 import com.gintong.frame.util.dto.InterfaceResult;
+import com.gintong.ywxt.im.service.MessageNotifyService;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
@@ -101,11 +103,13 @@ public class MeetingMemberController extends BaseController {
 	private MeetingMongoService meetingMongoService;
 	@Resource
 	private PayOrderService payOrderService;
+    @Autowired
+    private MeetingNotifyService meetingNotifyService;
 
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 
 	private final Byte reviewFlag = 0;
-	
+
 
 	/**
 	 * 名称: addMettingMember 描述: 当面邀请
@@ -116,8 +120,7 @@ public class MeetingMemberController extends BaseController {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/add.json", method = {RequestMethod.POST, RequestMethod.GET})
-	public InterfaceResult addMettingMember(HttpServletRequest request,
-			HttpServletResponse response) {
+	public InterfaceResult addMettingMember(HttpServletRequest request,	HttpServletResponse response) {
 		// 获取json参数串
 		String requestJson = "";
 		InterfaceResult result = null;
@@ -162,10 +165,10 @@ public class MeetingMemberController extends BaseController {
 					meetingId, meetingMember.getMemberId());
 			if (!isNullOrEmpty(list) || list.size() > 0) {
 				MeetingMember meetingMemberTemp = list.get(0);
-				if(!isNullOrEmpty(meetingMemberTemp)){
+				if(!isNullOrEmpty(meetingMemberTemp)) {
 					meetingMember.setId(meetingMemberTemp.getId());
 					// 用户已经报名参会
-					if(AttendMeetType.SIGN_UP.code() == meetingMemberTemp.getAttendMeetType()){
+					if(AttendMeetType.SIGN_UP.code() == meetingMemberTemp.getAttendMeetType()) {
 						// 用户已经报名参会，且被审核通过
 						if(meetingMemberTemp.getExcuteMeetSign() == ExcuteMeetSignType.AGREE_SIGN_UP.code()){
 							result = InterfaceResult.getInterfaceResultInstance(CommonResultCode.PARAMS_EXCEPTION, "该用户已经参加了该会议");
@@ -286,8 +289,7 @@ public class MeetingMemberController extends BaseController {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/signInMeeting.json", method = RequestMethod.POST)
-	public Map<String, Object> signInMeeting(HttpServletRequest request,
-			HttpServletResponse response) throws IOException {
+	public Map<String, Object> signInMeeting(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		// 获取json参数串
 		String requestJson = "";
 		try {
@@ -340,8 +342,7 @@ public class MeetingMemberController extends BaseController {
 								} else {
 									meetingMember.setIsSign(1);
 									meetingMember.setSignDistance(signDistance);
-									meetingMemberService
-											.saveOrUpdate(meetingMember);
+									meetingMemberService.saveOrUpdate(meetingMember);
 									User user=getUser(request);
 									// 签到发送系统消息
 									List<MeetingTopic> listMeetingTopic=meetingTopicService.getByMeetingId(meetingMember.getMeetingId());
@@ -417,8 +418,7 @@ public class MeetingMemberController extends BaseController {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/signUpReview.json", method = RequestMethod.POST)
-	public Map<String, Object> signUpReview(HttpServletRequest request,
-			HttpServletResponse response) throws IOException {
+	public Map<String, Object> signUpReview(HttpServletRequest request,	HttpServletResponse response) throws IOException {
 		// 获取json参数串
 		String requestJson = "";
 		try {
@@ -469,8 +469,7 @@ public class MeetingMemberController extends BaseController {
 							setSessionAndErr(request, response, "-1", "该用户没有参加该会议");
 						} else {
 							MeetingMember meetingMember = list.get(0);
-							if (isNullOrEmpty(meetingMember)
-									|| isNullOrEmpty(meetingMember.getId())) {
+							if (isNullOrEmpty(meetingMember) || isNullOrEmpty(meetingMember.getId())) {
 								responseDataMap.put("succeed", false);
 								notificationMap.put("notifCode", "0002");
 								notificationMap.put("notifInfo", "该用户没有参加该会议");
@@ -490,17 +489,23 @@ public class MeetingMemberController extends BaseController {
 								} else if (meetingMember.getAttendMeetStatus() != 4) {
 									responseDataMap.put("succeed", false);
 									notificationMap.put("notifCode", "0002");
-									notificationMap.put("notifInfo",
-											"该用户报名状态已变更，不需审核");
+									notificationMap.put("notifInfo", "该用户报名状态已变更，不需审核");
 									setSessionAndErr(request, response, "-1", "该用户报名状态已变更，不需审核");
 								} else {
-									if(!isNullOrEmpty(meetingMember)&&!isNullOrEmpty(meetingMember.getMemberId())){
-										Long meetingMemberId=meetingMember.getMemberId();
-										User meetingMemberUser=userService.selectByPrimaryKey(meetingMemberId);
-										if(!isNullOrEmpty(meetingMemberUser)&&!isNullOrEmpty(meetingMemberUser.getName())){
-											meetingMember.setMemberName(meetingMemberUser.getName());
-										}
+									Long meetingMemberId = meetingMember.getMemberId();
+									User meetingMemberUser = userService.getUserById(meetingMemberId);
+									if (meetingMemberUser == null) {
+										responseDataMap.put("succeed", false);
+										notificationMap.put("notifCode", "0002");
+										notificationMap.put("notifInfo", "该用户信息不存在");
+										setSessionAndErr(request, response, "-1", "该用户信息不存在");
+                                        return responseData(model, responseDataMap, notificationMap);
 									}
+
+									if(!isNullOrEmpty(meetingMemberUser.getName())){
+										meetingMember.setMemberName(meetingMemberUser.getName());
+									}
+
 									if ("1".equals(reviewStatus)) {
 										Integer count = meetingMemberService.getAttendMeetingCount(meetingId);
 										// 同意报名
@@ -512,6 +517,8 @@ public class MeetingMemberController extends BaseController {
 											notificationMap.put("notifInfo", "报名人数已满额，不能审核");
 											setSessionAndErr(request, response, "-1", "报名人数已满额，不能审核");
 										} else {
+											/** 如果会议免签  设置成员自动签到 **/
+											meetingMember.setIsSign(meeting.getIsSign() == 1 ? 0 : 1);
 											meetingMember.setExcuteMeetSign(ExcuteMeetSignType.AGREE_SIGN_UP.code());
 											meetingMemberService.signUpReview(0, meeting, meetingMember, user);
 											responseDataMap.put("succeed", true);
@@ -543,15 +550,21 @@ public class MeetingMemberController extends BaseController {
 											recordMessageBean.setMessageStartTime(new Date());
 											recordMessageBean.setStatus(String.valueOf(meeting.getMeetingStatus()));
 											imRecordmessageService.saveOrUpdate(recordMessageBean);
+
+                                            //add meeting notification
+                                            meetingNotifyService.deleteMeetingNotify(memberId, meeting.getCreateId(), meetingId);
+                                            meetingNotifyService.addAgreeMeetingNotify(meeting, meetingMemberUser, user);
 										}
 									} else if ("2".equals(reviewStatus)) {
 										meetingMember.setExcuteMeetSign(ExcuteMeetSignType.REFUSE_SIGN_UP.code());
-										meetingMemberService.signUpReview(1,
-												meeting, meetingMember, user);
+										meetingMemberService.signUpReview(1, meeting, meetingMember, user);
 										responseDataMap.put("succeed", true);
 										notificationMap.put("notifCode", "0001");
 										notificationMap.put("notifInfo", "操作成功");
 										setSessionAndErr(request, response, "0", "操作成功");
+                                        //add meeting notification
+                                        meetingNotifyService.deleteMeetingNotify(memberId, meeting.getCreateId(), meetingId);
+                                        meetingNotifyService.addRefuseMeetingNotify(meeting, meetingMemberUser, user);
 									}
 								}
 
@@ -727,8 +740,7 @@ public class MeetingMemberController extends BaseController {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/signUpMeeting.json", method = RequestMethod.GET)
-	public Map<String, Object> signUpMeetingGet(HttpServletRequest request,
-			HttpServletResponse response) throws IOException {
+	public Map<String, Object> signUpMeetingGet(HttpServletRequest request,	HttpServletResponse response) throws IOException {
 		Map<String, Object> model = signUpMeeting(request, response);
 		return model;
 	}
@@ -742,8 +754,7 @@ public class MeetingMemberController extends BaseController {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/signUpMeeting.json", method = RequestMethod.POST)
-	public Map<String, Object> signUpMeeting(HttpServletRequest request,
-			HttpServletResponse response) throws IOException {
+	public Map<String, Object> signUpMeeting(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		// 获取json参数串
 		String requestJson = "";
 		try {
@@ -782,8 +793,7 @@ public class MeetingMemberController extends BaseController {
 						responseDataMap.put("succeed", false);
 						notificationMap.put("notifCode", "0002");
 						notificationMap.put("notifInfo", "会议不存在");
-					} else if (!isNullOrEmpty(meeting.getIsSecrecy())
-							&& meeting.getIsSecrecy() == true) {
+					} else if (!isNullOrEmpty(meeting.getIsSecrecy()) && meeting.getIsSecrecy() == true) {
 						responseDataMap.put("succeed", false);
 						notificationMap.put("notifCode", "0002");
 						notificationMap.put("notifInfo", "会议是保密会议，不允许报名");
@@ -807,8 +817,7 @@ public class MeetingMemberController extends BaseController {
 									} else {
 										responseDataMap.put("succeed", false);
 										notificationMap.put("notifCode", "0002");
-										notificationMap.put("notifInfo",
-												"会议举办方已经邀请您参会，无需报名");
+										notificationMap.put("notifInfo", "会议举办方已经邀请您参会，无需报名");
 									}
 								} else if (meetingMember.getAttendMeetType() == 1 && meetingMember.getExcuteMeetSign() == 2){
 									User user = getUser(request);
@@ -816,8 +825,7 @@ public class MeetingMemberController extends BaseController {
 									signUp(meetingMember.getId(),memberName, memberPhoto, memberId, user, meeting);
 									responseDataMap.put("succeed", true);
 									notificationMap.put("notifCode", "0001");
-									notificationMap.put("notifInfo",
-											"hello mobile app!");
+									notificationMap.put("notifInfo", "hello mobile app!");
 								} else {
 									responseDataMap.put("succeed", false);
 									notificationMap.put("notifCode", "0002");
@@ -829,8 +837,7 @@ public class MeetingMemberController extends BaseController {
 								signUp(meetingMember.getId(),memberName, memberPhoto, memberId, user, meeting);
 								responseDataMap.put("succeed", true);
 								notificationMap.put("notifCode", "0001");
-								notificationMap.put("notifInfo",
-										"hello mobile app!");
+								notificationMap.put("notifInfo", "hello mobile app!");
 							}
 						} else {
 							User user = getUser(request);
@@ -838,8 +845,7 @@ public class MeetingMemberController extends BaseController {
 							signUp(null,memberName, memberPhoto, memberId, user, meeting);
 							responseDataMap.put("succeed", true);
 							notificationMap.put("notifCode", "0001");
-							notificationMap.put("notifInfo",
-									"hello mobile app!");
+							notificationMap.put("notifInfo", "hello mobile app!");
 
 						}
 					}
@@ -867,8 +873,7 @@ public class MeetingMemberController extends BaseController {
 		return model;
 	}
 
-	public void signUp(Long id,String memberName, String memberPhoto, Long memberId,
-			User user, Meeting meeting) throws Exception {
+	public void signUp(Long id,String memberName, String memberPhoto, Long memberId, User user, Meeting meeting) throws Exception {
 		MeetingMember meetingMember = new MeetingMember();
 		meetingMember.setMeetingId(meeting.getId());
 		meetingMember.setMemberId(memberId);
@@ -890,11 +895,24 @@ public class MeetingMemberController extends BaseController {
 		 * 参会状态 0.未答复 1接受邀请 2拒绝邀请， 4 报名 5取消报名
 		 */
 		meetingMember.setAttendMeetStatus(4);
+
 		/** 0 邀请，1 报名 **/
 		meetingMember.setAttendMeetType(1);
 		meetingMember.setAttendMeetTime(new Date());
+		/** 活动不需要审核不需要签到 直接设置成员为已签到状态 **/
+		if (meeting.getReviewFlag() == 0 && meeting.getIsSign() == 0)
+			meetingMember.setIsSign(1);
 		// 报名
 		meetingMemberService.signUp(meeting, meetingMember, user);
+
+        //send notification
+        String fromName = user.getName();
+        final String title = fromName + " 报名参加 " + meeting.getMeetingName();
+        if (meeting.getReviewFlag() == 0) {
+            meetingNotifyService.addMeetingNotify(meeting.getCreateId(), user, title, meeting);
+        } else if (meeting.getReviewFlag() == 1) {
+            meetingNotifyService.addApplyMeetingNotify(user, title, meeting);
+        }
 	}
 
 
@@ -907,8 +925,7 @@ public class MeetingMemberController extends BaseController {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/changeAttendMeetStatus.json", method = RequestMethod.GET)
-	public Map<String, Object> changeAttendMeetStatusGet(
-			HttpServletRequest request, HttpServletResponse response)
+	public Map<String, Object> changeAttendMeetStatusGet(HttpServletRequest request, HttpServletResponse response)
 			throws IOException {
 		Map<String, Object> model = changeAttendMeetStatus(request, response);
 		return model;
@@ -923,8 +940,7 @@ public class MeetingMemberController extends BaseController {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/changeAttendMeetStatus.json", method = RequestMethod.POST)
-	public Map<String, Object> changeAttendMeetStatus(
-			HttpServletRequest request, HttpServletResponse response)
+	public Map<String, Object> changeAttendMeetStatus(HttpServletRequest request, HttpServletResponse response)
 			throws IOException {
 		// 获取json参数串
 		String requestJson = "";
@@ -1056,9 +1072,7 @@ public class MeetingMemberController extends BaseController {
 							|| AttendMeetStatusType.QUIT_MEETING.code() == Integer.valueOf(type)){//取消报名、退出会议
 						if (MeetingStatusType.NOT_BEGIN.code() == meeting.getMeetingStatus()
 								|| MeetingStatusType.IN_MEETING.code() == meeting.getMeetingStatus()){
-							meetingMemberService.changeAttendMeetStatus(
-									Long.valueOf(meetingIdStr),
-									Long.valueOf(memberIdStr),
+							meetingMemberService.changeAttendMeetStatus(Long.valueOf(meetingIdStr),	Long.valueOf(memberIdStr),
 									Integer.valueOf(type), user);
 							responseDataMap.put("succeed", true);
 							notificationMap.put("notifCode", "0001");
@@ -1102,8 +1116,7 @@ public class MeetingMemberController extends BaseController {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/getmeetingMemberList.json", method = RequestMethod.GET)
-	public Map<String, Object> getmeetingMemberListGet(
-			HttpServletRequest request, HttpServletResponse response)
+	public Map<String, Object> getmeetingMemberListGet(HttpServletRequest request, HttpServletResponse response)
 			throws IOException {
 		Map<String, Object> model = getmeetingMemberList(request, response);
 		return model;
@@ -1176,8 +1189,7 @@ public class MeetingMemberController extends BaseController {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/getmeetingVisitantList.json", method = RequestMethod.GET)
-	public Map<String, Object> getmeetingVisitantListGet(
-			HttpServletRequest request, HttpServletResponse response)
+	public Map<String, Object> getmeetingVisitantListGet(HttpServletRequest request, HttpServletResponse response)
 			throws IOException {
 		Map<String, Object> model = getmeetingVisitantList(request, response);
 		return model;
@@ -1192,8 +1204,7 @@ public class MeetingMemberController extends BaseController {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/getmeetingVisitantList.json", method = RequestMethod.POST)
-	public Map<String, Object> getmeetingVisitantList(
-			HttpServletRequest request, HttpServletResponse response)
+	public Map<String, Object> getmeetingVisitantList(HttpServletRequest request, HttpServletResponse response)
 			throws IOException {
 		// 获取json参数串
 		String requestJson = "";
@@ -1215,8 +1226,7 @@ public class MeetingMemberController extends BaseController {
 
 				if (Utils.isAllNotNullOrEmpty(meetingIdStr)) {
 					Long meetingId = Long.valueOf(meetingIdStr);
-					List<MeetingMember> listMember = meetingMemberService
-							.getVisitantByMeetingId(meetingId);
+					List<MeetingMember> listMember = meetingMemberService.getVisitantByMeetingId(meetingId);
 					responseDataMap.put("listMeetingMember", listMember);
 				} else {
 					logger.error("会议id为空");
@@ -1232,8 +1242,7 @@ public class MeetingMemberController extends BaseController {
 			}
 		} else {
 			logger.error("传入参数异常");
-			responseDataMap.put("listMeetingMember",
-					new ArrayList<MeetingMember>());
+			responseDataMap.put("listMeetingMember", new ArrayList<MeetingMember>());
 		}
 		notificationMap.put("notifCode", "0001");
 		notificationMap.put("notifInfo", "hello mobile app!");
@@ -1251,8 +1260,7 @@ public class MeetingMemberController extends BaseController {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/getRequiredSignupInfo.json", method = RequestMethod.GET)
-	public Map<String, Object> getRequiredSignupInfoGet(
-			HttpServletRequest request, HttpServletResponse response)
+	public Map<String, Object> getRequiredSignupInfoGet(HttpServletRequest request, HttpServletResponse response)
 			throws IOException {
 		Map<String, Object> model = getRequiredSignupInfo(request, response);
 		return model;
@@ -1267,8 +1275,7 @@ public class MeetingMemberController extends BaseController {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/getRequiredSignupInfo.json", method = RequestMethod.POST)
-	public Map<String, Object> getRequiredSignupInfo(
-			HttpServletRequest request, HttpServletResponse response)
+	public Map<String, Object> getRequiredSignupInfo(HttpServletRequest request, HttpServletResponse response)
 			throws IOException {
 		// 获取json参数串
 		String requestJson = "";
@@ -1472,8 +1479,7 @@ public class MeetingMemberController extends BaseController {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/improveSignInformation.json", method = RequestMethod.GET)
-	public Map<String, Object> improveSignInformationGet(
-			HttpServletRequest request, HttpServletResponse response)
+	public Map<String, Object> improveSignInformationGet(HttpServletRequest request, HttpServletResponse response)
 			throws IOException {
 		Map<String, Object> model = improveSignInformation(request, response);
 		return model;
@@ -1488,8 +1494,7 @@ public class MeetingMemberController extends BaseController {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/improveSignInformation.json", method = RequestMethod.POST)
-	public Map<String, Object> improveSignInformation(
-			HttpServletRequest request, HttpServletResponse response)
+	public Map<String, Object> improveSignInformation(HttpServletRequest request, HttpServletResponse response)
 			throws IOException {
 		// 获取json参数串
 		String requestJson = "";
@@ -1662,8 +1667,7 @@ public class MeetingMemberController extends BaseController {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/deleteMeetingMember.json", method = RequestMethod.GET)
-	public Map<String, Object> deleteMeetingMemberGet(
-			HttpServletRequest request, HttpServletResponse response)
+	public Map<String, Object> deleteMeetingMemberGet(HttpServletRequest request, HttpServletResponse response)
 			throws IOException {
 		Map<String, Object> model = deleteMeetingMember(request, response);
 		return model;

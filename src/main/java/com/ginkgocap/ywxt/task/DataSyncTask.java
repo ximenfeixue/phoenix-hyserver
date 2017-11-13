@@ -1,32 +1,24 @@
 package com.ginkgocap.ywxt.task;
 
-import com.ginkgocap.ywxt.model.meeting.DataSync;
-import com.ginkgocap.ywxt.model.meeting.Meeting;
-import com.ginkgocap.ywxt.model.meeting.MeetingNotice;
-import com.ginkgocap.ywxt.model.meeting.NoticeField;
+import com.ginkgocap.ywxt.model.meeting.*;
 import com.ginkgocap.ywxt.payment.model.PayOrder;
 import com.ginkgocap.ywxt.payment.service.PayOrderService;
 import com.ginkgocap.ywxt.payment.utils.PayStatus;
-import com.ginkgocap.ywxt.service.meeting.DataSyncService;
-import com.ginkgocap.ywxt.service.meeting.MeetingNoticeService;
-import com.ginkgocap.ywxt.service.meeting.MeetingService;
-import com.ginkgocap.ywxt.service.meeting.NoticeFieldService;
+import com.ginkgocap.ywxt.service.meeting.*;
+import com.ginkgocap.ywxt.service.meeting.impl.MeetingNotifyService;
 import com.ginkgocap.ywxt.user.model.User;
+import com.ginkgocap.ywxt.user.service.UserService;
 import com.ginkgocap.ywxt.utils.Constant;
 import com.ginkgocap.ywxt.utils.GinTongInterface;
 import com.ginkgocap.ywxt.utils.ThreadPoolUtils;
-import com.ginkgocap.ywxt.utils.type.AttendMeetStatusType;
-import com.ginkgocap.ywxt.utils.type.NoticeReceiverType;
 import com.ginkgocap.ywxt.utils.type.NoticeType;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.poi.hssf.extractor.ExcelExtractor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
@@ -55,13 +47,23 @@ public class DataSyncTask implements Runnable{
     private MeetingService meetingService;
 
     @Autowired
+    private UserService userService;
+
+    @Autowired
     private NoticeFieldService noticeFieldService;
+
+    @Autowired
+    private MeetingNotifyService meetingNotifyService;
+
+    @Autowired
+    private MeetingMemberService meetingMemberService;
 
     @Override
     public void run() {
         List<PayOrder> payOrderList = null;
         try {
             while(true) {
+                logger.info("task 循环日志。");
                 DataSync dataSync = dataSyncQueue.take();
                 if (dataSync != null) {
                     boolean result = false;
@@ -82,22 +84,46 @@ public class DataSyncTask implements Runnable{
                                     // 支付成功发通知
                                     result = addMeetingNotice(meetingNotice);
                                     // 若该报名通知的活动不需要审核，则将该成员加到畅聊里
-                                    if (meetingNotice.getNoticeType() == NoticeType.NO_REVIEW_MEETING.code()) {
-                                        if (meetingId != null) {
-                                            Meeting meeting = meetingService.getById(meetingId);
-                                            if (meeting != null) {
-                                                final String groupId = meeting.getGroupId();
-                                                final Long userId = meetingNotice.getCreateId();
-                                                final long creatorUserId = meeting.getCreateId();
-                                                ThreadPoolUtils.getExecutorService().execute(new Runnable() {
-                                                    @Override
-                                                    public void run() {
-                                                        GinTongInterface.invite2MUC(creatorUserId, Arrays.asList(userId), groupId);
-                                                    }
-                                                });
-                                            } else {
-                                                logger.info("该活动不存在或已删除");
+                                    Meeting meeting = meetingService.getById(meetingId);
+                                    if (meeting == null) {
+                                        logger.error("该活动不存在或已删除. meetingId: " + meetingId);
+                                    } else {
+                                        if (meetingNotice.getNoticeType() == NoticeType.NO_REVIEW_MEETING.code()) {
+                                            // 报名活动不需要审核直接审核
+                                            logger.info("进入修改流程。。。。。 userId : " + payOrder.getUserId());
+
+                                            List<MeetingMember> list = meetingMemberService.getByMeetingIdAndMemberId(meetingId, payOrder.getUserId());
+                                            logger.info("list size  : " +  list.size());
+                                            if (null != list && list.size() > 0) {
+                                                MeetingMember meetingMember = list.get(0);
+                                                meetingMember.setExcuteMeetSign(1);
+                                                // 会议不需要签到直接签到
+                                                meetingMember.setIsSign(meeting.getIsSign() == 0 ? 1 : 0);
+                                                logger.info("修改成员 " + meetingMember.getMemberName() + "isSign: " + meetingMember.getIsSign() +
+                                                    "excuteMeetSign : " + meetingMember.getExcuteMeetSign());
+                                                meetingMemberService.saveOrUpdate(meetingMember);
                                             }
+                                            final String groupId = meeting.getGroupId();
+                                            final Long userId = meetingNotice.getCreateId();
+                                            final long creatorUserId = meeting.getCreateId();
+                                            ThreadPoolUtils.getExecutorService().execute(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    GinTongInterface.invite2MUC(creatorUserId, Arrays.asList(userId), groupId);
+                                                }
+                                            });
+                                        }
+                                        try {
+                                            String fromName = meetingNotice.getCreateName();
+                                            final String title = fromName + " 报名参加 " + meeting.getMeetingName();
+                                            final User applyUser = userService.getUserById(createId);
+                                            if (meeting.getReviewFlag() == 0) {
+                                                meetingNotifyService.addMeetingNotify(meeting.getCreateId(), applyUser, title, meeting);
+                                            } else if (meeting.getReviewFlag() == 1) {
+                                                meetingNotifyService.addApplyMeetingNotify(applyUser, title, meeting);
+                                            }
+                                        } catch (Exception ex) {
+                                            logger.error("send notification failed. error: meetingId: " + meetingId + " applyUserId: " + createId + ex.getMessage());
                                         }
                                     }
                                 }
@@ -113,6 +139,9 @@ public class DataSyncTask implements Runnable{
             }
         } catch (InterruptedException ex) {
             logger.error("queues thread interrupted. so exit this thread.");
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error("update member status failed" + e.getMessage());
         }
     }
     private boolean addMeetingNotice(MeetingNotice meetingNotice) {

@@ -21,6 +21,7 @@ import com.ginkgocap.ywxt.payment.utils.PayStatus;
 import com.ginkgocap.ywxt.utils.pic.DefaultPic;
 import com.ginkgocap.ywxt.vo.query.meeting.*;
 import com.gintong.frame.util.dto.InterfaceResult;
+import com.gintong.ywxt.im.model.MessageNotify;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.h2.util.StringUtils;
@@ -57,6 +58,8 @@ import com.ginkgocap.ywxt.utils.type.ModifyMeetingNoticeType;
 import com.ginkgocap.ywxt.utils.type.NoticeReceiverType;
 import com.ginkgocap.ywxt.utils.type.NoticeType;
 import com.ginkgocap.ywxt.vo.query.social.Social;
+
+import javax.annotation.Resource;
 
 @Service
 @Transactional
@@ -111,6 +114,8 @@ public class MeetingServiceImpl extends BaseServiceImpl<Meeting, Long> implement
 	private PayOrderService payOrderService;
 	@Autowired
 	private PayService payService;
+	@Autowired
+	private MeetingNotifyService meetingNotifyService;
 
 	@Value("${nginx.root}")
 	private String nginxRoot;
@@ -383,6 +388,7 @@ public class MeetingServiceImpl extends BaseServiceImpl<Meeting, Long> implement
 					UserBean userBean = new UserBean();
 					userBean.setId(user.getId());
 					userBean.setName(user.getName());
+					List<MessageNotify> notifyList = new ArrayList<MessageNotify>(10);
 					for (Entry<String, MeetingMember> entry : mapMeetingMember.entrySet()) {
 						MeetingMember meetingMember = entry.getValue();
 						if (!Utils.isNullOrEmpty(meetingMember)) {
@@ -413,7 +419,23 @@ public class MeetingServiceImpl extends BaseServiceImpl<Meeting, Long> implement
 							recordMessageBean.setMessageStartTime(date);
 							recordMessageBean.setStatus(String.valueOf(meeting.getMeetingStatus()));
 							recordMessageList.add(recordMessageBean);
+
+							//add invitation
+                            final long memberId = meetingMember.getMemberId();
+							MessageNotify notify = meetingNotifyService.newInvitationNotify(memberId, user.getPicPath(), meeting);
+                            if (notify != null) {
+                                notifyList.add(notify);
+                            }
+							if (notifyList.size() >= 10) {
+								meetingNotifyService.addInvitationNotify(notifyList);
+								notifyList.clear();
+							}
 						}
+					}
+
+					//add invitation
+					if (notifyList.size() >= 0) {
+						meetingNotifyService.addInvitationNotify(notifyList);
 					}
 				}
 			}

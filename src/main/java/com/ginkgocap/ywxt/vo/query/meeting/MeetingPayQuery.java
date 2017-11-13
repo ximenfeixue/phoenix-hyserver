@@ -16,6 +16,8 @@ public class MeetingPayQuery{
     private Integer web;
     // 来源类型 0：邀请时接受支付 1：报名时支付
     private Byte sourceType;
+    // 微信Id
+    private String openId;
 
     public Long getMeetingId() {
         return meetingId;
@@ -47,5 +49,13 @@ public class MeetingPayQuery{
 
     public void setSourceType(Byte sourceType) {
         this.sourceType = sourceType;
+    }
+
+    public String getOpenId() {
+        return openId;
+    }
+
+    public void setOpenId(String openId) {
+        this.openId = openId;
     }
 }
