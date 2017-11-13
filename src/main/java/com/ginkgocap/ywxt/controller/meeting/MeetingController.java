@@ -603,11 +603,15 @@ public class MeetingController extends BaseController {
 							if (isPay == 1) {
 								// 报名查询
 								List<PayOrder> payOrders = payOrderService.getPayOrderByUserIdAndSourceId(memberId, id);
+								logger.info("check pay status ...");
 								if (CollectionUtils.isNotEmpty(payOrders)) {
 									PayOrder payOrder = payOrders.get(0);
 									if (payOrder.getStatus() == PayStatus.PAY_SUCCESS.getValue()) {
+										logger.info("pay order success ... userId {}", memberId);
 										meetingObj.setPayStatus(Byte.valueOf("1"));
 									}
+								} else {
+									logger.info("no payOrder ...");
 								}
 							}
 						}
