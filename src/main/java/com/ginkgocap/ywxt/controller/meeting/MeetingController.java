@@ -3338,7 +3338,7 @@ public class MeetingController extends BaseController {
 				return 0;
 			}
 
-			if (null == o1 ||null == o1.getOrderTime()) {
+			if (null == o1 || null == o1.getOrderTime()) {
 				return 1;
 			}
 
