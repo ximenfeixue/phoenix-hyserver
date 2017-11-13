@@ -156,6 +156,7 @@ PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
 	    FROM tb_meeting_member 
 		WHERE meeting_id = #{meetingId}
 			AND is_delete = 0
+		GROUP BY memberId
     </select>
     
     <select id="getVisitantByMeetingId" resultType="meetingMember" parameterType="java.lang.Long">
