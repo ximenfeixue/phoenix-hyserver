@@ -3198,7 +3198,7 @@ public class MeetingController extends BaseController {
 		Long createId = meeting.getCreateId();
 		payMoney = payMoney.multiply(new BigDecimal(100));
 		// TODO : 上线 需要修改金额
-		PayRequest payRequest = createPayRequest(payMoney.intValue(), web.intValue(), type.intValue(), userId, meetingId, mobile, userName, createId,openId);
+		PayRequest payRequest = createPayRequest(payMoney.intValue(), web.intValue(), type.intValue(), userId, meetingId, mobile, userName, createId, openId);
 		PayResponse payResponse = null;
 		try {
 			payResponse = payService.request(payRequest);
@@ -3286,7 +3286,7 @@ public class MeetingController extends BaseController {
 	}
 
 	public static PayRequest createPayRequest(int money, int web, int type, long userId, long sourceId,
-											  String mobile, String userName, long createId,String openId) {
+											  String mobile, String userName, long createId, String openId) {
 
 		PayRequest payRequest = new PayRequest();
 		payRequest.setDetail("4"); // 活动："4"
