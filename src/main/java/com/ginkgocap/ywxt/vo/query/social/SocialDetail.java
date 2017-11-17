@@ -13,6 +13,8 @@ public class SocialDetail implements Serializable {
 	private static final long serialVersionUID = -4951531866420976010L;
 
 	private String messageId;
+    /** 内容type 0--文字，1--音频，2--图片，3--视频，4--其他文件*/
+    private int type;
 	/** 发送者用户id*/
 	private java.lang.Long senderID;
 	/** 发送方名称 */
@@ -33,7 +35,15 @@ public class SocialDetail implements Serializable {
 		this.messageId = messageId;
 	}
 
-	public int getModal() {
+    public int getType() {
+        return type;
+    }
+
+    public void setType(int type) {
+        this.type = type;
+    }
+
+    public int getModal() {
 		return modal;
 	}
 	public void setModal(int modal) {

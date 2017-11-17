@@ -540,6 +540,7 @@ public class GinTongInterface {
                 ChatMessage lastMessage = record.getChatMessage();
                 if (lastMessage != null) {
                     logger.info("last message id: " + lastMessage.getMessageID());
+                    socialDetail.setType(lastMessage.getType());
                     socialDetail.setMessageId(lastMessage.getMessageID()); //getString(node, "msgId", ""));
                 } else {
                     logger.error("last message is null, so no messageId. mucId: " + socail.getId());
@@ -548,6 +549,7 @@ public class GinTongInterface {
                 MUCMessage lastMessage = record.getMucMessage();
                 if (lastMessage != null) {
                     logger.info("last message id: " + lastMessage.getMessageID());
+                    socialDetail.setType(lastMessage.getType());
                     socialDetail.setMessageId(lastMessage.getMessageID()); //getString(node, "msgId", ""));
                 } else {
                     logger.error("last message is null, so no messageId. mucId: " + socail.getId());
