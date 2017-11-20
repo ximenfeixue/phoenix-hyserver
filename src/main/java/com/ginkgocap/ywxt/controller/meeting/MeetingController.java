@@ -603,11 +603,15 @@ public class MeetingController extends BaseController {
 							if (isPay == 1) {
 								// 报名查询
 								List<PayOrder> payOrders = payOrderService.getPayOrderByUserIdAndSourceId(memberId, id);
+								logger.info("check pay status ...");
 								if (CollectionUtils.isNotEmpty(payOrders)) {
 									PayOrder payOrder = payOrders.get(0);
 									if (payOrder.getStatus() == PayStatus.PAY_SUCCESS.getValue()) {
+										logger.info("pay order success ... userId {}", memberId);
 										meetingObj.setPayStatus(Byte.valueOf("1"));
 									}
+								} else {
+									logger.info("no payOrder ...");
 								}
 							}
 						}
@@ -3198,7 +3202,7 @@ public class MeetingController extends BaseController {
 		Long createId = meeting.getCreateId();
 		payMoney = payMoney.multiply(new BigDecimal(100));
 		// TODO : 上线 需要修改金额
-		PayRequest payRequest = createPayRequest(payMoney.intValue(), web.intValue(), type.intValue(), userId, meetingId, mobile, userName, createId,openId);
+		PayRequest payRequest = createPayRequest(payMoney.intValue(), web.intValue(), type.intValue(), userId, meetingId, mobile, userName, createId, openId);
 		PayResponse payResponse = null;
 		try {
 			payResponse = payService.request(payRequest);
@@ -3286,7 +3290,7 @@ public class MeetingController extends BaseController {
 	}
 
 	public static PayRequest createPayRequest(int money, int web, int type, long userId, long sourceId,
-											  String mobile, String userName, long createId,String openId) {
+											  String mobile, String userName, long createId, String openId) {
 
 		PayRequest payRequest = new PayRequest();
 		payRequest.setDetail("4"); // 活动："4"
@@ -3342,7 +3346,7 @@ public class MeetingController extends BaseController {
 				return 0;
 			}
 
-			if (null == o1 ||null == o1.getOrderTime()) {
+			if (null == o1 || null == o1.getOrderTime()) {
 				return 1;
 			}
 
