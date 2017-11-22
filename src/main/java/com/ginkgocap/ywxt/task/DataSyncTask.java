@@ -12,13 +12,17 @@ import com.ginkgocap.ywxt.utils.Constant;
 import com.ginkgocap.ywxt.utils.GinTongInterface;
 import com.ginkgocap.ywxt.utils.ThreadPoolUtils;
 import com.ginkgocap.ywxt.utils.type.NoticeType;
+import com.ginkgocap.ywxt.vo.query.meeting.MeetingFreeChat;
+import com.ginkgocap.ywxt.vo.query.meeting.MeetingQuery;
 import org.apache.commons.collections.CollectionUtils;
+import org.h2.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
@@ -69,6 +73,28 @@ public class DataSyncTask implements Runnable{
                     boolean result = false;
                     Object data = dataSync.getData();
                     if (data != null) {
+                        if (data instanceof MeetingFreeChat) {
+                            final MeetingFreeChat meetingFreeChat = (MeetingFreeChat) data;
+                            if (meetingFreeChat == null) {
+                                continue;
+                            }
+                            final Meeting meeting = meetingService.getById(meetingFreeChat.getMeetingId());
+                            ThreadPoolUtils.getExecutorService().execute(new Runnable() {
+                                @Override
+                                public void run() {
+                                    final Meeting updateMeeting = meeting;
+                                    String groupId = createFreeChatGroup(meetingFreeChat);
+                                    if (!StringUtils.isNullOrEmpty(groupId)) {
+                                        updateMeeting.setGroupId(groupId);
+                                        meetingService.saveOrUpdate(updateMeeting);
+                                    }
+                                }
+                            });
+                            Meeting meetingDb = meetingService.getById(meeting.getId());
+                            if (StringUtils.isNullOrEmpty(meetingDb.getGroupId())) {
+                                result = true;
+                            }
+                        }
                         if (data instanceof MeetingNotice) {
                             MeetingNotice meetingNotice = (MeetingNotice) data;
                             Long meetingId = meetingNotice.getMeetingId();
@@ -168,8 +194,8 @@ public class DataSyncTask implements Runnable{
     public boolean saveDataNeedSync(DataSync data)
     {
         try {
-            dataSyncService.saveDataSync(data);
-            addQueue(data);
+            DataSync dataSync = dataSyncService.saveDataSync(data);
+            addQueue(dataSync);
         } catch (Exception ex) {
             logger.error("save sync data failed: dataSync: {}", data.getId());
             return false;
@@ -217,5 +243,20 @@ public class DataSyncTask implements Runnable{
         } else {
             logger.error("sync list is null, so skip it");
         }
+    }
+    private String createFreeChatGroup(MeetingFreeChat meetingFreeChat) {
+
+        Long meetingId = meetingFreeChat.getMeetingId();
+        MeetingQuery entity = meetingFreeChat.getMeetingQuery();
+        List<Long> memberIds = meetingFreeChat.getUserIds();
+        Long ownerId = meetingFreeChat.getOwnerId();
+        String meetingName = entity.getMeetingName();
+        String meetingDesc = StringUtils.isNullOrEmpty(entity.getMeetingDesc()) ? meetingName : entity.getMeetingDesc().trim();
+        int roomSize = 1000;
+
+        if (memberIds == null) {
+            memberIds = Collections.emptyList();
+        }
+        return GinTongInterface.createMUC(meetingId, meetingName, meetingDesc, roomSize, ownerId, memberIds);
     }
 }
