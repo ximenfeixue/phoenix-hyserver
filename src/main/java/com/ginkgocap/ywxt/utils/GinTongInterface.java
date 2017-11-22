@@ -426,9 +426,15 @@ public class GinTongInterface {
 			UserBean userBean = new UserBean();
 			userBean.setId(property.getUserId());
 			String responseJson = HttpClientUtil.getGintongPost(url, interfaceName, "{}", userBean);
-			JsonNode jsonNode = objectMap.readTree(responseJson);
+			JsonNode jsonNode = null;
+			try {
+				jsonNode = objectMap.readTree(responseJson);
+			} catch (Exception ex) {
+				logger.error("parser json failed. error: " + ex.getMessage());
+				logger.error("responseJson content: " + responseJson);
+			}
 
-			if ("0".equals(jsonNode.get("notification").get("notifCode").asText())) {
+			if (jsonNode != null && "0".equals(jsonNode.get("notification").get("notifCode").asText())) {
 				JsonNode mapNode = jsonNode.get("responseData");
 				if (mapNode != null) {
 					Map<Integer, List<Social>> map = new HashMap<Integer, List<Social>>(2);
