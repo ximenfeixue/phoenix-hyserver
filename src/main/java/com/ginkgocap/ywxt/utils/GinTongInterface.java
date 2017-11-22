@@ -6,6 +6,9 @@ import java.net.URLEncoder;
 import java.util.*;
 
 import com.ginkgocap.ywxt.util.JsonUtil;
+import com.gintong.ywxt.im.model.ChatMessage;
+import com.gintong.ywxt.im.model.ImRecord;
+import com.gintong.ywxt.im.model.MUCMessage;
 import com.google.gson.GsonBuilder;
 import net.sf.json.JSONObject;
 
@@ -36,6 +39,8 @@ import com.ginkgocap.ywxt.vo.query.meeting.UserBean;
 import com.ginkgocap.ywxt.vo.query.social.Social;
 import com.ginkgocap.ywxt.vo.query.social.SocialDetail;
 import com.google.gson.Gson;
+import org.springframework.util.CollectionUtils;
+
 /**
  * @Description: rest调用客户端
  * @Author: qinguochao
@@ -430,11 +435,13 @@ public class GinTongInterface {
 					for (int index = 1; index <= 2; index++) {
 						JsonNode listIMRecordNode = mapNode.get(String.valueOf(index));
 						if (listIMRecordNode != null) {
+                            /*
 							List<Social> listSocial = new ArrayList<Social>(listIMRecordNode.size());
 							for (JsonNode node : listIMRecordNode) {
 								Social socail = convertNodeToSocial(node, (short)(index ==1 ? 1 : 0));
 								listSocial.add(socail);
-							}
+							}*/
+                            List<Social> listSocial = convertNodeToSocialList(listIMRecordNode, (short)(index ==1 ? 1 : 0));
 							map.put(index, listSocial);
 						}
 					}
@@ -488,12 +495,71 @@ public class GinTongInterface {
 		socialDetail.setSenderName(getString(node, "senderName", ""));
 		socialDetail.setContent(getString(node, "content", ""));
 		socialDetail.setModal(getInt(node, "modal", 0));
+		socialDetail.setMessageId(getString(node, "msgId", ""));
 		socail.setSocialDetail(socialDetail);
 		//logger.debug("socail info: id: " + socail.getId() + " title: " + socail.getTitle() +
 				//" sendId: " + socialDetail.getSenderID() + " sendName: " + socialDetail.getSenderName());
 
 		return socail;
 	}
+
+    private static List<Social> convertNodeToSocialList(JsonNode listIMRecordNode, final short top) {
+        final String listImRecordContent = listIMRecordNode.toString();
+        List<ImRecord> recordList = JsonReadUtil.readListValue(ImRecord.class, listImRecordContent);
+
+        if (CollectionUtils.isEmpty(recordList)) {
+            logger.error("node is null, so skip.");
+            return null;
+        }
+
+        List<Social> socialList = new ArrayList<Social>(recordList.size());
+        for (ImRecord record : recordList) {
+            final int type = record.getType();
+            Social socail = new Social();
+            socail.setTop(top);
+            socail.setId(record.getMucId()); //getLong(node, "mucId", 0L)
+            socail.setNewCount(record.getNewCount()); //getInt(node, "newCount", 0)
+            final Date dateTime =  DateConvertUtils.parse(record.getStartTime());// DateConvertUtils.parse(getString(node, "startTime", ""));
+            socail.setTime(dateTime);
+            socail.setOrderTime(dateTime);
+            socail.setTitle(record.getTitle()); //getString(node, "title", ""));
+            socail.setType(type); //node, "type", 0));
+            socail.setAtMsgId(record.getAtMsgId()); //getString(node, "atMsgId", ""));
+            socail.setAtName(record.getAtName()); //getString(node, "atName", ""));
+            socail.setCompereName(record.getCompereName()); //getString(node, "compereName", ""));
+            socail.setUserType(record.getUserType()); //getInt(node, "userType", 0));
+
+            SocialDetail socialDetail = new SocialDetail();
+            socialDetail.setListImageUrl(record.getListImageUrl()); //listImageUrl);
+            socialDetail.setSenderID(record.getSenderId());//getLong(node, "senderId", 0L));
+            socialDetail.setSenderName(record.getSenderName()); //getString(node, "senderName", ""));
+            socialDetail.setContent(record.getContent()); //getString(node, "content", ""));
+            socialDetail.setModal(record.getModal()); //getInt(node, "modal", 0));
+
+            if (type == 1) {
+                ChatMessage lastMessage = record.getChatMessage();
+                if (lastMessage != null) {
+                    logger.info("last message id: " + lastMessage.getMessageID());
+                    socialDetail.setType(lastMessage.getType());
+                    socialDetail.setMessageId(lastMessage.getMessageID()); //getString(node, "msgId", ""));
+                } else {
+                    logger.error("last message is null, so no messageId. mucId: " + socail.getId());
+                }
+            } else if (type == 2) {
+                MUCMessage lastMessage = record.getMucMessage();
+                if (lastMessage != null) {
+                    logger.info("last message id: " + lastMessage.getMessageID());
+                    socialDetail.setType(lastMessage.getType());
+                    socialDetail.setMessageId(lastMessage.getMessageID()); //getString(node, "msgId", ""));
+                } else {
+                    logger.error("last message is null, so no messageId. mucId: " + socail.getId());
+                }
+            }
+            socail.setSocialDetail(socialDetail);
+            socialList.add(socail);
+        }
+        return socialList;
+    }
 
 	/**
 	 * 获取用户会议会话列表
