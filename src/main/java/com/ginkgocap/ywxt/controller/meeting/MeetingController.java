@@ -562,8 +562,6 @@ public class MeetingController extends BaseController {
 		MeetingQuery meetingObj = null;
 		if (!isNullOrEmpty(requestJson)) {
 			User user = getUser(request);
-			// if(!Utils.isNullOrEmpty(user) &&
-			// !Utils.isNullOrEmpty(user.getId())) {
 			try {
 				JSONObject j = JSONObject.fromObject(requestJson);
 				// 会议Id
