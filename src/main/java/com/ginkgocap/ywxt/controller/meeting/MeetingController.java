@@ -561,7 +561,7 @@ public class MeetingController extends BaseController {
 		Map<String, Object> notificationMap = new HashMap<String, Object>();
 		MeetingQuery meetingObj = null;
 		if (!isNullOrEmpty(requestJson)) {
-			// User user = getUser(request);
+			User user = getUser(request);
 			// if(!Utils.isNullOrEmpty(user) &&
 			// !Utils.isNullOrEmpty(user.getId())) {
 			try {
@@ -576,7 +576,7 @@ public class MeetingController extends BaseController {
 				}
 				if (!Utils.isNullOrEmpty(idStr)) {
 					Long id = Long.valueOf(idStr);
-					Long memberId = Long.valueOf(memberIdStr);
+					Long memberId = user.getId(); //Long.valueOf(memberIdStr);
 					meetingObj = meetingService.getMeetingByIdAndMemberId(id, memberId);
 					if (1 == meetingObj.getIsDelete()) {
 						notificationMap.put("notifCode", "0002");
