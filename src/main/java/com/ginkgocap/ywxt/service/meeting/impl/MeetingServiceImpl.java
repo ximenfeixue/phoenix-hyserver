@@ -537,7 +537,9 @@ public class MeetingServiceImpl extends BaseServiceImpl<Meeting, Long> implement
 			if (!Utils.isNullOrEmpty(entity.getListMeetingDetail())) {
 				for (MeetingDetail md : entity.getListMeetingDetail()) {
 					md.setMeetingId(meetingId);
-					long mdid= meetingDetailDao.save(md);
+					String meetingDetail = md.getMeetingDetail();
+					md.setMeetingDetail(meetingDetail);
+					long mdid = meetingDetailDao.save(md);
 					// 小模块Id要和对应的sequence做一次关联 供图片存储时关联用
 					meetingDetailMap.put(md.getSequence(),mdid);
 				}
