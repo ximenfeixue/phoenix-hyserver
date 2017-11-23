@@ -26,15 +26,17 @@ public class DataSyncMongoDaoImpl implements DataSyncMongoDao {
     private final int maxSize = 50;
 
     @Override
-    public void saveDataSync(DataSync data) {
+    public DataSync saveDataSync(DataSync data) {
 
+        String id = null;
         try {
-            String id = MeetingFilePrimaryKey.getPrimaryKey();
+            id = MeetingFilePrimaryKey.getPrimaryKey();
             data.setId(id);
             mongoTemplate.save(data, "dataSync");
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return getDataSync(id);
     }
 
     @Override
@@ -59,5 +61,12 @@ public class DataSyncMongoDaoImpl implements DataSyncMongoDao {
         query.skip(0);
         query.limit(maxSize);
         return mongoTemplate.find(query, DataSync.class,"dataSync");
+    }
+
+    public DataSync getDataSync(String id) {
+
+        Query query = new Query();
+        query.addCriteria(Criteria.where("id").is(id));
+        return mongoTemplate.findOne(query, DataSync.class,"dataSync");
     }
 }
