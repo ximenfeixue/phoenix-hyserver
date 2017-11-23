@@ -87,6 +87,7 @@ public class MeetingNotifyService {
             MessageNotify notify = newApplyMeetingNotify(applyUser, title, meeting);
             if (notify != null) {
                 messageNotifyService.sendMessageNotify(notify);
+                logger.info("send notify success, title: " + title);
             }
         } catch (Exception ex) {
             logger.error("send messageNotify failed. error: " + ex.getMessage());

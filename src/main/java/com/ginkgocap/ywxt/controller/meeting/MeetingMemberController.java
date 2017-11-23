@@ -24,6 +24,7 @@ import com.ginkgocap.ywxt.utils.*;
 import com.ginkgocap.ywxt.vo.query.meeting.*;
 import com.gintong.frame.util.dto.CommonResultCode;
 import com.gintong.frame.util.dto.InterfaceResult;
+import com.gintong.ywxt.im.model.MessageNotify;
 import com.gintong.ywxt.im.service.MessageNotifyService;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -217,6 +218,9 @@ public class MeetingMemberController extends BaseController {
 				meetingMemberService.saveOrUpdate(meetingMember);
 				meetingMember.setAttendMeetTime(new Date());
 				logger.info("操作成功");
+				//send invite
+				final long memberId = meetingMember.getMemberId();
+				meetingNotifyService.addInvitationNotify(memberId, user.getPicPath(), meeting);
 			}
 		} catch (Exception e) {
 			logger.error("当面邀请失败", e);
