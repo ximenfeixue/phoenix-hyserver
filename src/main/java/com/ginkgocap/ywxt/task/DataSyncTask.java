@@ -78,20 +78,18 @@ public class DataSyncTask implements Runnable{
                             if (meetingFreeChat == null) {
                                 continue;
                             }
+                            logger.info("meetingId :" + meetingFreeChat.getMeetingId());
                             final Meeting meeting = meetingService.getById(meetingFreeChat.getMeetingId());
-                            ThreadPoolUtils.getExecutorService().execute(new Runnable() {
-                                @Override
-                                public void run() {
-                                    final Meeting updateMeeting = meeting;
-                                    String groupId = createFreeChatGroup(meetingFreeChat);
-                                    if (!StringUtils.isNullOrEmpty(groupId)) {
-                                        updateMeeting.setGroupId(groupId);
-                                        meetingService.saveOrUpdate(updateMeeting);
-                                    }
-                                }
-                            });
+                            // 备份的活动数据 若 groupId 不为 null，不需执行备份数据后的处理工作
+                            if (StringUtils.isNullOrEmpty(meeting.getGroupId())) {
+                                logger.info("check data .......meetingId: {}", meeting.getId());
+                                String groupId = createFreeChatGroup(meetingFreeChat);
+                                meeting.setGroupId(groupId);
+                                meetingService.saveOrUpdate(meeting);
+                            }
                             Meeting meetingDb = meetingService.getById(meeting.getId());
-                            if (StringUtils.isNullOrEmpty(meetingDb.getGroupId())) {
+                            if (!StringUtils.isNullOrEmpty(meetingDb.getGroupId())) {
+                                logger.info("remove sync success meeting data. meetingId :" + meeting.getId());
                                 result = true;
                             }
                         }
