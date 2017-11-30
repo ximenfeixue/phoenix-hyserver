@@ -1892,6 +1892,7 @@ public class MeetingController extends BaseController {
             filterDeletedChatList(listResult, user.getId());
 
             // 获取最新的通知
+			/*
             MeetingNotice meetingNotice = meetingNoticeService.getNewNotice(user.getId());
             if (!isNullOrEmpty(meetingNotice)) {
                 Integer noticeCount = meetingNoticeService.getUnReadNoticeCount(user.getId());
@@ -1970,6 +1971,8 @@ public class MeetingController extends BaseController {
                 socialRelation.setNewCount(relationCount);
                 listResult.add(0, socialRelation);
             }
+            */
+
             // }
             int count = 0;
             for (Social social : listResult) {
