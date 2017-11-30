@@ -24,6 +24,7 @@ import com.ginkgocap.ywxt.utils.*;
 import com.ginkgocap.ywxt.vo.query.meeting.*;
 import com.gintong.frame.util.dto.CommonResultCode;
 import com.gintong.frame.util.dto.InterfaceResult;
+import com.gintong.ywxt.im.model.MessageNotify;
 import com.gintong.ywxt.im.service.MessageNotifyService;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -217,6 +218,9 @@ public class MeetingMemberController extends BaseController {
 				meetingMemberService.saveOrUpdate(meetingMember);
 				meetingMember.setAttendMeetTime(new Date());
 				logger.info("操作成功");
+				//send invite
+				final long memberId = meetingMember.getMemberId();
+				meetingNotifyService.addInvitationNotify(memberId, user.getPicPath(), meeting);
 			}
 		} catch (Exception e) {
 			logger.error("当面邀请失败", e);
@@ -1543,39 +1547,28 @@ public class MeetingMemberController extends BaseController {
 					MeetingSignUpFormQuery meetingSignUpForm = meetingMongoService.getMeetingSignFormByMeetingIdAndUserId(meetingId, user.getId());
 					if (null != meetingSignUpForm) {
 						orderNumber = meetingSignUpForm.getOrderNumber();
+						logger.info("orderNumber : " + orderNumber);
 					}
 					if (!Utils.isNullOrEmpty(meetingSignLabel) && !Utils.isNullOrEmpty(user)) {
 						// 有报名信息 则核查该活动是否已成功报过名
 						List<MeetingMember> meetingMemberList = meetingMemberService.getByMeetingIdAndMemberId(meetingId, user.getId());
-						if (CollectionUtils.isNotEmpty(meetingMemberList) && null != orderNumber) {
+						if (CollectionUtils.isNotEmpty(meetingMemberList)) {
 							MeetingMember meetingMember = meetingMemberList.get(0);
 							// 没删除
 							if (2 != meetingMember.getMemberMeetStatus()) {
 								// 邀请情况
 								if (0 == meetingMember.getAttendMeetType() && 1 == meetingMember.getAttendMeetStatus()) {
-									// 需要付费
-									if (1 == isPay) {
-										PayOrder payOrder = payOrderService.getPayOrder(orderNumber);
-										if (payOrder.getStatus() == PayStatus.PAY_SUCCESS.getValue()) {
-											responseDataMap.put("succeed", false);
-											notificationMap.put("notifCode", "0002");
-											notificationMap.put("notifInfo", "您已成功报名，不需要再填写报名信息");
-											return model;
-										}
-									}
+									responseDataMap.put("succeed", false);
+									notificationMap.put("notifCode", "0002");
+									notificationMap.put("notifInfo", "您已成功报名，不需要再填写报名信息");
+									return model;
 								}
 								// 报名情况
-								if (1 == meetingMember.getAttendMeetType() && 1 == meetingMember.getExcuteMeetSign()){
-									// 需要付费
-									if (1 == isPay) {
-										PayOrder payOrder = payOrderService.getPayOrder(orderNumber);
-										if (payOrder.getStatus() == PayStatus.PAY_SUCCESS.getValue()) {
-											responseDataMap.put("succeed", false);
-											notificationMap.put("notifCode", "0002");
-											notificationMap.put("notifInfo", "您已成功报名，不需要再填写报名信息");
-											return model;
-										}
-									}
+								if (1 == meetingMember.getAttendMeetType() && 1 == meetingMember.getExcuteMeetSign()) {
+									responseDataMap.put("succeed", false);
+									notificationMap.put("notifCode", "0002");
+									notificationMap.put("notifInfo", "您已成功报名，不需要再填写报名信息");
+									return model;
 								}
 							}
 						}

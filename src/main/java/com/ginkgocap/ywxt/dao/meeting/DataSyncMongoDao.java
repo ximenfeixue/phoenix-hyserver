@@ -9,11 +9,13 @@ import java.util.List;
  */
 public interface DataSyncMongoDao {
 
-    void saveDataSync(DataSync data);
+    DataSync saveDataSync(DataSync data);
 
     void batchSaveDataSync(List<DataSync> dataList);
 
     boolean deleteDataSync(final String id);
 
     List<DataSync> getDataSyncList();
+
+    DataSync getDataSync(String id);
 }

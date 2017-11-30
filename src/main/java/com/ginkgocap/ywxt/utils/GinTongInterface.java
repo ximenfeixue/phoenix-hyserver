@@ -419,13 +419,20 @@ public class GinTongInterface {
 
 	public static Map<Integer,List<Social>> getListIMRecordMap(SocialListReq property) {
 
+		ObjectMapper objectMap = new ObjectMapper();
 		String url = resource.getString("imUrl");
 		String interfaceName = "/mobile/im/getListIMRecordMap";
 		try {
 			UserBean userBean = new UserBean();
 			userBean.setId(property.getUserId());
 			String responseJson = HttpClientUtil.getGintongPost(url, interfaceName, "{}", userBean);
-			JsonNode jsonNode = JsonReadUtil.getJsonNode(responseJson);
+			JsonNode jsonNode = null;
+			try {
+				jsonNode = objectMap.readTree(responseJson);
+			} catch (Exception ex) {
+				logger.error("parser json failed. error: " + ex.getMessage());
+				logger.error("responseJson content: " + responseJson);
+			}
 
 			if (jsonNode != null && "0".equals(jsonNode.get("notification").get("notifCode").asText())) {
 				JsonNode mapNode = jsonNode.get("responseData");

@@ -18,6 +18,7 @@ import com.ginkgocap.ywxt.payment.model.PayOrder;
 import com.ginkgocap.ywxt.payment.service.PayOrderService;
 import com.ginkgocap.ywxt.payment.service.PayService;
 import com.ginkgocap.ywxt.payment.utils.PayStatus;
+import com.ginkgocap.ywxt.task.DataSyncTask;
 import com.ginkgocap.ywxt.utils.pic.DefaultPic;
 import com.ginkgocap.ywxt.vo.query.meeting.*;
 import com.gintong.frame.util.dto.InterfaceResult;
@@ -116,6 +117,8 @@ public class MeetingServiceImpl extends BaseServiceImpl<Meeting, Long> implement
 	private PayService payService;
 	@Autowired
 	private MeetingNotifyService meetingNotifyService;
+	@Autowired
+	private DataSyncTask dataSyncTask;
 
 	@Value("${nginx.root}")
 	private String nginxRoot;
@@ -336,7 +339,7 @@ public class MeetingServiceImpl extends BaseServiceImpl<Meeting, Long> implement
 	@Transactional(rollbackFor = Exception.class)
 	public Long saveMeetingInterfix(MeetingQuery entity, User user, String fileImgUrl) throws Exception {
 		if (!Utils.isNullOrEmpty(entity)) {
-			Meeting meeting = new Meeting();
+			final Meeting meeting = new Meeting();
 			entity.setCreateTime(new Date());
 			org.apache.commons.beanutils.BeanUtils.copyProperties(meeting, entity);
 			meeting.setCreateId(user.getId());
@@ -359,7 +362,7 @@ public class MeetingServiceImpl extends BaseServiceImpl<Meeting, Long> implement
 			} else if (meeting.getStartTime().before(new Date()) && MeetingStatusType.DRAFT.code() != meeting.getMeetingStatus()) {
 				meeting.setMeetingStatus(MeetingStatusType.IN_MEETING.code());
 			}
-			Long meetingId = this.save(meeting);
+			final Long meetingId = this.save(meeting);
 
 			/**
 			 * 添加为了IOS获取到未读消息数
@@ -457,12 +460,27 @@ public class MeetingServiceImpl extends BaseServiceImpl<Meeting, Long> implement
 				userIds.clear();
 				userIds.add(entity.getCreateId());
 			}
-
-			String groupId = createFreeChatGroup(meetingid, meetingQuery, userIds, ownerId);
-			updatedMeeting.setGroupId(groupId);
-			updatedMeeting.setId(meetingid);
-			meetingDao.saveOrUpdate(updatedMeeting);
-
+			ThreadPoolUtils.getExecutorService().execute(new Runnable() {
+				@Override
+				public void run() {
+					String groupId = createFreeChatGroup(meetingid, meetingQuery, userIds, ownerId);
+					if (StringUtils.isNullOrEmpty(groupId)) {
+						// 备份到 mongo 中
+						MeetingFreeChat meetingFreeChat = new MeetingFreeChat();
+						meetingFreeChat.setMeetingId(meetingId);
+						meetingFreeChat.setMeetingQuery(meetingQuery);
+						meetingFreeChat.setUserIds(userIds);
+						meetingFreeChat.setOwnerId(ownerId);
+						DataSync dataSync = new DataSync();
+						dataSync.setData(meetingFreeChat);
+						dataSyncTask.saveDataNeedSync(dataSync);
+					} else {
+						updatedMeeting.setGroupId(groupId);
+						updatedMeeting.setId(meetingid);
+						meetingDao.saveOrUpdate(updatedMeeting);
+					}
+				}
+			});
 
 			/***
 			 * 保存会议议题 所有会议聊天记录都与议题相关联，无主讲会议给一个默认议题，页面不显示，仅用于关联连天数据
@@ -537,7 +555,9 @@ public class MeetingServiceImpl extends BaseServiceImpl<Meeting, Long> implement
 			if (!Utils.isNullOrEmpty(entity.getListMeetingDetail())) {
 				for (MeetingDetail md : entity.getListMeetingDetail()) {
 					md.setMeetingId(meetingId);
-					long mdid= meetingDetailDao.save(md);
+					String meetingDetail = md.getMeetingDetail();
+					md.setMeetingDetail(meetingDetail);
+					long mdid = meetingDetailDao.save(md);
 					// 小模块Id要和对应的sequence做一次关联 供图片存储时关联用
 					meetingDetailMap.put(md.getSequence(),mdid);
 				}
@@ -640,12 +660,12 @@ public class MeetingServiceImpl extends BaseServiceImpl<Meeting, Long> implement
 	protected String createFreeChatGroup(Long meetingId, MeetingQuery entity, List<Long> memberIds, Long ownerId) {
 		String meetingName = entity.getMeetingName();
 		String meetingDesc = StringUtils.isNullOrEmpty(entity.getMeetingDesc()) ? meetingName : entity.getMeetingDesc().trim();
-		int roomsize = 1000;
+		int roomSize = 1000;
 
 		if (memberIds == null) {
 			memberIds = Collections.emptyList();
 		}
-		return GinTongInterface.createMUC(meetingId, meetingName, meetingDesc, roomsize, ownerId, memberIds);
+		return GinTongInterface.createMUC(meetingId, meetingName, meetingDesc, roomSize, ownerId, memberIds);
 	}
 
 	/*
