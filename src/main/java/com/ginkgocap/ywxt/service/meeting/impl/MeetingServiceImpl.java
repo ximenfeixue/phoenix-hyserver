@@ -65,6 +65,8 @@ import javax.annotation.Resource;
 @Transactional
 public class MeetingServiceImpl extends BaseServiceImpl<Meeting, Long> implements MeetingService {
 
+	static final long DEFAULT_LIVE_DURATION = 1 * 60 * 60 * 1000;
+
 	@Autowired
 	private MeetingDetailDao meetingDetailDao;
 	@Autowired
@@ -358,6 +360,11 @@ public class MeetingServiceImpl extends BaseServiceImpl<Meeting, Long> implement
 				meeting.setMeetingStatus(MeetingStatusType.NOT_BEGIN.code());
 			} else if (meeting.getStartTime().before(new Date()) && MeetingStatusType.DRAFT.code() != meeting.getMeetingStatus()) {
 				meeting.setMeetingStatus(MeetingStatusType.IN_MEETING.code());
+			}
+			meeting.setLive(null == entity.getLive() ? 0 : entity.getLive());
+			if (1 == meeting.getLive()) {
+				meeting.setLiveStartTime(date);
+				meeting.setLiveEndTime(getLiveEndTime(meeting.getLiveStartTime(), DEFAULT_LIVE_DURATION));
 			}
 			Long meetingId = this.save(meeting);
 

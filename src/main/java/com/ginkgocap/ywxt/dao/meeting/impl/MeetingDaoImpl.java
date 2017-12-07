@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.ginkgocap.ywxt.model.meeting.Live;
 import com.ginkgocap.ywxt.vo.query.meeting.MeetingAdQuery;
 import com.ginkgocap.ywxt.vo.query.meeting.MeetingCommonQuery;
 import org.mybatis.spring.support.SqlSessionDaoSupport;
@@ -555,6 +556,49 @@ public class MeetingDaoImpl extends SqlSessionDaoSupport implements MeetingDao,A
 		map.put("startRow", index * size);
 		map.put("size", size);
 		return getSqlSession().selectList("Meeting.getTops", map);
+	}
+
+	/**
+	 * 开通直播
+	 *
+	 * @param live
+	 */
+	@Override
+	public void updateLive(Live live) {
+		Map<String, Object> map = new HashMap<String, Object>(6);
+		map.put("live", live.getLive());
+		map.put("liveStatus", live.getLiveStatus());
+		map.put("liveRoomNum", live.getLiveRoomNum());
+		map.put("liveStartTime", live.getLiveStartTime());
+		map.put("liveEndTime", live.getLiveEndTime());
+		map.put("id", live.getId());
+		getSqlSession().update("Meeting.updateLive", map);
+	}
+
+	/**
+	 * 更新直播状态
+	 *
+	 * @param liveStatus
+	 */
+	@Override
+	public void updateLiveStatus(final Long id, final Integer liveStatus) {
+		Map<String, Object> map = new HashMap<String, Object>(2);
+		map.put("liveStatus", liveStatus);
+		map.put("id", id);
+		getSqlSession().update("Meeting.updateLiveStatus", map);
+	}
+
+	/**
+	 * 更新直播结束时间
+	 *
+	 * @param liveEndTime
+	 */
+	@Override
+	public void updateLiveEndTime(final Long id, final Date liveEndTime) {
+		Map<String, Object> map = new HashMap<String, Object>(2);
+		map.put("liveEndTime", liveEndTime);
+		map.put("id", id);
+		getSqlSession().update("Meeting.updateLiveEndTime", map);
 	}
 
 	/**

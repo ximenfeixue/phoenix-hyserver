@@ -39,6 +39,11 @@ PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
 		<result property="reviewFlag" column="review_flag"/>
 		<result property="signReminderTime" column="sign_reminder_time"/>
 		<result property="isSign" column="is_sign"/>
+		<result property="live" column="is_live"/>
+		<result property="liveStatus" column="live_status"/>
+		<result property="liveRoomNum" column="live_room_num"/>
+		<result property="liveStartTime" column="live_start_time"/>
+		<result property="liveEndTime" column="live_end_time"/>
 	</resultMap>
 	
 	<sql id="columns">
@@ -51,7 +56,8 @@ PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
 			create_id AS createId,create_name AS createName,task_id AS taskId,create_time AS createTime,
 			update_time AS updateTime,group_id AS groupId,industry,is_delete AS isDelete,formated_desc AS formatedDesc,
 			create_user_type AS createUserType, top AS top, disable AS disable, is_pay AS isPay, pay_money AS payMoney,
-			send_flag AS sendFalg, review_flag as reviewFlag, sign_reminder_time AS signReminderTime, is_sign AS isSign
+			send_flag AS sendFalg, review_flag as reviewFlag, sign_reminder_time AS signReminderTime, is_sign AS isSign,
+			is_live AS live, live_status AS liveStatus, live_room_num AS liveRoomNum, live_start_time AS liveStartTime, live_end_time AS liveEndTime
 		]]>
 	</sql>
 
@@ -90,7 +96,12 @@ PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
         	send_flag,
         	sign_reminder_time,
         	review_flag,
-        	is_sign
+        	is_sign,
+        	is_live,
+        	live_status,
+        	live_room_num,
+        	live_start_time,
+        	live_end_time
         ) VALUES (
         	#{id},
         	#{meetingName},
@@ -124,7 +135,12 @@ PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
         	#{sendFalg},
         	#{signReminderTime},
         	#{reviewFlag},
-        	#{isSign}
+        	#{isSign},
+        	#{live},
+        	#{liveStatus},
+        	#{liveRoomNum},
+        	#{liveStartTime},
+        	#{liveEndTime}
         )
         
     ]]>
@@ -163,8 +179,13 @@ PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
 	        send_flag = #{sendFalg},
 	        review_flag = #{reviewFlag},
 	        sign_reminder_time = #{signReminderTime},
-	        is_sign = #{isSign}
-        WHERE id = #{id} 
+	        is_sign = #{isSign},
+	        is_live = #{live},
+	        live_status = #{liveStatus},
+	        live_room_num = #{liveRoomNum},
+	        live_start_time = #{liveStartTime},
+	        live_end_time = #{liveEndTime}
+        WHERE id = #{id}
     ]]>
 	</update>
 
@@ -1708,5 +1729,31 @@ PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
 			LIMIT #{startRow}, #{size}
 		</if>
     </select>
+
+	<update id="updateLive" parameterType="java.util.Map">
+		<![CDATA[
+			UPDATE tb_meeting
+			SET is_live = #{live},
+	        	live_status = #{liveStatus},
+				live_room_num = #{liveRoomNum},
+				live_start_time = #{liveStartTime},
+				live_end_time = #{liveEndTime}
+			WHERE id = #{id}
+		 ]]>
+	</update>
+	<update id="updateLiveStatus" parameterType="java.util.Map">
+		<![CDATA[
+			UPDATE tb_meeting
+			SET live_status = #{liveStatus}
+			WHERE id = #{id}
+		 ]]>
+	</update>
+	<update id="updateLiveEndTime" parameterType="java.util.Map">
+		<![CDATA[
+			UPDATE tb_meeting
+			SET live_end_time = #{liveEndTime}
+			WHERE id = #{id}
+		 ]]>
+	</update>
 
 </mapper>

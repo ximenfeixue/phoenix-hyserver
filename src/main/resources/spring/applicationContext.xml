@@ -111,6 +111,7 @@
                 <value>classpath:model/MeetingTemplateMapper.xml</value>
                 <value>classpath:model/MeetingCountMapper.xml</value>
                 <value>classpath:model/MeetingDetailMapper.xml</value>
+                <value>classpath:model/MeetingLiveMapper.xml</value>
             </list>
         </property>
         <property name="configLocation" value="classpath:SqlMapConfig.xml"/>

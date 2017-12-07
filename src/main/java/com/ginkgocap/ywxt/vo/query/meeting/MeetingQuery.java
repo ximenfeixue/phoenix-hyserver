@@ -136,6 +136,11 @@ public class MeetingQuery implements Serializable {
 	// 签到提醒时间 （0 —— 120）
 	private Integer signReminderTime;
 
+	/**
+	 * 是否需要直播
+	 */
+	private Integer live;
+
 	public Long getId() {
 		return this.id;
 	}
@@ -677,5 +682,13 @@ public class MeetingQuery implements Serializable {
 
 	public void setPayStatus(Byte payStatus) {
 		this.payStatus = payStatus;
+	}
+
+	public Integer getLive() {
+		return live;
+	}
+
+	public void setLive(Integer live) {
+		this.live = live;
 	}
 }

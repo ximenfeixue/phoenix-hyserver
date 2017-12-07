@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+"http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+<mapper namespace="MeetingLive">
+	<resultMap id="meetingLiveMap" type="com.ginkgocap.ywxt.model.meeting.MeetingLive">
+		<result property="id" column="id" />
+		<result property="meetingId" column="meeting_id" />
+		<result property="roomNum" column="room_num" />
+		<result property="durationType" column="duration_type" />
+		<result property="payOrderId" column="pay_order_id" />
+		<result property="gmtCreate" column="gmt_create" />
+		<result property="userCreate" column="user_create" />
+
+	</resultMap>
+	
+	<sql id="columns">
+		<![CDATA[
+			id AS id, meeting_id AS meetingId, room_num AS roomNum,
+			duration_type AS durationType, pay_order_id AS payOrderId,
+			gmt_create AS gmtCreate, user_create AS userCreate
+		]]>
+	</sql>
+
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id">
+    <![CDATA[
+        INSERT INTO tb_meeting_live (
+        	id,
+        	meeting_id,
+        	room_num,
+        	duration_type,
+        	pay_order_id,
+			gmt_create,
+		    user_create
+        ) VALUES (
+        	#{id},
+        	#{meetingId},
+        	#{roomNum},
+        	#{durationType},
+        	#{payOrderId},
+        	#{gmtCreate},
+        	#{userCreate}
+        )
+        
+    ]]>
+	</insert>
+
+	<update id="update">
+    <![CDATA[
+        UPDATE tb_meeting_live
+        SET meeting_id = #{meetingId},
+	        room_num = #{roomNum},
+	        duration_type = #{durationType},
+        	pay_order_id = #{payOrderId}
+        WHERE id = #{id}
+    ]]>
+	</update>
+
+	<select id="getByMeetingId" resultType="meetingLive"
+			parameterType="java.lang.Long">
+		SELECT <include refid="columns" />
+		<![CDATA[
+	        FROM tb_meeting_live
+			WHERE meeting_id = #{meetingId}
+	    ]]>
+	</select>
+
+
+
+</mapper>

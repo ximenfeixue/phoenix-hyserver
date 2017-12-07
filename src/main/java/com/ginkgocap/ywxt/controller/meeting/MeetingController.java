@@ -36,7 +36,6 @@ import com.gintong.frame.util.dto.CommonResultCode;
 import com.gintong.frame.util.dto.InterfaceResult;
 import com.gintong.ywxt.im.model.SocialStatus;
 import com.gintong.ywxt.im.service.SocialStatusService;
-import com.mchange.lang.ByteUtils;
 import net.sf.ezmorph.object.DateMorpher;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -45,8 +44,6 @@ import net.sf.json.util.JSONUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.builder.ReflectionToStringBuilder;
-import org.apache.velocity.runtime.parser.node.MathUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,7 +58,6 @@ import org.springframework.web.servlet.ModelAndView;
 import com.ginkgocap.ywxt.cache.Cache;
 import com.ginkgocap.ywxt.common.base.BaseController;
 import com.ginkgocap.ywxt.file.model.FileIndex;
-//import com.ginkgocap.ywxt.file.service.FileIndexService;
 import com.ginkgocap.ywxt.user.model.User;
 import com.ginkgocap.ywxt.user.service.UserService;
 import com.ginkgocap.ywxt.util.HttpClientHelper;
@@ -76,7 +72,6 @@ import com.gintong.rocketmq.api.utils.FlagTypeUtils;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-//import com.ginkgocap.ywxt.model.meeting.FileIndex;
 
 /**
  * @Description: Controller

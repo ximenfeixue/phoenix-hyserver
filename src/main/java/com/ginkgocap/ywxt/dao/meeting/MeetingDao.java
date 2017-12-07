@@ -10,6 +10,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import com.ginkgocap.ywxt.model.meeting.Live;
 import com.ginkgocap.ywxt.vo.query.meeting.MeetingAdQuery;
 import com.ginkgocap.ywxt.vo.query.meeting.MeetingCommonQuery;
 import org.springframework.stereotype.Repository;
@@ -373,4 +374,22 @@ public interface MeetingDao{
 	 * @throws Exception
 	 */
 	List<MeetingAdQuery> getTops(int index, final int size) throws Exception;
+
+	/**
+	 * 开通直播
+	 * @param live
+	 */
+	void updateLive(Live live);
+
+	/**
+	 * 更新直播状态
+	 * @param liveStatus
+	 */
+	void updateLiveStatus(final Long id, final Integer liveStatus);
+
+	/**
+	 * 更新直播结束时间
+	 * @param liveEndTime
+	 */
+	void updateLiveEndTime(final Long id, final Date liveEndTime);
 }

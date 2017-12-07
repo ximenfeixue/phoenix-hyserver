@@ -10,17 +10,18 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
-import org.apache.commons.lang.builder.EqualsBuilder;
-import org.apache.commons.lang.builder.HashCodeBuilder;
-import org.apache.commons.lang.builder.ToStringBuilder;
-import org.apache.commons.lang.builder.ToStringStyle;
-
 import com.ginkgocap.ywxt.common.base.BaseEntity;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 
-public class Meeting extends BaseEntity implements Serializable{
+/**
+* @author cinderella
+* @version 2017/11/27
+*/
+public class Meeting extends Live implements Serializable{
 	private static final long serialVersionUID = 5454155825314635342L;
-	//会议序号
-	private Long id;
     //会议名称
 	private String meetingName;
     //会议地点
@@ -91,15 +92,7 @@ public class Meeting extends BaseEntity implements Serializable{
 	public Meeting() {}
 
 	public Meeting(Long id) {
-		this.id = id;
-	}
-
-	public void setId(Long value) {
-		this.id = value;
-	}
-	
-	public Long getId() {
-		return this.id;
+		super(id);
 	}
 	
 	public void setMeetingName(String value) {
@@ -306,84 +299,26 @@ public class Meeting extends BaseEntity implements Serializable{
 		this.createUserType = createUserType;
 	}
 
-	/**
-	 * 名称: toString
-	 * 描述: 重写toString方法
-	 * @since  2014-09-14
-	 * @author qingc
-	 */
-	public String toString() {
-		return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)
-			.append("Id",getId())
-			.append("MeetingName",getMeetingName())
-			.append("MeetingAddress",getMeetingAddress())
-			.append("StartTime",getStartTime())
-			.append("EndTime",getEndTime())
-			.append("MeetingType",getMeetingType())
-			.append("MeetingStatus",getMeetingStatus())
-			.append("IsSecrecy",getIsSecrecy())
-			.append("MemberCount",getMemberCount())
-			.append("MeetingDesc",getMeetingDesc())
-			.append("CreateId",getCreateId())
-			.append("TaskId",getTaskId())
-			.append("CreateTime",getCreateTime())
-			.append("UpdateTime",getUpdateTime())
-			.append("Industry",getIndustry())
-			.append("GroupId",getGroupId())
-			.append("IsDelete",getIsDelete())
-			.append("FormatedDesc",getFormatedDesc())
-			.append("CreateUserType",getCreateUserType())
-			.append("Top", getTop())
-			.append("Disable", getDisable())
-			.append("IsPay", getIsPay())
-			.append("PayMoney", getPayMoney())
-			.toString();
-	}
-	/**
-	 * 名称: toJson
-	 * 描述: 生成json串
-	 * @since  2014-09-14
-	 * @author qingc
-	 */
-	public String toJson() {
-		return new StringBuilder()
-			.append("{ 'meeting':{")
-			.append("'id':'"+getId()+"',")
-			.append("'meetingName':'"+getMeetingName()+"',")
-			.append("'meetingAddress':'"+getMeetingAddress()+"',")
-			.append("'startTime':'"+getStartTime()+"',")
-			.append("'endTime':'"+getEndTime()+"',")
-			.append("'meetingType':'"+getMeetingType()+"',")
-			.append("'meetingStatus':'"+getMeetingStatus()+"',")
-			.append("'isSecrecy':'"+getIsSecrecy()+"',")
-			.append("'memberCount':'"+getMemberCount()+"',")
-			.append("'meetingDesc':'"+getMeetingDesc()+"',")
-			.append("'createId':'"+getCreateId()+"',")
-			.append("'taskId':'"+getTaskId()+"',")
-			.append("'createTime':'"+getCreateTime()+"',")
-			.append("'updateTime':'"+getUpdateTime()+"',")
-			.append("'industry':'"+getIndustry()+"',")
-			.append("'groupId':'"+getGroupId()+"',")
-			.append("'isDelete':'"+getIsDelete()+"',")
-			.append("'formatedDesc':'"+getFormatedDesc()+"',")
-			.append("'createUserType':'"+getCreateUserType()+"',")
-			.append("'top':'" + getTop() + "',")
-			.append("'disable':'" + getDisable() + "',")
-			.append("'isPay':'" + getIsPay() + "',")
-			.append("'payMoney':'" + getPayMoney() + "',")
-			.append("}}")
-			.toString().replaceAll(",}", "}");
-	}
-	
+    @Override
+    public String toString() {
+        return ToStringBuilder.reflectionToString(this, ToStringStyle.JSON_STYLE);
+    }
+
+    @Override
 	public int hashCode() {
 		return new HashCodeBuilder()
 			.append(getId())
 			.toHashCode();
 	}
-	
+
+	@Override
 	public boolean equals(Object obj) {
-		if(obj instanceof Meeting == false) return false;
-		if(this == obj) return true;
+		if (obj instanceof Meeting == false) {
+		    return false;
+        }
+		if (this == obj) {
+		    return true;
+        }
 		Meeting other = (Meeting)obj;
 		return new EqualsBuilder()
 			.append(getId(),other.getId())
