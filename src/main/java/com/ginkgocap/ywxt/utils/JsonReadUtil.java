@@ -2,8 +2,12 @@ package com.ginkgocap.ywxt.utils;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ginkgocap.ywxt.controller.meeting.MeetingController;
 import org.apache.commons.lang3.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -15,6 +19,7 @@ import javax.servlet.http.HttpServletRequest;
 import static com.ginkgocap.ywxt.utils.StringUtils.*;
 
 public class JsonReadUtil {
+	private final static Logger logger = LoggerFactory.getLogger(JsonReadUtil.class);
 	/**
 	 * 获取json字符串
 	 * @param request
@@ -27,6 +32,21 @@ public class JsonReadUtil {
         	return "";
         }
 		return requestJson;
+	}
+
+	public static JsonNode getJsonNode(final String content) {
+		if (content == null || content.trim().length() <= 0 || "null".equals(content)) {
+			return null;
+		}
+
+		try {
+			ObjectMapper objectMap = new ObjectMapper();
+			return objectMap.readTree(content);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			logger.error("json content : " + content);
+		}
+		return null;
 	}
 
 	public static <T> List<T> readListValue(Class<T> valueType, final String content) {

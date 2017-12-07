@@ -419,16 +419,15 @@ public class GinTongInterface {
 
 	public static Map<Integer,List<Social>> getListIMRecordMap(SocialListReq property) {
 
-		ObjectMapper objectMap = new ObjectMapper();
 		String url = resource.getString("imUrl");
 		String interfaceName = "/mobile/im/getListIMRecordMap";
 		try {
 			UserBean userBean = new UserBean();
 			userBean.setId(property.getUserId());
 			String responseJson = HttpClientUtil.getGintongPost(url, interfaceName, "{}", userBean);
-			JsonNode jsonNode = objectMap.readTree(responseJson);
+			JsonNode jsonNode = JsonReadUtil.getJsonNode(responseJson);
 
-			if ("0".equals(jsonNode.get("notification").get("notifCode").asText())) {
+			if (jsonNode != null && "0".equals(jsonNode.get("notification").get("notifCode").asText())) {
 				JsonNode mapNode = jsonNode.get("responseData");
 				if (mapNode != null) {
 					Map<Integer, List<Social>> map = new HashMap<Integer, List<Social>>(2);
