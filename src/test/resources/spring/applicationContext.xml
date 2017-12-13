@@ -65,9 +65,9 @@
     <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource"
           destroy-method="close"
           p:driverClass="${jdbc.driverClass}"
-          p:jdbcUrl="${jdbc.url}"
-          p:user="${jdbc.username}"
-          p:password="${jdbc.password}"
+          p:jdbcUrl="jdbc:mysql://mysql.gintong.local:3306/im?createDatabaseIfNotExist=true&amp;useUnicode=true&amp;characterEncoding=utf8"
+          p:user="ph_parent"
+          p:password="QHuqURq5EW"
           p:initialPoolSize="${jdbc.initialPoolSize}"
           p:minPoolSize="${jdbc.minPoolSize}"
           p:acquireIncrement="${jdbc.acquireIncrement}"
@@ -111,7 +111,8 @@
                 <value>classpath:model/MeetingTemplateMapper.xml</value>
                 <value>classpath:model/MeetingCountMapper.xml</value>
                 <value>classpath:model/MeetingDetailMapper.xml</value>
-                <value>classpath:model/MeetingLiveMapper.xml</value>
+                <value>classpath:model/MeetingLiveCreateRecordMapper.xml</value>
+                <value>classpath:model/MeetingLiveUseRecordMapper.xml</value>
             </list>
         </property>
         <property name="configLocation" value="classpath:SqlMapConfig.xml"/>
@@ -127,9 +128,9 @@
     <bean id="userDataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource"
           destroy-method="close"
           p:driverClass="${user.jdbc.driverClass}"
-          p:jdbcUrl="${user.jdbc.url}"
-          p:user="${user.jdbc.username}"
-          p:password="${user.jdbc.password}"
+          p:jdbcUrl="jdbc:mysql://mysql.gintong.local:3306/phoenix_user?createDatabaseIfNotExist=true&amp;useUnicode=true&amp;characterEncoding=utf8"
+          p:user="ph_parent"
+          p:password="QHuqURq5EW"
           p:initialPoolSize="${user.jdbc.initialPoolSize}"
           p:minPoolSize="${user.jdbc.minPoolSize}"
           p:acquireIncrement="${user.jdbc.acquireIncrement}"
@@ -181,8 +182,8 @@
 
     <bean id="mobileRpe" class="com.ginkgocap.ywxt.resource.ResourcePathExposer"
           init-method="init">
-        <property name="nfsHome" value="${nfs.home}"/>
-        <property name="nginxRoot" value="${nginx.root}"/>
+        <property name="nfsHome" value="/webserver/upload/meeting/"/>
+        <property name="nginxRoot" value="http://file.online.gintong.com"/>
     </bean>
     <bean id="dataSyncScheduler" class="com.ginkgocap.ywxt.task.DataSyncScheduler"/>
 </beans>
