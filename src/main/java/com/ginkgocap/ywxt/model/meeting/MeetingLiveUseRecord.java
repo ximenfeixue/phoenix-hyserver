@@ -9,11 +9,10 @@ import java.util.Date;
 
 /**
  * @author cinderella
- * @version 2017/12/7
+ * @version 2017/12/13
  */
-public class MeetingLive extends BaseEntity implements Serializable {
-
-    private static final long serialVersionUID = -8321937305026328911L;
+public class MeetingLiveUseRecord extends BaseEntity implements Serializable {
+    private static final long serialVersionUID = -2274073326203204929L;
 
     private Long id;
 
@@ -23,19 +22,19 @@ public class MeetingLive extends BaseEntity implements Serializable {
     private Long meetingId;
 
     /**
-     * 直播房间号
+     * 频道ID，32位字符串
      */
-    private String roomNum;
+    private String channelId;
 
     /**
-     * 直播时长类型
+     * 开始时间
      */
-    private Integer durationType;
+    private Date startTime;
 
     /**
-     * 支付订单
+     * 结束时间
      */
-    private Long payOrderId;
+    private Date endTime;
 
     /**
      * 创建时间
@@ -47,7 +46,7 @@ public class MeetingLive extends BaseEntity implements Serializable {
      */
     private Long userCreate;
 
-    public MeetingLive() {
+    public MeetingLiveUseRecord() {
     }
 
     public Long getId() {
@@ -66,28 +65,28 @@ public class MeetingLive extends BaseEntity implements Serializable {
         this.meetingId = meetingId;
     }
 
-    public String getRoomNum() {
-        return roomNum;
+    public String getChannelId() {
+        return channelId;
     }
 
-    public void setRoomNum(String roomNum) {
-        this.roomNum = roomNum;
+    public void setChannelId(String channelId) {
+        this.channelId = channelId;
     }
 
-    public Integer getDurationType() {
-        return durationType;
+    public Date getStartTime() {
+        return startTime;
     }
 
-    public void setDurationType(Integer durationType) {
-        this.durationType = durationType;
+    public void setStartTime(Date startTime) {
+        this.startTime = startTime;
     }
 
-    public Long getPayOrderId() {
-        return payOrderId;
+    public Date getEndTime() {
+        return endTime;
     }
 
-    public void setPayOrderId(Long payOrderId) {
-        this.payOrderId = payOrderId;
+    public void setEndTime(Date endTime) {
+        this.endTime = endTime;
     }
 
     public Date getGmtCreate() {

@@ -1,7 +1,7 @@
 package com.ginkgocap.ywxt.dao.meeting.impl;
 
-import com.ginkgocap.ywxt.dao.meeting.MeetingLiveDao;
-import com.ginkgocap.ywxt.model.meeting.MeetingLive;
+import com.ginkgocap.ywxt.dao.meeting.MeetingLiveCreateRecordDao;
+import com.ginkgocap.ywxt.model.meeting.MeetingLiveCreateRecord;
 import org.mybatis.spring.support.SqlSessionDaoSupport;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanInitializationException;
@@ -12,16 +12,14 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ApplicationContextException;
 import org.springframework.stereotype.Repository;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author cinderella
  * @version 2017/12/7
  */
 @Repository
-public class MeetingLiveDaoImpl extends SqlSessionDaoSupport implements MeetingLiveDao,ApplicationContextAware {
+public class MeetingLiveCreateRecordDaoImpl extends SqlSessionDaoSupport implements MeetingLiveCreateRecordDao,ApplicationContextAware {
 
     @Autowired
     private ApplicationContext applicationContext;
@@ -45,14 +43,14 @@ public class MeetingLiveDaoImpl extends SqlSessionDaoSupport implements MeetingL
     /**
      * save
      *
-     * @param meetingLive
+     * @param meetingLiveCreateRecord
      * @return
      */
     @Override
-    public MeetingLive save(MeetingLive meetingLive) {
-        int insert = getSqlSession().insert("MeetingLive.insert", meetingLive);
+    public MeetingLiveCreateRecord save(MeetingLiveCreateRecord meetingLiveCreateRecord) {
+        int insert = getSqlSession().insert("MeetingLiveCreateRecord.insert", meetingLiveCreateRecord);
         if (insert > 0) {
-            return meetingLive;
+            return meetingLiveCreateRecord;
         }
         return null;
     }
@@ -64,7 +62,7 @@ public class MeetingLiveDaoImpl extends SqlSessionDaoSupport implements MeetingL
      * @return
      */
     @Override
-    public List<MeetingLive> getByMeetingId(final Long meetingId) {
-        return getSqlSession().selectList("MeetingLive.getByMeetingId", meetingId);
+    public List<MeetingLiveCreateRecord> getByMeetingId(final Long meetingId) {
+        return getSqlSession().selectList("MeetingLiveCreateRecord.getByMeetingId", meetingId);
     }
 }

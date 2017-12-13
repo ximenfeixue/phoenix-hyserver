@@ -15,7 +15,8 @@
         <typeAlias alias="topicChat" type="com.ginkgocap.ywxt.model.meeting.TopicChat" />
         <typeAlias alias="meetingData" type="com.ginkgocap.ywxt.model.meeting.MeetingData" />
         <typeAlias alias="meeting" type="com.ginkgocap.ywxt.model.meeting.Meeting" />
-        <typeAlias alias="meetingLive" type = "com.ginkgocap.ywxt.model.meeting.MeetingLive" />
+        <typeAlias alias="meetingLiveCreateRecord" type = "com.ginkgocap.ywxt.model.meeting.MeetingLiveCreateRecord" />
+        <typeAlias alias="meetingLiveUseRecord" type = "com.ginkgocap.ywxt.model.meeting.MeetingLiveUseRecord" />
         <typeAlias alias="meetingMember" type="com.ginkgocap.ywxt.model.meeting.MeetingMember" />
         <typeAlias alias="meetingNoteDetail" type="com.ginkgocap.ywxt.model.meeting.MeetingNoteDetail" />
         <typeAlias alias="meetingNote" type="com.ginkgocap.ywxt.model.meeting.MeetingNote" />

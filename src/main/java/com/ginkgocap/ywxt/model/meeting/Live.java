@@ -26,7 +26,7 @@ public class Live extends BaseEntity implements Serializable {
     /**
      * 直播房间id
      */
-    private String liveRoomNum;
+    private String liveChannelId;
     /**
      * 直播开始时间
      */
@@ -67,12 +67,12 @@ public class Live extends BaseEntity implements Serializable {
         this.liveStatus = liveStatus;
     }
 
-    public String getLiveRoomNum() {
-        return liveRoomNum;
+    public String getLiveChannelId() {
+        return liveChannelId;
     }
 
-    public void setLiveRoomNum(String liveRoomNum) {
-        this.liveRoomNum = liveRoomNum;
+    public void setLiveChannelId(String liveChannelId) {
+        this.liveChannelId = liveChannelId;
     }
 
     public Date getLiveStartTime() {
