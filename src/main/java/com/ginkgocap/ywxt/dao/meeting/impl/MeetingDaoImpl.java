@@ -568,7 +568,7 @@ public class MeetingDaoImpl extends SqlSessionDaoSupport implements MeetingDao,A
 		Map<String, Object> map = new HashMap<String, Object>(6);
 		map.put("live", live.getLive());
 		map.put("liveStatus", live.getLiveStatus());
-		map.put("liveRoomNum", live.getLiveRoomNum());
+		map.put("liveChannelId", live.getLiveChannelId());
 		map.put("liveStartTime", live.getLiveStartTime());
 		map.put("liveEndTime", live.getLiveEndTime());
 		map.put("id", live.getId());
