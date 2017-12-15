@@ -1,5 +1,6 @@
 package com.ginkgocap.ywxt.dao.meeting.impl;
 
+import com.ginkgocap.ywxt.dao.meeting.MeetingDao;
 import com.ginkgocap.ywxt.dao.meeting.MeetingLiveUseRecordDao;
 import com.ginkgocap.ywxt.model.meeting.MeetingLiveUseRecord;
 import org.mybatis.spring.support.SqlSessionDaoSupport;
@@ -12,6 +13,7 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ApplicationContextException;
 import org.springframework.stereotype.Repository;
 
+import javax.annotation.Resource;
 import java.util.List;
 
 /**
@@ -23,6 +25,9 @@ public class MeetingLiveUseRecordDaoImpl extends SqlSessionDaoSupport implements
 
     @Autowired
     private ApplicationContext applicationContext;
+
+    @Resource
+    private MeetingDao meetingDao;
 
     /**
      * Set the ApplicationContext that this object runs in.

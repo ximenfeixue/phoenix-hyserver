@@ -28,13 +28,17 @@ public class Live extends BaseEntity implements Serializable {
      */
     private String liveChannelId;
     /**
+     * 直播聊天室id
+     */
+    private Long liveRoomId;
+    /**
      * 直播开始时间
      */
     private Date liveStartTime;
     /**
-     * 直播结束时间
+     * 直播剩余时长,单位秒
      */
-    private Date liveEndTime;
+    private Long liveRemainDuration = 0L;
 
     public Live() {
     }
@@ -75,20 +79,28 @@ public class Live extends BaseEntity implements Serializable {
         this.liveChannelId = liveChannelId;
     }
 
+    public Long getLiveRoomId() {
+        return liveRoomId;
+    }
+
+    public void setLiveRoomId(Long liveRoomId) {
+        this.liveRoomId = liveRoomId;
+    }
+
+    public Long getLiveRemainDuration() {
+        return liveRemainDuration;
+    }
+
+    public void setLiveRemainDuration(Long liveRemainDuration) {
+        this.liveRemainDuration = liveRemainDuration;
+    }
+
     public Date getLiveStartTime() {
         return liveStartTime;
     }
 
     public void setLiveStartTime(Date liveStartTime) {
         this.liveStartTime = liveStartTime;
-    }
-
-    public Date getLiveEndTime() {
-        return liveEndTime;
-    }
-
-    public void setLiveEndTime(Date liveEndTime) {
-        this.liveEndTime = liveEndTime;
     }
 
     @Override

@@ -9,12 +9,12 @@ public enum MeetingLiveDurationTypeEnum {
     /**
      * 30分钟
      */
-    HALF_HOUR(1, 30 * 60 * 1000),
+    HALF_HOUR(1, 30 * 60),
 
     /**
      * 60分钟
      */
-    ONE_HOUR(2, 60 * 60 * 1000);
+    ONE_HOUR(2, 60 * 60);
 
     private int key;
     private long value;

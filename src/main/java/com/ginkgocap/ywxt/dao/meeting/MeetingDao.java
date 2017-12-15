@@ -388,8 +388,22 @@ public interface MeetingDao{
 	void updateLiveStatus(final Long id, final Integer liveStatus);
 
 	/**
-	 * 更新直播结束时间
-	 * @param liveEndTime
+	 * 更新直播时长
+	 * @param liveRemainDuration
 	 */
-	void updateLiveEndTime(final Long id, final Date liveEndTime);
+	void updateLiveRemainDurationById(final Long id, final Long liveRemainDuration);
+
+	/**
+	 * getByLiveRoomId
+	 * @param liveRoomId
+	 * @return
+	 */
+	Meeting getByLiveRoomId(final long liveRoomId);
+
+	/**
+	 * getByLiveChannelId
+	 * @param liveChannelId
+	 * @return
+	 */
+	Meeting getByLiveChannelId(final String liveChannelId);
 }

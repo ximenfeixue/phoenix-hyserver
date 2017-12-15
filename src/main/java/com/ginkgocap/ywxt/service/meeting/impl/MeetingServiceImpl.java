@@ -2582,7 +2582,31 @@ public class MeetingServiceImpl extends BaseServiceImpl<Meeting, Long> implement
 		return meetingDao.getTops(index, size);
 	}
 
+	/**
+	 * getByLiveRoomId
+	 *
+	 * @param liveRoomId
+	 * @return
+	 */
 	@Override
+	public Meeting getByLiveRoomId(long liveRoomId) {
+		return null;
+	}
+
+	/**
+	 * getByLiveChannelId
+	 *
+	 * @param liveChannelId
+	 * @return
+	 */
+	@Override
+	@Transactional(readOnly = true)
+	public Meeting getByLiveChannelId(String liveChannelId) {
+		return null;
+	}
+
+	@Override
+	@Transactional(readOnly = true)
 	public Social getMeetingWithLatestMessage(Long userId) {
 		return meetingDao.getMeetingWithLatestMessage(userId);
 	}

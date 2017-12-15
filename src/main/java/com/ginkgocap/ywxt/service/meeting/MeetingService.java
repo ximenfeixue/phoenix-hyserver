@@ -430,4 +430,18 @@ public interface MeetingService {
 	 * @throws Exception
 	 */
 	List<MeetingAdQuery> getTops(int index, int size) throws Exception;
+
+	/**
+	 * getByLiveRoomId
+	 * @param liveRoomId
+	 * @return
+	 */
+	Meeting getByLiveRoomId(final long liveRoomId);
+
+	/**
+	 * getByLiveChannelId
+	 * @param liveChannelId
+	 * @return
+	 */
+	Meeting getByLiveChannelId(final String liveChannelId);
 }

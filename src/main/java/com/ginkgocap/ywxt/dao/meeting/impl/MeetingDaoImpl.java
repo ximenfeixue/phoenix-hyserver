@@ -570,7 +570,7 @@ public class MeetingDaoImpl extends SqlSessionDaoSupport implements MeetingDao,A
 		map.put("liveStatus", live.getLiveStatus());
 		map.put("liveChannelId", live.getLiveChannelId());
 		map.put("liveStartTime", live.getLiveStartTime());
-		map.put("liveEndTime", live.getLiveEndTime());
+		map.put("liveRemainDuration", live.getLiveRemainDuration());
 		map.put("id", live.getId());
 		getSqlSession().update("Meeting.updateLive", map);
 	}
@@ -591,14 +591,36 @@ public class MeetingDaoImpl extends SqlSessionDaoSupport implements MeetingDao,A
 	/**
 	 * 更新直播结束时间
 	 *
-	 * @param liveEndTime
+	 * @param liveRemainDuration
 	 */
 	@Override
-	public void updateLiveEndTime(final Long id, final Date liveEndTime) {
+	public void updateLiveRemainDurationById(final Long id, final Long liveRemainDuration) {
 		Map<String, Object> map = new HashMap<String, Object>(2);
-		map.put("liveEndTime", liveEndTime);
+		map.put("liveRemainDuration", liveRemainDuration);
 		map.put("id", id);
-		getSqlSession().update("Meeting.updateLiveEndTime", map);
+		getSqlSession().update("Meeting.updateLiveRemainDurationById", map);
+	}
+
+	/**
+	 * getByLiveRoomId
+	 *
+	 * @param liveRoomId
+	 * @return
+	 */
+	@Override
+	public Meeting getByLiveRoomId(long liveRoomId) {
+		return (Meeting)getSqlSession().selectOne("Meeting.getByLiveRoomId", liveRoomId);
+	}
+
+	/**
+	 * getByLiveChannelId
+	 *
+	 * @param liveChannelId
+	 * @return
+	 */
+	@Override
+	public Meeting getByLiveChannelId(String liveChannelId) {
+		return (Meeting)getSqlSession().selectOne("Meeting.getByLiveChannelId", liveChannelId);
 	}
 
 	/**
