@@ -43,6 +43,11 @@ public class MeetingLiveCreateRecord extends BaseEntity implements Serializable 
     private Integer durationType;
 
     /**
+     * 剩余时长（秒），包含当次开通/续费时长
+     */
+    private Long remainDuration;
+
+    /**
      * 支付订单
      */
     private Long payOrderId;
@@ -111,6 +116,14 @@ public class MeetingLiveCreateRecord extends BaseEntity implements Serializable 
 
     public void setDurationType(Integer durationType) {
         this.durationType = durationType;
+    }
+
+    public Long getRemainDuration() {
+        return remainDuration;
+    }
+
+    public void setRemainDuration(Long remainDuration) {
+        this.remainDuration = remainDuration;
     }
 
     public Long getPayOrderId() {

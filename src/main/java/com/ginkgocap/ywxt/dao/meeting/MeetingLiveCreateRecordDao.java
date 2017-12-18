@@ -17,7 +17,7 @@ public interface MeetingLiveCreateRecordDao {
      * @param meetingLiveCreateRecord
      * @return
      */
-    MeetingLiveCreateRecord save(MeetingLiveCreateRecord meetingLiveCreateRecord);
+    MeetingLiveCreateRecord save(MeetingLiveCreateRecord meetingLiveCreateRecord) throws Exception;
 
     /**
      * select
@@ -25,4 +25,19 @@ public interface MeetingLiveCreateRecordDao {
      * @return
      */
     List<MeetingLiveCreateRecord> getByMeetingId(final Long meetingId);
+
+    /**
+     * updateRemainDurationById
+     * @param remainDuration
+     * @param id
+     * @return
+     */
+    boolean updateRemainDurationById(final long remainDuration, final long id);
+
+    /**
+     * getById
+     * @param id
+     * @return
+     */
+    MeetingLiveCreateRecord getById(final long id);
 }

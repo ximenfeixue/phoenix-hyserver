@@ -118,6 +118,8 @@ public class MeetingServiceImpl extends BaseServiceImpl<Meeting, Long> implement
 	private PayService payService;
 	@Autowired
 	private MeetingNotifyService meetingNotifyService;
+	@Autowired
+	private MeetingLiveCreateRecordDao meetingLiveCreateRecordDao;
 
 	@Value("${nginx.root}")
 	private String nginxRoot;
@@ -2583,6 +2585,22 @@ public class MeetingServiceImpl extends BaseServiceImpl<Meeting, Long> implement
 	}
 
 	/**
+	 * 开通/续费 直播
+	 *
+	 * @param meetingLiveCreateRecord
+	 * @return
+	 */
+	@Override
+	@Transactional(rollbackFor = Exception.class)
+	public Meeting addLive(MeetingLiveCreateRecord meetingLiveCreateRecord) throws Exception{
+		MeetingLiveCreateRecord save = meetingLiveCreateRecordDao.save(meetingLiveCreateRecord);
+		if (null != save) {
+			return meetingDao.getById(save.getId());
+		}
+		return null;
+	}
+
+	/**
 	 * getByLiveRoomId
 	 *
 	 * @param liveRoomId
@@ -2590,7 +2608,7 @@ public class MeetingServiceImpl extends BaseServiceImpl<Meeting, Long> implement
 	 */
 	@Override
 	public Meeting getByLiveRoomId(long liveRoomId) {
-		return null;
+		return meetingDao.getByLiveRoomId(liveRoomId);
 	}
 
 	/**
@@ -2602,7 +2620,7 @@ public class MeetingServiceImpl extends BaseServiceImpl<Meeting, Long> implement
 	@Override
 	@Transactional(readOnly = true)
 	public Meeting getByLiveChannelId(String liveChannelId) {
-		return null;
+		return meetingDao.getByLiveChannelId(liveChannelId);
 	}
 
 	@Override

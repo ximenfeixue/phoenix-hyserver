@@ -77,6 +77,7 @@ public class RouteController {
             LOGGER.info("verifyMD5 = {}, verifyChecksum = {}", verifyMD5, verifyChecksum);
             //比较md5、checkSum是否一致，以及后续业务处理
             if (MD5.equals(verifyMD5) && verifyChecksum.equals(CheckSum)) {
+                //若消息很多 可改为队列 异步依次处理
                 handleJSONObject(requestBody);
             }
             result.put("code", 200);

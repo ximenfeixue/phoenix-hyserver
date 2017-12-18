@@ -19,7 +19,9 @@ import org.springframework.stereotype.Repository;
 
 import javax.annotation.Resource;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author cinderella
@@ -57,19 +59,21 @@ public class MeetingLiveCreateRecordDaoImpl extends SqlSessionDaoSupport impleme
      * @return
      */
     @Override
-    public MeetingLiveCreateRecord save(MeetingLiveCreateRecord meetingLiveCreateRecord) {
+    public MeetingLiveCreateRecord save(MeetingLiveCreateRecord meetingLiveCreateRecord) throws Exception{
+        Meeting meeting = meetingDao.getById(meetingLiveCreateRecord.getMeetingId());
+        if (null == meeting) {
+            return null;
+        }
+        Long duration = meeting.getLiveRemainDuration();
+        if (MeetingLiveDurationTypeEnum.HALF_HOUR.getKey() == meetingLiveCreateRecord.getDurationType()) {
+            duration += MeetingLiveDurationTypeEnum.HALF_HOUR.getValue();
+        }
+        if (MeetingLiveDurationTypeEnum.ONE_HOUR.getKey() == meetingLiveCreateRecord.getDurationType()) {
+            duration += MeetingLiveDurationTypeEnum.ONE_HOUR.getValue();
+        }
+        meetingLiveCreateRecord.setRemainDuration(duration);
         int insert = getSqlSession().insert("MeetingLiveCreateRecord.insert", meetingLiveCreateRecord);
         if (insert > 0) {
-            Meeting meeting = meetingDao.getById(meetingLiveCreateRecord.getMeetingId());
-
-            Long duration = meeting.getLiveRemainDuration();
-            if (MeetingLiveDurationTypeEnum.HALF_HOUR.getKey() == meetingLiveCreateRecord.getDurationType()) {
-                duration += MeetingLiveDurationTypeEnum.HALF_HOUR.getValue();
-            }
-            if (MeetingLiveDurationTypeEnum.ONE_HOUR.getKey() == meetingLiveCreateRecord.getDurationType()) {
-                duration += MeetingLiveDurationTypeEnum.ONE_HOUR.getValue();
-            }
-
             if (MeetingLiveCreateTypeEnum.CREATE_LIVE.getKey() == meetingLiveCreateRecord.getCreateType()) {
                 Live live = new Live();
                 live.setId(meeting.getId());
@@ -84,6 +88,7 @@ public class MeetingLiveCreateRecordDaoImpl extends SqlSessionDaoSupport impleme
                 meetingDao.updateLiveRemainDurationById(meeting.getId(), duration);
             } else {
                 //状态非法
+                throw new RuntimeException();
             }
             return meetingLiveCreateRecord;
         }
@@ -99,5 +104,35 @@ public class MeetingLiveCreateRecordDaoImpl extends SqlSessionDaoSupport impleme
     @Override
     public List<MeetingLiveCreateRecord> getByMeetingId(final Long meetingId) {
         return getSqlSession().selectList("MeetingLiveCreateRecord.getByMeetingId", meetingId);
+    }
+
+    /**
+     * updateRemainDurationById
+     *
+     * @param remainDuration
+     * @param id
+     * @return
+     */
+    @Override
+    public boolean updateRemainDurationById(final long remainDuration, final long id) {
+        Map<String, Object> map = new HashMap<String, Object>(2);
+        map.put("remainDuration", remainDuration);
+        map.put("id", id);
+        int update = getSqlSession().update("MeetingLiveCreateRecord.updateRemainDurationById", map);
+        if (update > 0) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * getById
+     *
+     * @param id
+     * @return
+     */
+    @Override
+    public MeetingLiveCreateRecord getById(final long id) {
+        return getSqlSession().selectOne("MeetingLiveCreateRecord.getById", id);
     }
 }

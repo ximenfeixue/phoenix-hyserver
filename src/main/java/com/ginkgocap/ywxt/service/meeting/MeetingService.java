@@ -13,6 +13,7 @@ import java.util.Map;
 
 import com.ginkgocap.parasol.file.exception.FileIndexServiceException;
 import com.ginkgocap.ywxt.model.meeting.Meeting;
+import com.ginkgocap.ywxt.model.meeting.MeetingLiveCreateRecord;
 import com.ginkgocap.ywxt.model.meeting.MeetingVo;
 import com.ginkgocap.ywxt.user.model.User;
 import com.ginkgocap.ywxt.vo.query.meeting.*;
@@ -430,6 +431,13 @@ public interface MeetingService {
 	 * @throws Exception
 	 */
 	List<MeetingAdQuery> getTops(int index, int size) throws Exception;
+
+	/**
+	 * 开通/续费 直播
+	 * @param meetingLiveCreateRecord
+	 * @return
+	 */
+	Meeting addLive(final MeetingLiveCreateRecord meetingLiveCreateRecord) throws Exception;
 
 	/**
 	 * getByLiveRoomId
