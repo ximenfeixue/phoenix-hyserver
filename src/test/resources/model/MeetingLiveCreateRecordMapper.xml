@@ -11,6 +11,7 @@ PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
 		<result property="roomId" column="room_id" />
 		<result property="createType" column="create_type" />
 		<result property="durationType" column="duration_type" />
+		<result property="remainDuration" column="remain_duration" />
 		<result property="payOrderId" column="pay_order_id" />
 		<result property="gmtCreate" column="gmt_create" />
 		<result property="userCreate" column="user_create" />
@@ -21,8 +22,8 @@ PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
 	<sql id="columns">
 		<![CDATA[
 			id AS id, meeting_id AS meetingId, channel_id AS channelId, room_id AS roomId,
-			create_type AS createType, duration_type AS durationType, pay_order_id AS payOrderId,
-			gmt_create AS gmtCreate, user_create AS userCreate, remark AS remark
+			create_type AS createType, duration_type AS durationType, remain_duration AS remainDuration,
+			pay_order_id AS payOrderId, gmt_create AS gmtCreate, user_create AS userCreate, remark AS remark
 		]]>
 	</sql>
 
@@ -35,6 +36,7 @@ PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
         	room_id,
         	create_type,
         	duration_type,
+        	remain_duration,
         	pay_order_id,
 			gmt_create,
 		    user_create,
@@ -46,6 +48,7 @@ PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
         	#{roomId},
         	#{createType},
         	#{durationType},
+        	#{remainDuration},
         	#{payOrderId},
         	#{gmtCreate},
         	#{userCreate},
@@ -63,8 +66,17 @@ PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
 	        room_id = #{roomId},
 	        create_type = #{createType},
 	        duration_type = #{durationType},
+	        remain_duration = #{remainDuration},
         	pay_order_id = #{payOrderId},
         	remark = #{remark}
+        WHERE id = #{id}
+    ]]>
+	</update>
+
+	<update id="updateRemainDurationById" parameterType="java.util.Map">
+		<![CDATA[
+        UPDATE tb_meeting_live_create_record
+        SET remain_duration = #{remainDuration}
         WHERE id = #{id}
     ]]>
 	</update>
@@ -76,6 +88,15 @@ PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
 	        FROM tb_meeting_live_create_record
 			WHERE meeting_id = #{meetingId}
 			ORDER BY gmt_create DESC
+	    ]]>
+	</select>
+
+	<select id="getById" resultType="meetingLiveCreateRecord"
+			parameterType="java.lang.Long">
+		SELECT <include refid="columns" />
+		<![CDATA[
+	        FROM tb_meeting_live_create_record
+			WHERE id = #{id}
 	    ]]>
 	</select>
 
