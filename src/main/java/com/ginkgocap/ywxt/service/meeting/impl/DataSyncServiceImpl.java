@@ -18,8 +18,8 @@ public class DataSyncServiceImpl implements DataSyncService {
     private DataSyncMongoDao dataSyncMongoDao;
 
     @Override
-    public void saveDataSync(DataSync data) {
-        dataSyncMongoDao.saveDataSync(data);
+    public DataSync saveDataSync(DataSync data) {
+       return dataSyncMongoDao.saveDataSync(data);
     }
 
     @Override
@@ -35,5 +35,10 @@ public class DataSyncServiceImpl implements DataSyncService {
     @Override
     public List<DataSync> getDataSyncList() {
         return dataSyncMongoDao.getDataSyncList();
+    }
+
+    public DataSync getDataSync(String id) {
+
+        return dataSyncMongoDao.getDataSync(id);
     }
 }

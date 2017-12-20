@@ -120,8 +120,9 @@ public class GinTongInterface {
 			ConnectionsMini connectionsMini = new ConnectionsMini();
 			connectionsMini.setListUserID(userIds);
 			for (int i = userIds.size() - 1; i >= 0; i--) {
-				if (userIds.get(i) == 0)
+				if (userIds.get(i) == 0) {
 					userIds.remove(i);
+				}
 			}
 			json = new Gson().toJson(connectionsMini);
 			url = resource.getString("url");
@@ -158,8 +159,9 @@ public class GinTongInterface {
 			MeetingMemberPush updateMeetingPush = new MeetingMemberPush();
 			updateMeetingPush.setContent(content);
 			updateMeetingPush.setMeetingId(Integer.valueOf(meetingId));
-			if (!Utils.isNullOrEmpty(user))
+			if (!Utils.isNullOrEmpty(user)) {
 				updateMeetingPush.setUser(user);
+			}
 			updateMeetingPush.setHaveCreate(true);
 			updateMeetingPush.setDate(date);
 			json = new Gson().toJson(updateMeetingPush);
@@ -419,13 +421,21 @@ public class GinTongInterface {
 
 	public static Map<Integer,List<Social>> getListIMRecordMap(SocialListReq property) {
 
+		ObjectMapper objectMap = new ObjectMapper();
 		String url = resource.getString("imUrl");
 		String interfaceName = "/mobile/im/getListIMRecordMap";
 		try {
 			UserBean userBean = new UserBean();
 			userBean.setId(property.getUserId());
 			String responseJson = HttpClientUtil.getGintongPost(url, interfaceName, "{}", userBean);
-			JsonNode jsonNode = JsonReadUtil.getJsonNode(responseJson);
+
+			JsonNode jsonNode = null;
+			try {
+				jsonNode = objectMap.readTree(responseJson);
+			} catch (Exception ex) {
+				logger.error("parser json failed. error: " + ex.getMessage());
+				logger.error("responseJson content: " + responseJson);
+			}
 
 			if (jsonNode != null && "0".equals(jsonNode.get("notification").get("notifCode").asText())) {
 				JsonNode mapNode = jsonNode.get("responseData");
