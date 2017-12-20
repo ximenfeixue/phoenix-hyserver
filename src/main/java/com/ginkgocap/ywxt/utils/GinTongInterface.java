@@ -420,7 +420,7 @@ public class GinTongInterface {
 	}
 
 	public static Map<Integer,List<Social>> getListIMRecordMap(SocialListReq property) {
-		
+
 		String url = resource.getString("imUrl");
 		String interfaceName = "/mobile/im/getListIMRecordMap";
 		try {
