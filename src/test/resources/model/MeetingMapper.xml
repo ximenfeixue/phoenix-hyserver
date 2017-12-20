@@ -1,0 +1,1781 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+"http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+<mapper namespace="Meeting">
+	<resultMap id="meetingMap" type="com.ginkgocap.ywxt.model.meeting.Meeting">
+		<result property="id" column="id" />
+		<result property="meetingName" column="meeting_name" />
+		<result property="meetingAddress" column="meeting_address" />
+		<result property="meetingAddressPosX" column="meeting_address_pos_x" />
+		<result property="meetingAddressPosY" column="meeting_address_pos_y" />
+		<result property="country" column="country" />
+		<result property="province" column="province" />
+		<result property="city" column="city" />
+		<result property="town" column="town" />
+		<result property="startTime" column="start_time" />
+		<result property="endTime" column="end_time" />
+		<result property="meetingType" column="meeting_type" />
+		<result property="meetingStatus" column="meeting_status" />
+		<result property="isSecrecy" column="is_secrecy" />
+		<result property="memberCount" column="member_count" />
+		<result property="meetingDesc" column="meeting_desc" />
+		<result property="createId" column="create_id" />
+		<result property="createName" column="create_name" />
+		<result property="taskId" column="task_id" />
+		<result property="groupId" column="group_id" />
+		<result property="createTime" column="create_time" />
+		<result property="updateTime" column="update_time" />
+		<result property="industry" column="industry" />
+		<result property="isDelete" column="is_delete" />
+		<result property="formatedDesc" column="formated_desc" />
+		<result property="createUserType" column="create_user_type" />
+		<result property="top" column="top"/>
+		<result property="disable" column="disable"/>
+		<result property="isPay" column="is_pay"/>
+		<result property="payMoney" column="pay_money"/>
+		<result property="sendFalg" column="send_flag"/>
+		<result property="reviewFlag" column="review_flag"/>
+		<result property="signReminderTime" column="sign_reminder_time"/>
+		<result property="isSign" column="is_sign"/>
+		<result property="live" column="is_live"/>
+		<result property="liveStatus" column="live_status"/>
+		<result property="liveChannelId" column="live_channel_id"/>
+		<result property="liveRoomId" column="live_room_id"/>
+		<result property="liveStartTime" column="live_start_time"/>
+		<result property="liveRemainDuration" column="live_remain_duration"/>
+	</resultMap>
+	
+	<sql id="columns">
+		<![CDATA[
+			id AS id,meeting_name AS meetingName,meeting_address AS meetingAddress,
+			meeting_address_pos_x AS meetingAddressPosX,meeting_address_pos_y AS meetingAddressPosY,
+			country AS country,province AS province,city AS city,town AS town,start_time AS startTime,
+			end_time AS endTime,meeting_type AS meetingType,meeting_status AS meetingStatus,
+			is_secrecy AS isSecrecy,member_count AS memberCount,meeting_desc AS meetingDesc,
+			create_id AS createId,create_name AS createName,task_id AS taskId,create_time AS createTime,
+			update_time AS updateTime,group_id AS groupId,industry,is_delete AS isDelete,formated_desc AS formatedDesc,
+			create_user_type AS createUserType, top AS top, disable AS disable, is_pay AS isPay, pay_money AS payMoney,
+			send_flag AS sendFalg, review_flag as reviewFlag, sign_reminder_time AS signReminderTime, is_sign AS isSign,
+			is_live AS live, live_status AS liveStatus, live_channel_id AS liveChannelId, live_room_id AS liveRoomId
+			live_start_time AS liveStartTime, live_remain_duration AS liveRemainDuration
+		]]>
+	</sql>
+
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id">
+    <![CDATA[
+        INSERT INTO tb_meeting (
+        	id,
+        	meeting_name,
+        	meeting_address,
+        	meeting_address_pos_x,
+        	meeting_address_pos_y,
+			country,
+		    province,
+			city,
+			town,
+        	start_time,
+        	end_time,
+        	meeting_type,
+        	meeting_status,
+        	is_secrecy ,
+        	member_count,
+        	meeting_desc,
+        	create_id,
+        	create_name,
+        	task_id,
+        	group_id,
+        	create_time,
+        	update_time,
+        	industry,
+        	is_delete,
+        	formated_desc,
+        	top,
+        	disable,
+        	is_pay,
+        	pay_money,
+        	send_flag,
+        	sign_reminder_time,
+        	review_flag,
+        	is_sign,
+        	is_live,
+        	live_status,
+        	live_channel_id,
+        	live_room_id,
+        	live_start_time,
+        	live_remain_duration
+        ) VALUES (
+        	#{id},
+        	#{meetingName},
+        	#{meetingAddress},
+        	#{meetingAddressPosX },
+        	#{meetingAddressPosY },
+			#{country},
+		    #{province},
+			#{city},
+			#{town},
+        	#{startTime},
+        	#{endTime},
+        	#{meetingType},
+        	#{meetingStatus},
+        	#{isSecrecy},
+        	#{memberCount},
+        	#{meetingDesc},
+        	#{createId},
+        	#{createName},
+        	#{taskId},
+        	#{groupId} ,
+        	NOW(),
+        	NOW(),
+        	#{industry},
+        	#{isDelete},
+        	#{formatedDesc},
+        	#{top},
+        	#{disable},
+        	#{isPay},
+        	#{payMoney},
+        	#{sendFalg},
+        	#{signReminderTime},
+        	#{reviewFlag},
+        	#{isSign},
+        	#{live},
+        	#{liveStatus},
+        	#{liveChannelId},
+        	#{liveRoomId},
+        	#{liveStartTime},
+        	#{liveRemainDuration}
+        )
+        
+    ]]>
+	</insert>
+
+	<update id="update">
+    <![CDATA[
+        UPDATE tb_meeting 
+        SET meeting_name = #{meetingName},
+	        meeting_address = #{meetingAddress},
+	        meeting_address_pos_x = #{meetingAddressPosX },
+        	meeting_address_pos_y = #{meetingAddressPosY },
+			country = #{country},
+		    province = #{province},
+			city = #{city},
+			town = #{town},
+	        start_time = #{startTime},
+	        end_time = #{endTime},
+	        meeting_type = #{meetingType},
+	        meeting_status = #{meetingStatus},
+	        is_secrecy = #{isSecrecy},
+	        member_count = #{memberCount},
+	        meeting_desc = #{meetingDesc},
+	        create_id = #{createId},
+	        create_name = #{createName},
+	        task_id = #{taskId},
+	        group_id = #{groupId} ,
+	        update_time = NOW(),
+	        industry = #{industry},
+	        is_delete = #{isDelete},
+	        formated_desc = #{formatedDesc},
+	        top = #{top},
+	        disable = #{disable},
+	        is_pay = #{isPay},
+	        pay_money = #{payMoney},
+	        send_flag = #{sendFalg},
+	        review_flag = #{reviewFlag},
+	        sign_reminder_time = #{signReminderTime},
+	        is_sign = #{isSign},
+	        is_live = #{live},
+	        live_status = #{liveStatus},
+	        live_channel_id = #{liveChannelId},
+	        live_room_id = #{liveRoomId},
+	        live_start_time = #{liveStartTime},
+	        live_remain_duration = #{liveRemainDuration}
+        WHERE id = #{id}
+    ]]>
+	</update>
+
+	<update id="delete">
+    <![CDATA[
+        UPDATE tb_meeting 
+        SET is_delete = 1,
+        	update_time = NOW()
+        WHERE id = #{id} 
+    ]]>
+	</update>
+	
+	<delete id="deleteBatchOtherByMeetingId" statementType="STATEMENT">
+		DELETE FROM ${tableName} 
+		WHERE meeting_id = <![CDATA[${meetingId}]]> 
+			AND id NOT IN <![CDATA[${list}]]>
+		<if test="isMember != null">
+			AND member_type <![CDATA[<>]]> 2
+		</if>
+	</delete>
+	
+	<delete id="deleteAllByMeetingId" statementType="STATEMENT">
+		<![CDATA[
+			DELETE FROM ${tableName} 
+			WHERE meeting_id = ${meetingId}
+		]]> 
+	</delete>
+	
+	<update id="deleteByIdAndCreateId">
+	<![CDATA[
+		UPDATE tb_meeting 
+		SET is_delete = 1,
+			update_time = NOW()
+		WHERE id = #{id} 
+			AND create_id = #{memberId}
+	]]>
+	</update>
+
+
+	<select id="getById" resultType="meeting">
+		SELECT
+		<include refid="columns" />
+	    <![CDATA[
+		    FROM tb_meeting 
+	        WHERE id = #{id} 
+	    ]]>
+	</select>
+
+	<select id="getByMeetingName" resultType="meeting"
+		parameterType="java.lang.String">
+		SELECT
+		<include refid="columns" />
+	    <![CDATA[
+	        FROM tb_meeting 
+			WHERE meeting_name = #{meetingName}
+	    ]]>
+	</select>
+
+	<select id="getByMeetingAddress" resultType="meeting"
+		parameterType="java.lang.String">
+		SELECT <include refid="columns" />
+	    <![CDATA[
+	        FROM tb_meeting 
+			WHERE meeting_address = #{meetingAddress}
+	    ]]>
+	</select>
+
+
+	<select id="getByStartTime" resultType="meeting" parameterType="java.util.Date">
+		SELECT
+		<include refid="columns" />
+	    <![CDATA[
+	        FROM tb_meeting 
+			WHERE start_time = #{startTime}
+	    ]]>
+	</select>
+
+	<select id="getByEndTime" resultType="meeting" parameterType="java.util.Date">
+		SELECT
+		<include refid="columns" />
+	    <![CDATA[
+	        FROM tb_meeting 
+			WHERE end_time = #{endTime}
+	    ]]>
+	</select>
+
+	<select id="getByMeetingType" resultType="meeting"
+		parameterType="java.lang.Integer">
+		SELECT
+		<include refid="columns" />
+	    <![CDATA[
+	        FROM tb_meeting 
+			WHERE meeting_type = #{meetingType}
+	    ]]>
+	</select>
+
+	<select id="getByMeetingStatus" resultType="meeting"
+		parameterType="java.lang.Integer">
+		SELECT
+		<include refid="columns" />
+	    <![CDATA[
+	        FROM tb_meeting 
+			WHERE meeting_status = #{meetingStatus}
+	    ]]>
+	</select>
+
+	<select id="getByIsSecrecy" resultType="meeting" parameterType="java.lang.Boolean">
+		SELECT
+		<include refid="columns" />
+	    <![CDATA[
+	        FROM tb_meeting 
+			WHERE is_secrecy = #{isSecrecy}
+	    ]]>
+	</select>
+
+	<select id="getByMemberCount" resultType="meeting"
+		parameterType="java.lang.Integer">
+		SELECT
+		<include refid="columns" />
+	    <![CDATA[
+	        FROM tb_meeting 
+			WHERE member_count = #{memberCount}
+	    ]]>
+	</select>
+
+	<select id="getByMeetingDesc" resultType="meeting"
+		parameterType="java.lang.String">
+		SELECT
+		<include refid="columns" />
+	    <![CDATA[
+	        FROM tb_meeting 
+			WHERE meeting_desc = #{meetingDesc}
+	    ]]>
+	</select>
+
+	<select id="getByCreateId" resultType="meeting" parameterType="java.lang.Long">
+		SELECT
+		<include refid="columns" />
+	    <![CDATA[
+	        FROM tb_meeting 
+			WHERE create_id = #{createId}
+	    ]]>
+	</select>
+
+	<select id="getByTaskId" resultType="meeting" parameterType="java.lang.String">
+		SELECT
+		<include refid="columns" />
+	    <![CDATA[
+	        FROM tb_meeting 
+			WHERE task_id = #{taskId}
+	    ]]>
+	</select>
+
+	<select id="getByCreateTime" resultType="meeting" parameterType="java.util.Date">
+		SELECT <include refid="columns" />
+		FROM tb_meeting 
+		WHERE create_time = #{createTime}
+	</select>
+	
+	
+	<select id="getInMeetingByMemberId" parameterType="java.util.Map"
+		resultType="meetingMemberList">
+		SELECT 
+			m.id AS id,
+			m.start_time AS startTime,
+			m.meeting_name AS meetingName,
+			m.meeting_desc AS meetingDesc,
+			2 AS meetingStatus,
+			m.meeting_address AS meetingAddress,
+			m.meeting_address_pos_x AS meetingAddressPosX,
+			m.meeting_address_pos_y AS meetingAddressPosY,
+			mm.member_meet_status AS memberMeetStatus,
+			m.meeting_type AS meetingType,
+			0 AS TYPE,
+			m.create_id AS createId,
+			m.create_name AS createName,
+			m.end_time AS endTime,
+			m.group_id AS groupId,
+			m.top AS top,
+			m.disable AS disable,
+			m.review_flag AS reviewFlag,
+			m.sign_reminder_time AS signReminderTime,
+			p.pic_path AS path
+		FROM tb_meeting AS m 
+		INNER JOIN tb_meeting_member AS mm 
+			ON m.id = mm.meeting_id  
+			AND mm.member_id = #{memberId} 
+			AND mm.member_meet_status <![CDATA[<>]]> 2 
+			AND m.meeting_status = 2
+			AND (
+				(mm.attend_meet_type = 0 AND mm.attend_meet_status = 1)
+				OR (mm.attend_meet_type = 1 AND mm.attend_meet_status = 4 AND mm.excute_meet_sign = 1)
+			)
+		LEFT JOIN tb_meeting_pic AS p 
+			ON p.meeting_id = m.id 
+			AND p.ishome_page = 1 
+		ORDER BY startTime DESC
+	</select>
+	<select id="getListOtherMeeting" parameterType="java.util.Map"
+		resultType="meetingMemberList">
+		SELECT 
+			m.id AS id,
+			m.start_time AS startTime,
+			m.meeting_name AS meetingName,
+			m.meeting_desc AS meetingDesc,
+			m.meeting_status AS meetingStatus,
+			m.meeting_address AS meetingAddress,
+			m.meeting_address_pos_x AS meetingAddressPosX,
+			m.meeting_address_pos_y AS meetingAddressPosY,
+			mm.member_meet_status AS memberMeetStatus,
+			0 AS TYPE,
+			m.meeting_type AS meetingType,
+			m.create_id AS createId,
+			m.create_name AS createName,
+			m.end_time AS endTime,
+			m.group_id AS groupId,
+			p.pic_path AS path 
+		FROM tb_meeting AS m 
+		INNER JOIN tb_meeting_member AS mm 
+			ON m.id = mm.meeting_id 
+		LEFT JOIN tb_meeting_pic AS p 
+			ON p.meeting_id = m.id 
+			AND p.ishome_page = 1 
+		WHERE mm.member_id = #{memberId} 
+			AND mm.member_meet_status <![CDATA[<>]]> 2 
+			AND (
+				m.meeting_status = 1 
+				OR m.meeting_status = 3
+			) AND (
+			    (mm.attend_meet_type = 0 AND mm.attend_meet_status = 1)
+			    OR (mm.attend_meet_type = 1 AND mm.attend_meet_status = 4 AND mm.excute_meet_sign = 1)
+			) AND m.disable = 0
+		ORDER BY startTime DESC 
+	</select>
+	
+	<select id="getMeetingListByMemberIdAfterNotice" parameterType="java.util.Map"
+		resultType="meetingMemberList">
+		SELECT * FROM (
+			SELECT * FROM (
+				SELECT m.id AS id,
+					m.start_time AS startTime,
+					m.meeting_name AS meetingName,
+					m.meeting_desc AS meetingDesc,
+					m.meeting_status AS meetingStatus,
+					m.meeting_address AS meetingAddress,
+					m.meeting_address_pos_x AS meetingAddressPosX,
+					m.meeting_address_pos_y AS meetingAddressPosY,
+					mm.member_meet_status AS memberMeetStatus,
+					0 AS TYPE,
+					m.meeting_type AS meetingType,
+					m.create_id AS createId,
+					m.create_name AS createName,
+					m.end_time AS endTime,
+					p.pic_path AS path
+				FROM
+					tb_meeting AS m 
+				INNER JOIN tb_meeting_member AS mm 
+					ON m.id = mm.meeting_id  
+				LEFT JOIN tb_meeting_pic AS p 
+					ON p.meeting_id = m.id 
+					AND p.ishome_page = 1 
+				WHERE
+					mm.member_id = #{memberId} 
+					AND m.meeting_status <![CDATA[<>]]> 0 
+					AND mm.member_meet_status <![CDATA[<>]]> 2 
+					AND (m.start_time <![CDATA[>]]> NOW() OR m.end_time <![CDATA[<]]> NOW())
+					<if test="lastNoticeUpdateDate!=null">
+						AND m.start_time <![CDATA[>]] >#{lastNoticeUpdateDate}
+					</if>	
+					AND (
+						(mm.attend_meet_type = 0 AND mm.attend_meet_status = 1)
+						OR (mm.attend_meet_type = 1 AND mm.attend_meet_status = 4 AND mm.excute_meet_sign = 1)
+					)
+				ORDER BY startTime DESC
+			) AS m
+			<if test="invitationBeforeNotice==false">
+				UNION ALL
+				SELECT * FROM (
+					SELECT m.id AS id,
+						m.start_time AS startTime,
+						m.meeting_name AS meetingName,
+						m.meeting_desc AS meetingDesc,
+						m.meeting_status AS meetingStatus,
+						m.meeting_address AS meetingAddress,
+						m.meeting_address_pos_x AS meetingAddressPosX,
+						m.meeting_address_pos_y AS meetingAddressPosY,
+						mm.member_meet_status AS memberMeetStatus,
+						1 AS TYPE,
+						m.meeting_type AS meetingType,
+						m.create_id AS createId,
+						m.create_name AS createName,
+						m.end_time AS endTime,
+						'' AS path
+					FROM tb_meeting AS m 
+					INNER JOIN tb_meeting_member AS mm 
+						ON m.id = mm.meeting_id  
+					WHERE mm.member_id = #{memberId} 
+						AND m.meeting_status <![CDATA[<>]]> 0 
+						AND mm.member_meet_status <![CDATA[<>]]> 2 
+						<if test="lastNoticeUpdateDate!=null">
+							AND m.start_time<![CDATA[>]]>#{lastNoticeUpdateDate}
+						</if>	
+						AND (
+							mm.attend_meet_type = 0 AND mm.attend_meet_status = 0
+						)
+					ORDER BY startTime DESC
+			    	LIMIT 1
+				) AS n
+			</if>
+		) X ORDER BY startTime DESC 	  
+	</select>
+	<select id="getMeetingListByMemberId" parameterType="java.lang.Long"
+		resultType="meetingMemberList">
+		SELECT * FROM (
+			SELECT * FROM (
+				SELECT m.id,
+				m.start_time AS startTime,
+				m.meeting_name AS meetingName,
+				m.meeting_desc AS meetingDesc,
+				m.meeting_status AS meetingStatus,
+				m.meeting_address AS meetingAddress,
+				m.meeting_address_pos_x AS meetingAddressPosX,
+				m.meeting_address_pos_y AS meetingAddressPosY,
+				mm.member_meet_status AS memberMeetStatus,
+				0 AS type,
+				m.create_id AS createId,
+				m.create_name AS createName,
+				m.end_time AS endTime
+			FROM tb_meeting m,
+				tb_meeting_member mm 
+			WHERE m.id = mm.meeting_id
+				AND mm.member_meet_status <![CDATA[<>]]> 2 
+				AND (
+					((mm.attend_meet_status = 1) OR (mm.attend_meet_status = 3) and mm.attend_meet_type=0) 
+					OR (mm.attend_meet_status <![CDATA[<>]]> 1 AND attend_meet_type=1)
+				) 
+				AND mm.member_id = #{memberId}
+				AND (m.start_time <![CDATA[>]]> NOW() OR m.end_time <![CDATA[<]]> NOW())
+			ORDER BY startTime DESC
+			) n
+			UNION ALL
+			SELECT * FROM (
+				SELECT m.id,
+					m.start_time AS startTime,
+					m.meeting_name AS meetingName,
+					m.meeting_desc AS meetingDesc,
+					m.meeting_status AS meetingStatus,
+					m.meeting_address AS meetingAddress,
+					m.meeting_address_pos_x AS meetingAddressPosX,
+					m.meeting_address_pos_y AS meetingAddressPosY,
+					mm.member_meet_status AS memberMeetStatus,
+					1 AS type,
+					m.create_id AS createId,
+					m.create_name AS createName,
+					m.end_time AS endTime
+				FROM tb_meeting m,
+					tb_meeting_member mm 
+				WHERE m.id = mm.meeting_id
+					AND mm.member_meet_status <![CDATA[<>]]> 2
+					AND mm.attend_meet_type = 0 
+					AND mm.attend_meet_status = 0
+					AND mm.member_id = #{memberId} 
+				ORDER BY startTime DESC LIMIT 1
+			) m
+			UNION ALL
+			SELECT DISTINCT * FROM (
+				SELECT m.id,
+					m.start_time AS startTime,
+					m.meeting_name AS meetingName,
+					m.meeting_desc AS meetingDesc,
+					m.meeting_status AS meetingStatus,
+					m.meeting_address AS meetingAddress,
+					m.meeting_address_pos_x AS meetingAddressPosX,
+					m.meeting_address_pos_y AS meetingAddressPosY,
+					mm.member_meet_status AS memberMeetStatus,
+					0 AS type,
+					m.create_id AS createId,
+					m.create_name AS createName,
+					m.end_time AS endTime 
+				FROM tb_meeting m,
+					tb_meeting_member mm 
+				WHERE m.id = mm.meeting_id 
+					AND m.create_id = #{memberId} 
+				ORDER BY startTime DESC
+			) l
+		) X ORDER BY startTime DESC
+	</select>
+	
+	<select id="getMeetingListByMemberIdAndDate" parameterType="java.util.Map"
+		resultType="meetingMemberList">
+		<![CDATA[
+			SELECT 
+				m.id,
+				m.start_time AS startTime,
+				m.meeting_name AS meetingName,
+				m.meeting_desc AS meetingDesc,
+				m.meeting_status AS meetingStatus,
+				m.meeting_address AS meetingAddress,
+				m.meeting_address_pos_x AS meetingAddressPosX,
+				m.meeting_address_pos_y AS meetingAddressPosY,
+				mm.member_meet_status AS memberMeetStatus,
+				0 AS type,
+				m.create_id AS createId,
+				m.create_name AS createName
+			FROM tb_meeting m,
+				tb_meeting_member mm 
+			WHERE m.id = mm.meeting_id 
+				AND mm.member_meet_status <> 2 
+				AND (
+					((mm.attend_meet_status = 1) OR (mm.attend_meet_status = 3) AND mm.attend_meet_type = 0) 
+					OR (mm.attend_meet_status  <> 1 AND attend_meet_type=1)
+				)
+				AND mm.member_id = #{memberId} 
+				AND m.start_time >= #{beginDate} 
+				AND m.start_time < #{endDate} 
+			ORDER BY m.start_time
+		]]>
+	</select>
+	<select id="getPigeonholeMeetingListByMemberIdAndDate"
+		parameterType="java.util.Map" resultType="meetingMemberList">
+		<![CDATA[ 
+			SELECT 
+				m.id,
+				m.start_time AS startTime,
+				m.meeting_name AS meetingName,
+				m.meeting_desc AS meetingDesc,
+				m.meeting_status AS meetingStatus,
+				m.meeting_address AS meetingAddress,
+				m.meeting_address_pos_x AS meetingAddressPosX,
+				m.meeting_address_pos_y AS meetingAddressPosY,
+				mm.member_meet_status AS memberMeetStatus,
+				0 AS type,
+				m.create_id AS createId,
+				m.create_name AS createName
+			FROM tb_meeting m,
+				tb_meeting_member mm 
+			WHERE m.id = mm.meeting_id 
+				AND mm.member_meet_status = 1
+		 		AND (
+					( mm.attend_meet_type = 1 and mm.attend_meet_status = 4 and mm.excute_meet_sign = 1)
+					OR (mm.attend_meet_type = 0 and mm.attend_meet_status = 1)	
+				)
+				AND mm.member_id = #{memberId}
+				AND m.start_time >= #{beginDate} 
+				AND m.start_time < #{endDate} 
+			ORDER BY m.start_time
+			UNION ALL
+			SELECT 
+				m.id,
+				m.start_time AS startTime,
+				m.meeting_name AS meetingName,
+				m.meeting_desc AS meetingDesc,
+				m.meeting_status AS meetingStatus,
+				m.meeting_address AS meetingAddress,
+				m.meeting_address_pos_x AS meetingAddressPosX,
+				m.meeting_address_pos_y AS meetingAddressPosY,
+				mm.member_meet_status AS memberMeetStatus,
+				0 AS type,
+				m.create_id AS createId,
+				m.create_name AS createName
+			FROM tb_meeting m 
+			LEFT JOIN tb_meeting_member mm 
+				ON m.id = mm.meeting_id 
+				AND m.create_id = #{memberId}
+			WHERE m.start_time >= #{beginDate} 
+				AND m.start_time < #{endDate} 
+			ORDER BY m.start_time
+		]]>
+	</select>
+	
+	<select id="getMyMeetingSquareCount" parameterType="java.util.Map"
+		resultType="Integer">
+		SELECT
+			count(*)
+		FROM
+			tb_meeting m 
+		WHERE (m.meeting_status = 1 
+			OR m.meeting_status = 2) 
+			AND m.is_delete = 0
+			AND m.is_secrecy = 0
+			AND m.disable = 0
+		<if test="beginDate!=null">
+			AND m.start_time<![CDATA[>=]]> #{beginDate}
+		</if>
+		<if test="endDate!=null">
+			AND m.start_time<![CDATA[<]]> #{endDate}
+		</if>
+		<if test="isCurrent==1">
+			AND m.city = #{city}
+		</if>
+		<if test="addressPosX!=null">
+			AND m.city IS NOT NULL
+		</if>
+		<if test="industry!=null">
+			AND m.industry LIKE #{industry}
+		</if>
+		<if test="keyword!=null">
+			AND m.meeting_name LIKE #{keyword}
+		</if>
+		<if test="isCurrent==0">
+			AND m.city <![CDATA[<>]]> #{city}
+		</if>
+	</select>
+	<select id="getMyMeetingSquare" parameterType="java.util.Map"
+		resultType="meetingMemberList">
+		SELECT DISTINCT
+			m.id AS id,
+			m.start_time AS startTime,
+			m.meeting_name AS meetingName,
+			m.meeting_type AS meetingType,
+			m.meeting_desc AS meetingDesc,
+			m.meeting_status AS meetingStatus,
+			m.meeting_address AS meetingAddress,
+			m.meeting_address_pos_x AS meetingAddressPosX,
+			m.meeting_address_pos_y AS meetingAddressPosY,
+			m.create_id AS createId,
+			m.create_name AS createName,
+			m.end_time AS endTime,
+			m.member_count AS memberCount,
+			m.industry,
+			m.top,
+			m.disable,
+			m.is_pay AS isPay,
+			m.pay_money AS payMoney,
+		<if test="addressPosX!=null">
+			lat_long_distance(#{addressPosX},#{addressPosY},m.meeting_address_pos_x,m.meeting_address_pos_y) AS distance,
+		</if>
+			p.pic_path AS path
+		FROM
+			tb_meeting m
+		LEFT JOIN tb_meeting_pic p
+			ON m.id = p.meeting_id
+			AND p.module_type = 1
+			AND p.ishome_page = 1
+		WHERE  (m.meeting_status = 1 
+			OR m.meeting_status = 2) 
+			AND m.is_delete = 0
+			AND m.is_secrecy = 0
+			AND m.disable = 0
+		<if test="beginDate!=null">
+			AND m.start_time<![CDATA[>=]]> #{beginDate}
+		</if>
+		<if test="endDate!=null">
+			AND m.start_time<![CDATA[<]]> #{endDate}
+		</if>
+		<if test="isCurrent==1">
+			AND m.city = #{city}
+		</if>
+		<if test="isCurrent==0">
+			AND m.city<![CDATA[<>]]> #{city}
+		</if>
+		<if test="addressPosX!=null">
+			AND m.city is not null
+		</if>
+		<if test="industry!=null">
+			AND m.industry LIKE #{industry}
+		</if>
+		<if test="keyword!=null">
+			AND m.meeting_name LIKE #{keyword}
+		</if>
+		ORDER BY 
+		<if test="addressPosX!=null">
+			lat_long_distance(#{addressPosX},#{addressPosY},m.meeting_address_pos_x,m.meeting_address_pos_y),
+		</if>
+		m.meeting_status DESC,
+		m.start_time DESC
+		<if test="startRow!=null">
+			LIMIT #{startRow},#{size}
+		</if>
+	</select>
+
+	<select id="getCommonMeetingList" parameterType="meetingCommonQuery" resultType="meeting">
+		SELECT
+			DISTINCT id AS id,
+			meeting_name AS meetingName,
+			meeting_status AS meetingStatus,
+			create_id AS createId,
+			create_name AS createName,
+			start_time as startTime,
+			end_time AS endTime,
+			province AS province,
+			city, town, top, disable,
+			is_pay as isPay
+		FROM tb_meeting
+		WHERE is_delete = 0
+		<if test="keyword != null and keyword != ''">
+			<if test="type == 0">
+				AND meeting_name LIKE concat('%',concat(#{keyword},'%'))
+			</if>
+			<if test="type == 1">
+				AND create_name LIKE concat('%',concat(#{keyword},'%'))
+			</if>
+		</if>
+		<if test="province != null and province != ''">
+			AND province = #{province}
+		</if>
+		<if test="city != null and city != ''">
+			AND city = #{city}
+		</if>
+		<if test="town != null and town != ''">
+			AND town = #{town}
+		</if>
+		<if test="startTime != null and startTime != ''">
+			AND start_time <![CDATA[>=]]> #{startTime}
+		</if>
+		<if test="endTime != null and endTime != ''">
+			AND end_time <![CDATA[<]]> #{endTime}
+		</if>
+		<if test="disable != null and disable != ''">
+			AND disable = #{disable}
+		</if>
+		ORDER BY
+		start_time DESC
+		<if test="startRow != null">
+			LIMIT #{startRow}, #{size}
+		</if>
+	</select>
+
+	<select id="getCommonMeetingCount" parameterType="meetingCommonQuery" resultType="Long">
+		SELECT
+		DISTINCT count(id)
+		FROM tb_meeting
+		WHERE is_delete = 0
+		<if test="keyword != null and keyword != ''">
+			<if test="type == 0">
+				AND meeting_name LIKE concat('%',concat(#{keyword},'%'))
+			</if>
+			<if test="type == 1">
+				AND create_name LIKE concat('%',concat(#{keyword},'%'))
+			</if>
+		</if>
+		<if test="province != null and province != ''">
+			AND province = #{province}
+		</if>
+		<if test="city != null and city != ''">
+			AND city = #{city}
+		</if>
+		<if test="town != null and town != ''">
+			AND town = #{town}
+		</if>
+		<if test="startTime != null and startTime != ''">
+			AND start_time <![CDATA[>=]]> #{startTime}
+		</if>
+		<if test="endTime != null and endTime != ''">
+			AND end_time <![CDATA[<]]> #{endTime}
+		</if>
+		<if test="disable != null and disable != ''">
+			AND disable = #{disable}
+		</if>
+	</select>
+	<select id="getMyAttendAndCreateMeeting" parameterType="java.util.Map"
+		resultType="meetingMemberList">
+		SELECT DISTINCT M.* FROM (
+			(
+				SELECT 
+					DISTINCT m.id AS id,
+					m.start_time AS startTime,
+					m.end_time AS endTime,
+					m.meeting_name AS meetingName,
+					m.meeting_desc AS meetingDesc,
+					m.meeting_type  AS meetingType,
+					m.meeting_status AS meetingStatus,
+					m.create_id AS createId,
+					m.create_name AS createName,
+					m.meeting_address AS meetingAddress,
+					m.meeting_address_pos_x AS meetingAddressPosX,
+					m.meeting_address_pos_y AS meetingAddressPosY,
+					m.top,
+					m.disable as disable,
+					m.is_pay AS isPay,
+					m.pay_money AS payMoney,
+					m.is_secrecy AS isSecrecy,
+					p.pic_path AS path,
+					CASE m.meeting_status WHEN 3 THEN -1 ELSE m.meeting_status END AS orderType
+				FROM tb_meeting m 
+				LEFT JOIN tb_meeting_pic AS p 
+					ON p.meeting_id = m.id
+					AND p.module_type = 1 
+					AND p.ishome_page = 1 
+				WHERE m.meeting_status = 0 
+					AND m.is_delete = 0
+					AND m.create_id = #{memberId}
+			) UNION ALL (
+				SELECT 
+					DISTINCT m.id AS id,
+					m.start_time AS startTime,
+					m.end_time AS endTime,
+					m.meeting_name AS meetingName,
+					m.meeting_desc AS meetingDesc,
+					m.meeting_type AS meetingType,
+					m.meeting_status AS meetingStatus,
+					m.create_id AS createId,
+					m.create_name AS createName,
+					m.meeting_address AS meetingAddress,
+					m.meeting_address_pos_x AS meetingAddressPosX,
+					m.meeting_address_pos_y AS meetingAddressPosY,
+					m.top,
+					m.disable as disable,
+					m.is_pay AS isPay,
+					m.pay_money AS payMoney,
+					m.is_secrecy AS isSecrecy,
+					p.pic_path AS path,
+					CASE m.meeting_status WHEN 3 THEN -1 ELSE m.meeting_status END AS orderType
+				FROM tb_meeting m
+				LEFT JOIN tb_meeting_pic AS p 
+					ON p.meeting_id = m.id
+					AND p.module_type = 1
+					AND p.ishome_page = 1 
+				INNER JOIN tb_meeting_member mm 
+					ON m.id = mm.meeting_id 
+				WHERE m.meeting_status = 2 
+					AND m.is_delete = 0 
+					AND mm.is_delete = 0
+					AND mm.member_id = #{memberId} 
+					AND (
+						(
+			  				m.create_id <![CDATA[ <>]]> #{memberId} 
+					  		AND mm.is_delete = 0
+							AND (
+								(mm.attend_meet_type = 1 AND mm.attend_meet_status = 4 AND mm.excute_meet_sign = 1)
+								OR (mm.attend_meet_type = 0 AND mm.attend_meet_status = 1)
+							)
+						)
+						OR (m.create_id = #{memberId} AND mm.is_delete = 0)
+					)
+			) UNION ALL (
+				SELECT 
+					DISTINCT m.id AS id,
+					m.start_time AS startTime,
+					m.end_time AS endTime,
+					m.meeting_name AS meetingName,
+					m.meeting_desc AS meetingDesc,
+					m.meeting_type AS meetingType,
+					m.meeting_status AS meetingStatus,
+					m.create_id AS createId,
+					m.create_name AS createName,
+					m.meeting_address AS meetingAddress,
+					m.meeting_address_pos_x AS meetingAddressPosX,
+					m.meeting_address_pos_y AS meetingAddressPosY,
+					m.top,
+					m.disable as disable,
+					m.is_pay AS isPay,
+					m.pay_money AS payMoney,
+					m.is_secrecy AS isSecrecy,
+					p.pic_path AS path,
+					CASE m.meeting_status WHEN 3 THEN -1 ELSE m.meeting_status END AS orderType
+				FROM tb_meeting m
+				LEFT JOIN tb_meeting_pic AS p 
+					ON p.meeting_id = m.id
+					AND p.module_type = 1
+					AND p.ishome_page = 1 
+				INNER JOIN tb_meeting_member mm 
+					ON m.id = mm.meeting_id 
+				WHERE (m.meeting_status = 1 OR m.meeting_status = 3) 
+					AND m.is_delete = 0 
+					AND mm.is_delete = 0
+					AND mm.member_id = #{memberId} 
+					AND (
+						(
+							m.create_id <![CDATA[ <>]]> #{memberId} 
+							AND (
+								(mm.attend_meet_type = 1 AND mm.attend_meet_status = 4 AND mm.excute_meet_sign = 1) 
+								OR (mm.attend_meet_type = 0 AND mm.attend_meet_status = 1)
+							)
+						)
+						OR (m.create_id = #{memberId})
+					)
+			)
+		) M 
+		<if test="type != null">
+			WHERE M.id IS NOT NULL
+			<if test="type == '0'.toString()">
+		   		<if test="keyword != null">
+		    		AND M.meetingName LIKE #{keyword}
+		    	</if>
+			</if>
+			<if test="type == '1'.toString()">
+		   		<if test="keyword != null">
+		    		AND M.meetingName LIKE #{keyword}
+		    	</if>
+			</if>
+			<if test="type == '2'.toString()">
+				AND EXISTS (SELECT N.id FROM tb_meeting_people N WHERE N.meeting_id = M.id
+				<if test="keyword != null">
+					AND N.people_name LIKE #{keyword}
+				</if>
+				)
+			</if>
+			<if test="type == '3'.toString()">
+				AND EXISTS (SELECT N.id FROM tb_meeting_organ N WHERE N.meeting_id = M.id
+				<if test="keyword != null">
+					AND N.organ_name LIKE #{keyword}
+				</if>
+				)
+			</if>
+			<if test="type == '4'.toString()">
+				AND EXISTS (SELECT N.id FROM tb_meeting_data N WHERE N.meeting_id = M.id AND data_type = 1
+				<if test="keyword != null">
+					AND N.data_name LIKE #{keyword}
+				</if>
+				)
+			</if>
+			<if test="type == '5'.toString()">
+				AND EXISTS (SELECT N.id FROM tb_meeting_data N WHERE N.meeting_id = M.id AND data_type = 0
+				<if test="keyword != null">
+					AND N.data_name LIKE #{keyword}
+				</if>
+				)
+			</if>
+			<if test="type == '6'.toString()">
+				AND EXISTS (SELECT N.id FROM tb_meeting_note N WHERE N.meeting_id = M.id AND N.creater = #{memberId}
+				<if test="keyword != null">
+					AND N.meeting_note_title LIKE #{keyword}
+				</if>
+				)
+			</if>
+		</if>
+		<if test="memberType != null">
+			<if test="memberType == '1'.toString()">
+				AND M.createId = #{memberId}
+			</if>
+			<if test="memberType == '2'.toString()">
+				AND M.createId <![CDATA[<>]]> #{memberId}
+			</if>
+		</if>
+		ORDER BY M.orderType DESC, M.startTime DESC
+		<if test="startRow!=null">
+			LIMIT #{startRow}, #{size}
+		</if>
+	</select>
+
+	<select id="getMyAttendAndCreateMeetingCount" parameterType="java.util.Map"
+		resultType="Long">
+		SELECT count(*) FROM (
+			(
+				SELECT DISTINCT m.id,
+					m.meeting_name AS meetingName,
+					m.create_id AS createId
+				FROM tb_meeting m 
+				LEFT JOIN tb_meeting_pic AS p 
+					ON p.meeting_id = m.id
+					AND p.module_type = 1 
+					AND p.ishome_page = 1 
+				WHERE m.meeting_status = 0 
+					AND m.is_delete = 0
+					AND m.create_id = #{memberId}
+			) UNION ALL (
+				SELECT DISTINCT m.id,
+					m.meeting_name AS meetingName,
+					m.create_id AS createId
+				FROM tb_meeting m
+				LEFT JOIN tb_meeting_pic AS p 
+					ON p.meeting_id = m.id
+					AND p.module_type = 1 
+					AND p.ishome_page = 1 
+				INNER JOIN tb_meeting_member mm 
+					ON m.id = mm.meeting_id 
+				WHERE m.meeting_status IN (1,2,3)
+					AND m.is_delete = 0 
+					AND mm.is_delete = 0
+					AND mm.member_id = #{memberId} 
+					AND (
+						(
+							m.create_id <![CDATA[ <>]]> #{memberId} 
+							AND (
+								(mm.attend_meet_type = 1 AND mm.attend_meet_status = 4 AND mm.excute_meet_sign = 1)
+								OR (mm.attend_meet_type = 0 AND mm.attend_meet_status = 1)
+							) 
+						)
+						OR (m.create_id = #{memberId})
+					)
+			)
+		) M
+		WHERE M.id IS NOT NULL
+		<if test="type != null">
+		    <if test="type == '0'.toString()">
+		   		<if test="keyword != null">
+		    		AND M.meetingName LIKE #{keyword}
+		    	</if>
+		    </if>
+		    <if test="type == '1'.toString()">
+		   		<if test="keyword != null">
+		    		AND M.meetingName LIKE #{keyword}
+		    	</if>
+		    </if>
+		    <if test="type == '2'.toString()">
+				AND EXISTS (SELECT N.id FROM tb_meeting_people N WHERE N.meeting_id = M.id
+				<if test="keyword != null">
+					AND N.people_name LIKE #{keyword}
+				</if>
+				)
+			</if>
+		    <if test="type == '3'.toString()">
+				AND EXISTS (SELECT N.id FROM tb_meeting_organ N WHERE N.meeting_id = M.id
+				<if test="keyword != null">
+					AND N.organ_name LIKE #{keyword}
+				</if>
+				)
+			</if>
+			<if test="type == '4'.toString()">
+				AND EXISTS (SELECT N.id FROM tb_meeting_data N WHERE N.meeting_id = M.id AND data_type = 1
+				<if test="keyword != null">
+					AND N.data_name LIKE #{keyword}
+				</if>
+				)
+			</if>
+			<if test="type == '5'.toString()">
+				AND EXISTS (SELECT N.id FROM tb_meeting_data N WHERE N.meeting_id=M.id AND data_type=0
+				<if test="keyword != null">
+					AND N.data_name LIKE #{keyword}
+				</if>
+				)
+			</if>
+			<if test="type == '6'.toString()">
+				AND EXISTS (SELECT N.id FROM tb_meeting_note N WHERE N.meeting_id=M.id AND N.creater=#{memberId}
+				<if test="keyword != null">
+					AND N.meeting_note_title LIKE #{keyword}
+				</if>
+				)
+			</if>
+		</if>
+		<if test="memberType != null">
+			<if test="memberType == '1'.toString()">
+				AND M.createId = #{memberId}
+			</if>
+			<if test="memberType == '2'.toString()">
+				AND M.createId <![CDATA[<>]]> #{memberId}
+			</if>
+		</if>
+	</select>
+	<select id="getMyCreateMeeting" parameterType="java.util.Map"
+		resultType="meetingMemberList">
+		(
+			SELECT 
+				DISTINCT m.id AS id,
+				m.start_time AS startTime,
+				m.meeting_name AS meetingName,
+				m.meeting_desc AS meetingDesc,
+				m.meeting_type AS meetingType,
+				m.meeting_status AS meetingStatus,
+				m.top,
+				m.disable,
+				m.is_pay AS isPay,
+				m.pay_money AS payMoney,
+				p.pic_path AS path 
+			FROM tb_meeting m 
+			LEFT JOIN tb_meeting_pic AS p 
+				ON p.meeting_id = m.id 
+				AND p.ishome_page = 1 
+			WHERE m.create_id = #{memberId} 
+				AND m.meeting_status = 0
+			<if test="year != null">
+				AND YEAR(m.start_time) = #{year}
+			</if>
+			<if test="month != null">
+				AND MONTH(m.start_time) = #{month}
+			</if>
+			ORDER BY m.start_time DESC
+		) UNION ALL (
+			SELECT 
+				DISTINCT m.id AS id,
+				m.start_time AS startTime,
+				m.meeting_name AS meetingName,
+				m.meeting_desc AS meetingDesc,
+				m.meeting_type  AS meetingType,
+				m.meeting_status AS meetingStatus,
+				m.top,
+				m.disable,
+				m.is_pay AS isPay,
+				m.pay_money AS payMoney,
+				p.pic_path AS path 
+			FROM tb_meeting m 
+			LEFT JOIN tb_meeting_pic AS p 
+				ON p.meeting_id = m.id 
+				AND p.ishome_page = 1 
+			WHERE m.create_id = #{memberId} 
+				AND m.meeting_status = 2
+			<if test="year != null">
+				AND YEAR(m.start_time) = #{year}
+			</if>
+			<if test="month != null">
+				AND MONTH(m.start_time) = #{month}
+			</if>
+			ORDER BY m.start_time DESC
+		) UNION ALL (
+			SELECT 
+				DISTINCT m.id AS id,
+				m.start_time AS startTime,
+				m.meeting_name AS meetingName,
+				m.meeting_desc AS meetingDesc,
+				m.meeting_type  AS meetingType,
+				m.meeting_status AS meetingStatus,
+				m.top,
+				m.disable,
+				m.is_pay AS isPay,
+				m.pay_money AS payMoney,
+				p.pic_path AS path 
+			FROM tb_meeting m 
+			LEFT JOIN tb_meeting_pic AS p 
+				ON p.meeting_id = m.id 
+				AND p.ishome_page = 1 
+			WHERE m.create_id = #{memberId} 
+				AND (m.meeting_status = 1 OR m.meeting_status = 3)
+				<if test="year != null">
+					AND YEAR(m.start_time) = #{year}
+				</if>
+				<if test="month !=null">
+					AND MONTH(m.start_time) = #{month}
+				</if>
+			ORDER BY m.start_time DESC
+		)
+	</select>
+	
+	<select id="getMyLastInvitation" parameterType="java.lang.Long"
+		resultType="meetingMemberList">
+		SELECT m.id,
+			m.start_time AS startTime,
+			m.meeting_name AS meetingName,
+			m.meeting_desc AS meetingDesc,
+			m.meeting_status AS meetingStatus,
+			m.meeting_address AS meetingAddress,
+			m.meeting_address_pos_x AS meetingAddressPosX,
+			m.meeting_address_pos_y AS meetingAddressPosY,
+			mm.member_meet_status AS memberMeetStatus,
+			1 AS TYPE,
+			m.meeting_type AS meetingType,
+			m.create_id AS createId,
+			m.create_name AS createName,
+			m.end_time AS endTime,
+			m.group_id AS groupId,
+			m.top,
+			m.disable,
+			m.is_pay AS isPay,
+			m.pay_money AS payMoney,
+			p.pic_path AS path 
+		FROM tb_meeting m 
+		LEFT JOIN tb_meeting_pic AS p 
+			ON p.meeting_id = m.id 
+			AND p.ishome_page = 1 
+		INNER JOIN tb_meeting_member AS mm 
+			ON m.id = mm.meeting_id  
+		WHERE mm.member_id = #{memberId} 
+			AND mm.member_meet_status <![CDATA[<>]]> 2 
+			AND m.meeting_status <![CDATA[<>]]> 0 
+			AND (mm.attend_meet_type = 0 AND mm.attend_meet_status = 0)
+		ORDER BY mm.attend_meet_time DESC 
+		LIMIT 1 
+	</select>
+	
+	<select id="getMyInvitation" parameterType="java.lang.Long"
+		resultType="meetingMemberList">
+		SELECT DISTINCT m.id,
+			m.start_time AS startTime,
+			m.meeting_name AS meetingName,
+			m.meeting_desc AS meetingDesc,
+			mm.attend_meet_time AS attendMeetTime,
+			p.pic_path AS path,
+			m.is_delete AS meetingDeleteFlag,
+			mm.is_delete AS memberDeleteFlag,
+			m.create_id AS createId,
+			m.create_name AS createName,
+			m.top,
+			m.disable,
+			m.is_pay AS isPay,
+			m.pay_money AS payMoney,
+			mm.attend_meet_status AS attendMeetStatus
+		FROM tb_meeting m
+		LEFT JOIN tb_meeting_pic AS p
+			ON p.module_id = m.id
+			AND p.module_type = 1
+			AND p.ishome_page = 1
+		INNER JOIN tb_meeting_member AS mm 
+			ON m.id = mm.meeting_id
+		WHERE mm.member_id = #{memberId}
+			AND mm.is_show_invitation = 1
+			AND mm.member_type = 1
+			AND mm.member_meet_status <![CDATA[<>]]> 2
+			AND m.meeting_status <![CDATA[<>]]> 0
+			AND mm.attend_meet_type = 0
+		ORDER BY attendMeetTime DESC
+	</select>
+
+	<select id="getMeetingListByMemberIdCount" parameterType="java.util.Map"
+		resultType="Long">
+		SELECT count(*) 
+		FROM tb_meeting m,
+			tb_meeting_member mm
+		WHERE m.id = mm.meeting_id 
+			AND mm.member_id = #{memberId}
+	</select>
+
+	<select id="getInvitationCount" parameterType="java.lang.Long"
+		resultType="Integer">
+		SELECT count(*) 
+		FROM tb_meeting m,
+			tb_meeting_member mm
+		WHERE m.id = mm.meeting_id 
+			AND mm.member_meet_status != 2
+			AND mm.attend_meet_type = 0 
+			AND mm.attend_meet_status = 0 
+			AND mm.member_id = #{memberId}
+	</select>
+	
+	<select id="getAllNotBeginMeetng" 
+		resultType="meeting">
+		SELECT <include refid="columns" /> 
+		FROM tb_meeting m
+		WHERE m.meeting_status = 1
+			AND m.is_delete = 0
+	</select>
+	
+	<select id="getMyForwardingMeeting" 
+		resultType="meetingQuery">
+		SELECT 
+			m.id AS id,
+			m.meeting_name AS meetingName,
+			m.start_time AS startTime,
+			m.end_time AS endTime,
+			m.meeting_type AS meetingType,
+			m.meeting_status AS meetingStatus,
+			m.meeting_desc AS meetingDesc,
+			m.top,
+			m.disable,
+			m.is_pay AS isPay,
+			m.pay_money AS payMoney,
+			mp.pic_path AS path
+		FROM tb_meeting m
+		LEFT JOIN tb_meeting_pic mp 
+			ON m.id = mp.module_id
+			AND mp.module_type=1 
+			AND mp.ishome_page = 1 
+		INNER JOIN tb_meeting_member mm
+			ON m.id = mm.meeting_id 
+		WHERE (m.meeting_status = 1 OR m.meeting_status = 2) 
+			AND (
+				(mm.attend_meet_type = 0 AND mm.attend_meet_status = 1)
+				OR (mm.attend_meet_type = 1 AND mm.attend_meet_status = 4 AND mm.excute_meet_sign = 1)
+			) 
+			AND mm.member_id = #{userId} 
+		ORDER BY m.start_time DESC
+	</select>
+	
+	<select id="selectmeetingindex" parameterType="long"  resultType="hashmap">
+		SELECT 
+			tm.id, 
+			tm.meeting_name AS title,
+			tm.start_time AS start_time,
+			tm.create_time AS create_time,
+			tm.meeting_status AS status,
+			tm.end_time   AS end_time,
+			tmp.pic_path AS image
+		FROM tb_meeting AS tm   
+		INNER JOIN tb_meeting_member AS tmm 
+			ON tm.id = tmm.meeting_id 
+		LEFT JOIN tb_meeting_pic AS tmp 
+			ON tm.id = tmp.meeting_id
+		WHERE tmm.member_id = #{userId}
+			AND tmm.member_meet_status != 2  
+			AND tm.meeting_status != 0   
+			AND tmp.ishome_page = 1   
+			AND (attend_meet_type = 0 AND attend_meet_status = 1) 
+			OR (attend_meet_type = 1 AND attend_meet_status = 4 AND excute_meet_sign = 1)
+	</select>
+	
+	<select id="selectinviteindex" parameterType="long"  resultType="hashmap">
+		SELECT 
+			tm.id, 
+			tm.meeting_name AS title,
+			tm.start_time AS start_time,
+			tm.create_time AS create_time,
+			tm.meeting_status AS status,
+			tm.end_time   AS end_time,
+			tmp.pic_path AS image
+		FROM tb_meeting  AS tm
+		INNER JOIN tb_meeting_member AS tmm 
+			ON tm.id = tmm.meeting_id 
+		LEFT JOIN tb_meeting_pic AS tmp 
+			ON tm.id = tmp.meeting_id
+		WHERE tmm.member_id = #{userId}
+			AND tmm.member_meet_status != 2
+			AND tm.meeting_status != 0 
+			AND tmp.ishome_page = 1 
+			AND tmm.attend_meet_type = 0 AND tmm.attend_meet_status = 0 
+		ORDER BY tm.create_time DESC 
+		LIMIT 1
+	</select>
+	
+	<!-- 获取最新的一条邀请函 -->
+	<select id="getLatestInvitation" parameterType="long"  resultType="social">
+		SELECT tm.id AS id, 
+			tm.meeting_name AS title,
+			concat(tm.create_name,'邀请您参加') AS "socialDetail.content",
+			tmm.attend_meet_time AS orderTime,
+			tm.create_id as compereId,
+			tm.create_name AS compereName,
+			7 as TYPE,	 
+			tm.meeting_type as meetingType,
+			tmp.pic_path AS path,
+			tmm.attend_meet_time as "time"
+		FROM tb_meeting  AS tm
+		INNER JOIN tb_meeting_member AS tmm 
+			ON tm.id = tmm.meeting_id  
+		LEFT JOIN tb_meeting_pic AS tmp 
+			ON tm.id = tmp.module_id 
+			AND tmp.module_type = 1 
+			AND tmp.ishome_page = 1 
+		WHERE tmm.member_id = #{userId}
+			AND tmm.is_show_invitation = 1
+			AND tmm.member_type = 1
+			AND tmm.member_meet_status != 2
+			AND tm.meeting_status != 0
+			AND tmm.attend_meet_type = 0
+		ORDER BY tmm.attend_meet_time DESC 
+		LIMIT 1
+	</select>
+
+	<select id="getMeetingWithLatestMessage" parameterType="long" resultType="social">
+		SELECT tm.id AS id, 
+			tm.meeting_name AS title,
+			IF(tm.meeting_status=3,DATE_FORMAT(tm.end_time, '%Y-%m-%d %H:%i'),DATE_FORMAT(tm.start_time, '%Y-%m-%d %H:%i')) AS "socialDetail.content",
+			IF(tm.meeting_status=3,DATE_FORMAT(tm.end_time, '%Y-%m-%d %T'),DATE_FORMAT(tm.start_time, '%Y-%m-%d %T')) AS orderTime,
+			tm.create_id as compereId,
+			tm.create_name AS compereName,
+			CASE meeting_status
+				WHEN 1 THEN 4
+				WHEN 2 THEN 3
+				WHEN 3 THEN 5
+			END AS TYPE,
+			tm.meeting_type as meetingType, 
+			tm.start_time as "time" 
+		FROM tb_meeting tm 
+		INNER JOIN tb_meeting_member AS tmm 
+			ON tm.id = tmm.meeting_id 
+		LEFT join tb_topic_chat c 
+			ON tm.id = c.meeting_id 
+		WHERE tmm.member_id = #{userId}
+			AND tm.is_delete = 0
+			AND tmm.is_delete = 0
+			AND tmm.member_meet_status != 2 
+			AND (
+				(tmm.attend_meet_type = 0 AND tmm.attend_meet_status = 1)
+				OR (tmm.attend_meet_type = 1 AND tmm.attend_meet_status = 4 AND tmm.excute_meet_sign = 1)
+			)
+			AND tm.meeting_status != 0 
+		ORDER BY c.publish_time DESC 
+		LIMIT 1
+	</select>
+	
+	<select id="getMeetingListAndInvitation" parameterType="long"  resultType="social">
+		(
+			SELECT 
+				tm.id, 
+				tm.meeting_name AS title,
+				IF(tm.meeting_status=3,DATE_FORMAT(tm.end_time, '%Y-%m-%d %H:%i'),DATE_FORMAT(tm.start_time, '%Y-%m-%d %H:%i')) AS "socialDetail.content",
+				IF(tm.meeting_status=3,DATE_FORMAT(tm.end_time, '%Y-%m-%d %T'),DATE_FORMAT(tm.start_time, '%Y-%m-%d %T')) AS orderTime,
+				tm.create_id AS compereId,
+				tm.create_name AS compereName,
+				CASE meeting_status
+			 		WHEN 1 THEN 4
+					WHEN 2 THEN 3
+					WHEN 3 THEN 5
+				END AS TYPE,
+				tm.meeting_type AS meetingType,	 
+				tmp.pic_path AS path,
+		 		tm.start_time AS "time"
+			FROM tb_meeting  AS tm
+			INNER JOIN tb_meeting_member AS tmm 
+				ON tm.id = tmm.meeting_id  
+			LEFT JOIN tb_meeting_pic AS tmp 	
+				ON tm.id = tmp.module_id 
+				AND tmp.module_type = 1 
+				AND tmp.ishome_page = 1 
+			WHERE tmm.member_id = #{userId}
+				AND tm.is_delete = 0
+				AND tmm.is_delete = 0
+				AND tmm.member_meet_status != 2
+				AND (
+					(tmm.attend_meet_type = 0 AND tmm.attend_meet_status = 1) 
+					OR (tmm.attend_meet_type = 1 AND tmm.attend_meet_status = 4 AND tmm.excute_meet_sign = 1)
+				)
+				AND tm.meeting_status != 0
+			ORDER BY tm.create_time
+		) UNION ALL (
+			SELECT 
+				tm.id, 
+				tm.meeting_name AS title,
+				concat(tm.create_name,'邀请您参加') AS "socialDetail.content",
+				tmm.attend_meet_time AS orderTime,
+				tm.create_id AS compereId,
+				tm.create_name AS compereName,
+				7 AS TYPE,	 
+				tm.meeting_type AS meetingType,
+				tmp.pic_path AS path,
+				tmm.attend_meet_time AS "time"
+			FROM tb_meeting  AS tm
+			INNER JOIN tb_meeting_member AS tmm 
+				ON tm.id = tmm.meeting_id  
+			LEFT JOIN tb_meeting_pic AS tmp 
+				ON tm.id = tmp.module_id 
+				AND tmp.module_type = 1 
+				AND tmp.ishome_page = 1 
+			WHERE tmm.member_id = #{userId}
+				AND tmm.is_show_invitation = 1
+				AND tmm.member_type = 1
+				AND tmm.member_meet_status <![CDATA[<>]]> 2
+				AND tm.meeting_status <![CDATA[<>]]> 0
+				AND tmm.attend_meet_type = 0
+			ORDER BY tmm.attend_meet_time DESC
+			LIMIT 1
+		)
+	</select>
+
+	<select id="getMeetingListByUserId" parameterType="long"  resultType="social">
+		SELECT tm.id AS id, 
+			tm.meeting_name AS title,
+			IF(tm.meeting_status=3,DATE_FORMAT(tm.end_time, '%Y-%m-%d %H:%i'),DATE_FORMAT(tm.start_time, '%Y-%m-%d %H:%i')) AS "socialDetail.content",
+			IF(tm.meeting_status=3,DATE_FORMAT(tm.end_time, '%Y-%m-%d %T'),DATE_FORMAT(tm.start_time, '%Y-%m-%d %T')) AS orderTime,
+			tm.create_id as compereId,
+			tm.create_name AS compereName,
+			CASE meeting_status
+				WHEN 1 THEN 4
+				WHEN 2 THEN 3
+				WHEN 3 THEN 5
+			END AS TYPE,
+			tm.meeting_type as meetingType,	 
+			tmp.pic_path AS path,
+			tm.group_id as groupId,
+			tm.start_time as "time"
+		FROM tb_meeting  AS tm
+		INNER JOIN tb_meeting_member AS tmm 
+			ON tm.id = tmm.meeting_id  
+		LEFT JOIN tb_meeting_pic AS tmp 
+			ON tm.id = tmp.module_id 
+			AND tmp.module_type = 1 
+			AND tmp.ishome_page = 1 
+		WHERE tmm.member_id = #{userId}
+			AND tm.is_delete = 0
+			AND tmm.is_delete = 0
+			AND tmm.member_meet_status != 2
+			AND (
+				(tmm.attend_meet_type = 0 AND tmm.attend_meet_status = 1) 
+				OR (tmm.attend_meet_type = 1 AND tmm.attend_meet_status = 4 AND tmm.excute_meet_sign = 1)
+			)
+			AND tm.meeting_status != 0
+		ORDER BY tm.create_time
+	</select>
+	
+	<select id="getMyForwardingInMeeting" parameterType="long"  resultType="social">
+		SELECT 
+			tm.id AS id, 
+			tm.meeting_name AS title,
+			DATE_FORMAT(tm.start_time, '%Y-%m-%d %T') AS "socialDetail.content",
+			tm.start_time AS orderTime,
+			tm.create_id AS compereId,
+			tm.create_name AS compereName,
+			3 AS TYPE,	 
+			tm.meeting_type AS meetingType,
+			tmp.pic_path AS path,
+			tm.start_time AS "time"
+		FROM tb_meeting AS tm
+		INNER JOIN tb_meeting_member AS tmm
+			ON tm.id = tmm.meeting_id  
+		LEFT JOIN tb_meeting_pic AS tmp
+			ON tm.id = tmp.module_id
+			AND tmp.module_type = 1
+			AND tmp.ishome_page = 1 
+		WHERE tmm.member_id = #{userId}
+			AND tm.meeting_status = 2
+			AND tmm.member_meet_status != 2
+			AND (
+				(tmm.attend_meet_type = 0 AND tmm.attend_meet_status = 1) 
+				OR (tmm.attend_meet_type = 1 AND tmm.attend_meet_status = 4 AND tmm.excute_meet_sign = 1)
+			) AND tm.meeting_status != 0
+		ORDER BY tm.create_time
+	</select>
+	
+	<select id="getMyAttendAndCreateMeetingOld" parameterType="java.util.Map"
+		resultType="meetingMemberList">
+		(
+			SELECT 
+				DISTINCT m.id,
+				m.start_time AS startTime,
+				m.meeting_name AS meetingName,
+				m.meeting_desc AS meetingDesc,
+				m.meeting_type  AS meetingType,
+				m.meeting_status AS meetingStatus,
+				m.create_id AS createId,
+				m.create_name AS createName,
+				p.pic_path AS path 
+			FROM tb_meeting m 
+			LEFT JOIN tb_meeting_pic AS p 
+				ON p.meeting_id = m.id 
+				AND p.ishome_page = 1 
+			WHERE m.meeting_status = 0 
+				AND m.create_id = #{memberId} 
+			<if test="year != null">
+				And YEAR(m.start_time) = #{year}
+			</if>
+			<if test="month != null">
+				And MONTH(m.start_time) = #{month}
+			</if>
+			ORDER BY m.start_time DESC
+		) UNION ALL (
+			SELECT 
+				DISTINCT m.id AS id,
+				m.start_time AS startTime,
+				m.meeting_name AS meetingName,
+				m.meeting_desc AS meetingDesc,
+				m.meeting_type AS meetingType,
+				m.meeting_status AS meetingStatus,
+				m.create_id AS createId,
+				m.create_name AS createName,
+				p.pic_path AS path 
+			FROM tb_meeting m
+			LEFT JOIN tb_meeting_pic AS p 
+				ON p.meeting_id = m.id 
+				AND p.ishome_page = 1 
+			INNER JOIN tb_meeting_member mm 
+				ON m.id = mm.meeting_id 
+			WHERE m.meeting_status = 2 
+				AND (
+					(
+						m.create_id <![CDATA[<>]]> #{memberId} 
+						AND mm.member_meet_status = 1 
+						AND mm.member_id = #{memberId} 
+						AND (
+							(mm.attend_meet_type = 1 AND mm.attend_meet_status = 4 AND mm.excute_meet_sign = 1) 
+							OR (mm.attend_meet_type = 0 AND mm.attend_meet_status = 1)
+						) 
+					)
+					OR m.create_id = #{memberId}
+				) 
+				<if test="year != null">
+					AND YEAR(m.start_time) = #{year}
+				</if>
+				<if test="month != null">
+					AND MONTH(m.start_time) = #{month}
+				</if>
+		    ORDER BY m.start_time DESC
+	    ) UNION ALL (
+		    SELECT 
+				DISTINCT m.id AS id,
+				m.start_time AS startTime,
+				m.meeting_name AS meetingName,
+				m.meeting_desc AS meetingDesc,
+				m.meeting_type AS meetingType,
+				m.meeting_status AS meetingStatus,
+				m.create_id AS createId,
+				m.create_name AS createName,
+				p.pic_path AS path 
+			FROM tb_meeting m
+			LEFT JOIN tb_meeting_pic AS p 
+				ON p.meeting_id = m.id 
+				AND p.ishome_page = 1 
+			INNER JOIN tb_meeting_member mm 
+				ON m.id = mm.meeting_id 
+			WHERE (m.meeting_status = 1 OR m.meeting_status = 3)
+				AND (
+					(
+						m.create_id <![CDATA[<>]]> #{memberId} 
+						AND mm.member_meet_status = 1 
+						AND mm.member_id = #{memberId} 
+						AND (
+			    			(mm.attend_meet_type = 1 AND mm.attend_meet_status = 4 AND mm.excute_meet_sign = 1) 
+							OR (mm.attend_meet_type = 0 AND mm.attend_meet_status = 1)
+						) 
+					)
+					OR m.create_id = #{memberId}
+				) 
+				<if test="year != null">
+					AND YEAR(m.start_time) = #{year}
+				</if>
+				<if test="month != null">
+					AND MONTH(m.start_time) = #{month}
+				</if>
+			ORDER BY m.start_time DESC
+		)
+	</select>
+	
+	<select id="getByIds" resultType="meeting" parameterType="java.util.List">
+		SELECT <include refid="columns" />
+	    FROM tb_meeting 
+		WHERE id IN
+	    <foreach collection="list" item="item" open="(" separator="," close=")">
+    	    #{item}
+    	</foreach>
+	</select>
+	
+	<update id="deleteBatch" parameterType="java.util.List">
+		UPDATE tb_meeting 
+		SET is_delete = 1,
+        	update_time = NOW()
+        WHERE id IN
+	    <foreach collection="list" item="item" open="(" separator="," close=")">
+    	    #{item}
+    	</foreach>
+	</update>
+
+	<update id="addTop" parameterType="long">
+		UPDATE tb_meeting
+		SET top = 1
+		WHERE id = #{id}
+	</update>
+
+	<update id="deleteTop" parameterType="long">
+		UPDATE tb_meeting
+		SET top = 0
+		WHERE id = #{id}
+	</update>
+
+	<update id="disable" parameterType="long">
+		UPDATE tb_meeting
+		SET disable = 1
+		WHERE id = #{id}
+	</update>
+
+	<update id="enable" parameterType="long">
+		UPDATE tb_meeting
+		SET disable = 0
+		WHERE id = #{id}
+	</update>
+	<select id="getTops" parameterType="java.util.Map" resultType="meetingAdQuery">
+		SELECT
+		m.id AS id,
+		m.meeting_name AS meetingName,
+		m.meeting_status AS meetingStatus,
+		m.meeting_desc AS meetingDesc,
+		m.top,
+		m.disable,
+		mp.pic_path AS path
+		FROM tb_meeting m
+		LEFT JOIN tb_meeting_pic mp
+		ON m.id = mp.meeting_id
+		WHERE
+		m.is_delete = 0
+		AND mp.module_type = 1
+		AND mp.ishome_page = 1
+		AND m.disable = 0
+		AND m.top = 1
+		<if test="startRow != null">
+			LIMIT #{startRow}, #{size}
+		</if>
+    </select>
+
+	<update id="updateLive" parameterType="java.util.Map">
+		<![CDATA[
+			UPDATE tb_meeting
+			SET is_live = #{live},
+	        	live_status = #{liveStatus},
+				live_channel_id = #{liveChannelId},
+				live_room_id = #{liveRoomId},
+				live_start_time = #{liveStartTime},
+				live_remain_duration = #{liveRemainDuration}
+			WHERE id = #{id}
+		 ]]>
+	</update>
+	<update id="updateLiveStatus" parameterType="java.util.Map">
+		<![CDATA[
+			UPDATE tb_meeting
+			SET live_status = #{liveStatus}
+			WHERE id = #{id}
+		 ]]>
+	</update>
+	<update id="updateLiveEndTime" parameterType="java.util.Map">
+		<![CDATA[
+			UPDATE tb_meeting
+			SET live_remain_duration = #{liveRemainDuration}
+			WHERE id = #{id}
+		 ]]>
+	</update>
+	<select id="getByLiveRoomId" resultType="meeting">
+		SELECT
+		<include refid="columns" />
+		<![CDATA[
+		    FROM tb_meeting
+	        WHERE live_room_id = #{liveRoomId}
+	    ]]>
+	</select>
+	<select id="getByLiveChannelId" resultType="meeting">
+		SELECT
+		<include refid="columns" />
+		<![CDATA[
+		    FROM tb_meeting
+	        WHERE live_channel_id = #{liveChannelId}
+	    ]]>
+	</select>
+
+</mapper>

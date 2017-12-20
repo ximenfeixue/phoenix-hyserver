@@ -66,6 +66,8 @@ import javax.annotation.Resource;
 @Transactional
 public class MeetingServiceImpl extends BaseServiceImpl<Meeting, Long> implements MeetingService {
 
+	static final long DEFAULT_LIVE_DURATION = 1 * 60 * 60 * 1000;
+
 	@Autowired
 	private MeetingDetailDao meetingDetailDao;
 	@Autowired
@@ -118,7 +120,12 @@ public class MeetingServiceImpl extends BaseServiceImpl<Meeting, Long> implement
 	@Autowired
 	private MeetingNotifyService meetingNotifyService;
 	@Autowired
+	private MeetingLiveCreateRecordDao meetingLiveCreateRecordDao;
+	@Autowired
+	private MeetingLiveUseRecordDao meetingLiveUseRecordDao;
+	@Autowired
 	private DataSyncTask dataSyncTask;
+
 
 	@Value("${nginx.root}")
 	private String nginxRoot;
@@ -362,7 +369,16 @@ public class MeetingServiceImpl extends BaseServiceImpl<Meeting, Long> implement
 			} else if (meeting.getStartTime().before(new Date()) && MeetingStatusType.DRAFT.code() != meeting.getMeetingStatus()) {
 				meeting.setMeetingStatus(MeetingStatusType.IN_MEETING.code());
 			}
+<<<<<<< HEAD
+			meeting.setLive(null == entity.getLive() ? 0 : entity.getLive());
+			if (1 == meeting.getLive()) {
+				meeting.setLiveStartTime(date);
+				meeting.setLiveEndTime(getLiveEndTime(meeting.getLiveStartTime(), DEFAULT_LIVE_DURATION));
+			}
+			Long meetingId = this.save(meeting);
+=======
 			final Long meetingId = this.save(meeting);
+>>>>>>> origin/release
 
 			/**
 			 * 添加为了IOS获取到未读消息数
@@ -2595,7 +2611,58 @@ public class MeetingServiceImpl extends BaseServiceImpl<Meeting, Long> implement
 		return meetingDao.getTops(index, size);
 	}
 
+	/**
+	 * 开通/续费 直播
+	 *
+	 * @param meetingLiveCreateRecord
+	 * @return
+	 */
 	@Override
+	@Transactional(rollbackFor = Exception.class)
+	public Meeting addLive(MeetingLiveCreateRecord meetingLiveCreateRecord) throws Exception{
+		MeetingLiveCreateRecord save = meetingLiveCreateRecordDao.save(meetingLiveCreateRecord);
+		if (null != save) {
+			return meetingDao.getById(save.getId());
+		}
+		return null;
+	}
+
+	/**
+	 * getByLiveRoomId
+	 *
+	 * @param liveRoomId
+	 * @return
+	 */
+	@Override
+	public Meeting getByLiveRoomId(long liveRoomId) {
+		return meetingDao.getByLiveRoomId(liveRoomId);
+	}
+
+	/**
+	 * getByLiveChannelId
+	 *
+	 * @param liveChannelId
+	 * @return
+	 */
+	@Override
+	@Transactional(readOnly = true)
+	public Meeting getByLiveChannelId(String liveChannelId) {
+		return meetingDao.getByLiveChannelId(liveChannelId);
+	}
+
+	/**
+	 * getMeetingLiveUseRecordByMeetingId
+	 *
+	 * @param meetingId
+	 * @return
+	 */
+	@Override
+	public List<MeetingLiveUseRecord> getMeetingLiveUseRecordByMeetingId(final long meetingId) {
+		return meetingLiveUseRecordDao.getByMeetingId(meetingId);
+	}
+
+	@Override
+	@Transactional(readOnly = true)
 	public Social getMeetingWithLatestMessage(Long userId) {
 		return meetingDao.getMeetingWithLatestMessage(userId);
 	}

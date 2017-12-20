@@ -91,7 +91,7 @@
 		</dependency>
 		<dependency>
 			<groupId>com.ginkgocap.ywxt</groupId>
-			<artifactId>phoenix-entire-api</artifactId>
+			<artifactId>phoenix-user-api</artifactId>
 			<version>${entire.dependencied}</version>
 		</dependency>
 		<dependency>
@@ -314,7 +314,7 @@
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
-			<version>3.1</version>
+			<version>3.6</version>
 		</dependency>
 		<dependency>
 			<groupId>commons-io</groupId>

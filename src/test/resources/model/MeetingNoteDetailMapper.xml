@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+"http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+<mapper namespace="MeetingNoteDetail">
+	<resultMap id="meetingNoteDetailMap" type="com.ginkgocap.ywxt.model.meeting.MeetingNoteDetail">
+        <result property="id" column="id"/>
+        <result property="meetingNoteId" column="meeting_note_id"/>
+        <result property="meetingNoteContent" column="meeting_note_content"/>
+        <result property="meetingChatId" column="meeting_chat_id"/>
+        <result property="meetingNoteTime" column="meeting_note_time"/>
+        <result property="taskId" column="task_id"/>
+        <result property="formatedContent" column="formated_content"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+	</resultMap>
+	
+	<sql id="columns">
+	   <![CDATA[
+		id,meeting_note_id AS meetingNoteId,meeting_note_content AS meetingNoteContent,
+		meeting_chat_id AS meetingChatId,meeting_note_time AS meetingNoteTime,task_id AS taskId,
+		formated_content AS formatedContent,create_time AS createTime,update_time AS updateTime
+	    ]]>
+	</sql>
+	
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id">
+    <![CDATA[
+        INSERT INTO tb_meeting_note_detail (
+        	id,
+        	meeting_note_id,
+        	meeting_note_content,
+        	meeting_chat_id,
+        	meeting_note_time,
+        	task_id,
+        	formated_content,
+        	create_time,
+        	update_time
+        ) VALUES (
+        	#{id},
+        	#{meetingNoteId},
+        	#{meetingNoteContent},
+        	#{meetingChatId},
+        	#{meetingNoteTime},
+        	#{taskId},
+        	#{formatedContent},
+        	NOW(),
+        	NOW()
+        )
+    ]]>
+	</insert>
+    
+	<update id="update" >
+    <![CDATA[
+        UPDATE tb_meeting_note_detail 
+        SET meeting_note_id = #{meetingNoteId},
+	        meeting_note_content = #{meetingNoteContent},
+	        meeting_chat_id = #{meetingChatId},
+	        meeting_note_time = #{meetingNoteTime},
+	        task_id = #{taskId},
+	        formated_content = #{formatedContent},
+	        update_time = NOW()
+        WHERE id = #{id}
+    ]]>
+	</update>
+
+    <delete id="delete">
+    <![CDATA[
+        DELETE FROM tb_meeting_note_detail 
+        WHERE id = #{id}
+    ]]>
+    </delete>
+    
+    <delete id="batchRemoveAllByNoteId" parameterType="java.util.Map">
+		DELETE FROM tb_meeting_note_detail 
+		WHERE meeting_note_id = #{meetingNoteId} 
+    </delete>
+    <delete id="batchRemoveUserByPks" parameterType="java.util.Map">
+		DELETE FROM tb_meeting_note_detail 
+		WHERE meeting_note_id = #{meetingNoteId} 
+			AND id NOT IN 
+		<foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</delete>
+    
+    <select id="getById" resultType="meetingNoteDetail">
+		SELECT <include refid="columns" />
+	    <![CDATA[
+		    FROM tb_meeting_note_detail 
+	        WHERE id = #{id} 
+	    ]]>
+	</select>
+
+    <select id="getByMeetingNoteId" resultType="meetingNoteDetail" parameterType="java.lang.Long">
+	    SELECT <include refid="columns"/>
+	    <![CDATA[
+	        FROM tb_meeting_note_detail 
+			WHERE meeting_note_id = #{meetingNoteId}
+	    ]]>
+    </select>
+    
+    <select id="getQueryByMeetingNoteId" resultType="meetingNoteDetailQuery" parameterType="java.lang.Long">
+	    SELECT <include refid="columns"/>
+	    <![CDATA[
+	        FROM tb_meeting_note_detail 
+			WHERE meeting_note_id = #{meetingNoteId}
+	    ]]>
+    </select>
+    
+    <select id="getByMeetingNoteContent" resultType="meetingNoteDetail" parameterType="java.lang.String">
+	    SELECT <include refid="columns"/>
+	    <![CDATA[
+	        FROM tb_meeting_note_detail 
+			WHERE meeting_note_content = #{meetingNoteContent}
+	    ]]>
+    </select>
+    
+    <select id="getByMeetingNoteTime" resultType="meetingNoteDetail" parameterType="java.util.Date">
+	    SELECT <include refid="columns"/>
+	    <![CDATA[
+	        FROM tb_meeting_note_detail 
+			WHERE meeting_note_time = #{meetingNoteTime}
+	    ]]>
+    </select>
+    
+    <select id="getByTaskId" resultType="meetingNoteDetail" parameterType="java.lang.String">
+	    SELECT <include refid="columns"/>
+	    <![CDATA[
+	        FROM tb_meeting_note_detail 
+			WHERE task_id = #{taskId}
+	    ]]>
+    </select>
+    
+</mapper>

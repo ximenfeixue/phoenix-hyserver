@@ -1,0 +1,293 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+"http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+
+<!-- 不使用namespace的话sql搜索定位会比较方便 -->
+<mapper namespace="ImChatmessage">
+
+	<resultMap id="imChatmessageMap" type="com.ginkgocap.ywxt.model.meeting.ImChatmessage">
+        <result property="id" column="Id"/>
+        <result property="userId1" column="user_Id1"/>
+        <result property="userId2" column="user_Id2"/>
+        <result property="userId1ReadStatus" column="userId1_Read_Status"/>
+        <result property="userId2ReadStatus" column="userId2_Read_Status"/>
+        <result property="senderId" column="sender_Id"/>
+        <result property="msg" column="msg"/>
+        <result property="msgType" column="msg_Type"/>
+        <result property="messageId" column="message_Id"/>
+        <result property="time" column="time"/>
+        <result property="jtFileUrl" column="jtFile_Url"/>
+        <result property="jtFileSuffixName" column="jtFile_Suffix_Name"/>
+        <result property="jtFileType" column="jtFile_Type"/>
+        <result property="jtFileName" column="jtFile_Name"/>
+        <result property="jtFileSize" column="jtFile_Size"/>
+        <result property="jtFileModuleType" column="jtFile_Module_Type"/>
+        <result property="jtFileTaskId" column="jtFile_Task_Id"/>
+        <result property="jtFileReserved1" column="jtFile_Reserved1"/>
+        <result property="jtFileReserved2" column="jtFile_Reserved2"/>
+        <result property="jtFileReserved3" column="jtFile_Reserved3"/>
+        <result property="sequence" column="sequence"/>
+	</resultMap>
+	
+	<!-- 用于select查询公用抽取的列 -->
+	<sql id="columns">
+	    <![CDATA[
+		Id as id,user_Id1 as userId1,user_Id2 as userId2,userId1_Read_Status as userId1ReadStatus,userId2_Read_Status as userId2ReadStatus,sender_Id as senderId,msg as msg,msg_Type as msgType,message_Id as messageId,time as time,jtFile_Url as jtFileUrl,jtFile_Suffix_Name as jtFileSuffixName,jtFile_Type as jtFileType,jtFile_Name as jtFileName,jtFile_Size as jtFileSize,jtFile_Module_Type as jtFileModuleType,jtFile_Task_Id as jtFileTaskId,jtFile_Reserved1 as jtFileReserved1,jtFile_Reserved2 as jtFileReserved2,jtFile_Reserved3 as jtFileReserved3,sequence as sequence
+	    ]]>
+	</sql>
+
+	<!-- useGeneratedKeys="true" keyProperty="xxx" for sqlserver and mysql -->
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id">
+    <![CDATA[
+        INSERT INTO t_im_ChatMessage (
+        	Id ,
+        	user_Id1 ,
+        	user_Id2 ,
+        	userId1_Read_Status ,
+        	userId2_Read_Status ,
+        	sender_Id ,
+        	msg ,
+        	msg_Type ,
+        	message_Id ,
+        	time ,
+        	jtFile_Url ,
+        	jtFile_Suffix_Name ,
+        	jtFile_Type ,
+        	jtFile_Name ,
+        	jtFile_Size ,
+        	jtFile_Module_Type ,
+        	jtFile_Task_Id ,
+        	jtFile_Reserved1 ,
+        	jtFile_Reserved2 ,
+        	jtFile_Reserved3 ,
+        	sequence 
+        ) VALUES (
+        	#{id} ,
+        	#{userId1} ,
+        	#{userId2} ,
+        	#{userId1ReadStatus} ,
+        	#{userId2ReadStatus} ,
+        	#{senderId} ,
+        	#{msg} ,
+        	#{msgType} ,
+        	#{messageId} ,
+        	#{time} ,
+        	#{jtFileUrl} ,
+        	#{jtFileSuffixName} ,
+        	#{jtFileType} ,
+        	#{jtFileName} ,
+        	#{jtFileSize} ,
+        	#{jtFileModuleType} ,
+        	#{jtFileTaskId} ,
+        	#{jtFileReserved1} ,
+        	#{jtFileReserved2} ,
+        	#{jtFileReserved3} ,
+        	#{sequence} 
+        )
+    ]]>
+		<!--	
+			oracle: order="BEFORE" SELECT sequenceName.nextval AS ID FROM DUAL 
+			DB2: order="BEFORE"" values nextval for sequenceName
+		<selectKey resultType="java.lang.Long" order="BEFORE" keyProperty="userId">
+			SELECT sequenceName.nextval AS ID FROM DUAL 
+        </selectKey>
+		-->
+	</insert>
+    
+	<update id="update" >
+    <![CDATA[
+        UPDATE t_im_ChatMessage SET
+	        user_Id1 = #{userId1} ,
+	        user_Id2 = #{userId2} ,
+	        userId1_Read_Status = #{userId1ReadStatus} ,
+	        userId2_Read_Status = #{userId2ReadStatus} ,
+	        sender_Id = #{senderId} ,
+	        msg = #{msg} ,
+	        msg_Type = #{msgType} ,
+	        message_Id = #{messageId} ,
+	        time = #{time} ,
+	        jtFile_Url = #{jtFileUrl} ,
+	        jtFile_Suffix_Name = #{jtFileSuffixName} ,
+	        jtFile_Type = #{jtFileType} ,
+	        jtFile_Name = #{jtFileName} ,
+	        jtFile_Size = #{jtFileSize} ,
+	        jtFile_Module_Type = #{jtFileModuleType} ,
+	        jtFile_Task_Id = #{jtFileTaskId} ,
+	        jtFile_Reserved1 = #{jtFileReserved1} ,
+	        jtFile_Reserved2 = #{jtFileReserved2} ,
+	        jtFile_Reserved3 = #{jtFileReserved3} ,
+	        sequence = #{sequence} 
+        WHERE 
+	        Id = #{id} 
+    ]]>
+	</update>
+
+    <delete id="delete">
+    <![CDATA[
+        DELETE FROM t_im_ChatMessage WHERE
+        Id = #{id} 
+    ]]>
+    </delete>
+    
+    <select id="getById" resultMap="imChatmessageMap">
+		SELECT <include refid="columns" />
+	    <![CDATA[
+		    FROM t_im_ChatMessage 
+	        WHERE 
+		        Id = #{id} 
+	    ]]>
+	</select>
+    <select id="getByIds" resultMap="imChatmessageMap" parameterType="java.util.Map">
+    		SELECT <include refid="columns" />
+		    FROM t_im_ChatMessage where id in
+    	<foreach collection="ids" item="item" open="(" separator="," close=")">
+    	    #{item}
+    	</foreach>
+	</select>
+
+
+    <select id="getByUserId1" resultMap="imChatmessageMap" parameterType="java.lang.Integer">
+	    SELECT <include refid="columns"/>
+	    <![CDATA[
+	        FROM t_im_ChatMessage where user_Id1 = #{userId1}
+	    ]]>
+    </select>
+    
+    <select id="getByUserId2" resultMap="imChatmessageMap" parameterType="java.lang.Integer">
+	    SELECT <include refid="columns"/>
+	    <![CDATA[
+	        FROM t_im_ChatMessage where user_Id2 = #{userId2}
+	    ]]>
+    </select>
+    
+    <select id="getByUserId1ReadStatus" resultMap="imChatmessageMap" parameterType="java.lang.String">
+	    SELECT <include refid="columns"/>
+	    <![CDATA[
+	        FROM t_im_ChatMessage where userId1_Read_Status = #{userId1ReadStatus}
+	    ]]>
+    </select>
+    
+    <select id="getByUserId2ReadStatus" resultMap="imChatmessageMap" parameterType="java.lang.String">
+	    SELECT <include refid="columns"/>
+	    <![CDATA[
+	        FROM t_im_ChatMessage where userId2_Read_Status = #{userId2ReadStatus}
+	    ]]>
+    </select>
+    
+    <select id="getBySenderId" resultMap="imChatmessageMap" parameterType="java.lang.Integer">
+	    SELECT <include refid="columns"/>
+	    <![CDATA[
+	        FROM t_im_ChatMessage where sender_Id = #{senderId}
+	    ]]>
+    </select>
+    
+    <select id="getByMsg" resultMap="imChatmessageMap" parameterType="java.lang.String">
+	    SELECT <include refid="columns"/>
+	    <![CDATA[
+	        FROM t_im_ChatMessage where msg = #{msg}
+	    ]]>
+    </select>
+    
+    <select id="getByMsgType" resultMap="imChatmessageMap" parameterType="java.lang.Integer">
+	    SELECT <include refid="columns"/>
+	    <![CDATA[
+	        FROM t_im_ChatMessage where msg_Type = #{msgType}
+	    ]]>
+    </select>
+    
+    <select id="getByMessageId" resultMap="imChatmessageMap" parameterType="java.lang.String">
+	    SELECT <include refid="columns"/>
+	    <![CDATA[
+	        FROM t_im_ChatMessage where message_Id = #{messageId}
+	    ]]>
+    </select>
+    
+    <select id="getByTime" resultMap="imChatmessageMap" parameterType="java.util.Date">
+	    SELECT <include refid="columns"/>
+	    <![CDATA[
+	        FROM t_im_ChatMessage where time = #{time}
+	    ]]>
+    </select>
+    
+    <select id="getByJtFileUrl" resultMap="imChatmessageMap" parameterType="java.lang.String">
+	    SELECT <include refid="columns"/>
+	    <![CDATA[
+	        FROM t_im_ChatMessage where jtFile_Url = #{jtFileUrl}
+	    ]]>
+    </select>
+    
+    <select id="getByJtFileSuffixName" resultMap="imChatmessageMap" parameterType="java.lang.String">
+	    SELECT <include refid="columns"/>
+	    <![CDATA[
+	        FROM t_im_ChatMessage where jtFile_Suffix_Name = #{jtFileSuffixName}
+	    ]]>
+    </select>
+    
+    <select id="getByJtFileType" resultMap="imChatmessageMap" parameterType="java.lang.Integer">
+	    SELECT <include refid="columns"/>
+	    <![CDATA[
+	        FROM t_im_ChatMessage where jtFile_Type = #{jtFileType}
+	    ]]>
+    </select>
+    
+    <select id="getByJtFileName" resultMap="imChatmessageMap" parameterType="java.lang.String">
+	    SELECT <include refid="columns"/>
+	    <![CDATA[
+	        FROM t_im_ChatMessage where jtFile_Name = #{jtFileName}
+	    ]]>
+    </select>
+    
+    <select id="getByJtFileSize" resultMap="imChatmessageMap" parameterType="java.lang.Integer">
+	    SELECT <include refid="columns"/>
+	    <![CDATA[
+	        FROM t_im_ChatMessage where jtFile_Size = #{jtFileSize}
+	    ]]>
+    </select>
+    
+    <select id="getByJtFileModuleType" resultMap="imChatmessageMap" parameterType="java.lang.Integer">
+	    SELECT <include refid="columns"/>
+	    <![CDATA[
+	        FROM t_im_ChatMessage where jtFile_Module_Type = #{jtFileModuleType}
+	    ]]>
+    </select>
+    
+    <select id="getByJtFileTaskId" resultMap="imChatmessageMap" parameterType="java.lang.String">
+	    SELECT <include refid="columns"/>
+	    <![CDATA[
+	        FROM t_im_ChatMessage where jtFile_Task_Id = #{jtFileTaskId}
+	    ]]>
+    </select>
+    
+    <select id="getByJtFileReserved1" resultMap="imChatmessageMap" parameterType="java.lang.String">
+	    SELECT <include refid="columns"/>
+	    <![CDATA[
+	        FROM t_im_ChatMessage where jtFile_Reserved1 = #{jtFileReserved1}
+	    ]]>
+    </select>
+    
+    <select id="getByJtFileReserved2" resultMap="imChatmessageMap" parameterType="java.lang.String">
+	    SELECT <include refid="columns"/>
+	    <![CDATA[
+	        FROM t_im_ChatMessage where jtFile_Reserved2 = #{jtFileReserved2}
+	    ]]>
+    </select>
+    
+    <select id="getByJtFileReserved3" resultMap="imChatmessageMap" parameterType="java.lang.String">
+	    SELECT <include refid="columns"/>
+	    <![CDATA[
+	        FROM t_im_ChatMessage where jtFile_Reserved3 = #{jtFileReserved3}
+	    ]]>
+    </select>
+    
+    <select id="getBySequence" resultMap="imChatmessageMap" parameterType="java.lang.Integer">
+	    SELECT <include refid="columns"/>
+	    <![CDATA[
+	        FROM t_im_ChatMessage where sequence = #{sequence}
+	    ]]>
+    </select>
+    
+	
+</mapper>
+

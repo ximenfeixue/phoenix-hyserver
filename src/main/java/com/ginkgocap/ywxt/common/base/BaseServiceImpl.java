@@ -1,6 +1,7 @@
 package com.ginkgocap.ywxt.common.base;
 
 import java.io.Serializable;
+import java.util.Date;
 
 import org.springframework.stereotype.Controller;
 
@@ -13,7 +14,6 @@ import com.ginkgocap.ywxt.utils.Utils;
  *
  */
 public class BaseServiceImpl<T, PK extends Serializable> {
-	
 //	============
 	
 	 /**
@@ -23,5 +23,9 @@ public class BaseServiceImpl<T, PK extends Serializable> {
      */
 	public static boolean isNullOrEmpty(Object obj){
         return Utils.isNullOrEmpty(obj);
+    }
+
+    protected Date getLiveEndTime(final Date liveStartTime, final long liveDuration) {
+	    return new Date(liveStartTime.getTime() + liveDuration);
     }
 }

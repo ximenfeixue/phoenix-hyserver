@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+"http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+<mapper namespace="MeetingTemplate">
+
+	<resultMap id="meetingTemplateMap" type="com.ginkgocap.ywxt.model.meeting.MeetingTemplate">
+		<result property="id" column="id" />
+		<result property="templateName" column="template_name" />
+		<result property="userId" column="user_id" />
+		<result property="modules" column="modules" />
+		<result property="isDelete" column="is_delete" />
+		<result property="createTime" column="create_time" />
+		<result property="updateTime" column="update_time" />
+	</resultMap>
+	
+	<sql id="columns">
+		<![CDATA[
+			id AS id,template_name AS templateName,user_id AS userId,modules,create_time AS createTime,update_time AS updateTime
+		]]>
+	</sql>
+
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id">
+	<![CDATA[
+		INSERT INTO tb_meeting_template (
+			id,
+			template_name,
+			user_id,
+			modules,
+			create_time,
+			update_time
+        ) VALUES (
+			#{id},
+			#{templateName},
+			#{userId},
+			#{modules },
+			NOW(),
+			NOW()
+		)
+	]]>
+	</insert>
+
+	<update id="update">
+	<![CDATA[
+		UPDATE tb_meeting_template SET
+			template_name = #{templateName},
+			user_id = #{userId},
+			modules = #{modules},
+			update_time = NOW()
+		WHERE 
+			id = #{id} 
+	]]>
+	</update>
+
+	<update id="delete">
+	<![CDATA[
+		UPDATE tb_meeting_template
+		SET is_delete = 1,
+			update_time = NOW()
+		WHERE id = #{id} 
+	]]>
+	</update>
+	
+	<update id="deleteByUserId">
+	<![CDATA[
+		UPDATE tb_meeting_template
+		SET is_delete = 1,
+			update_time = NOW()
+		WHERE user_id = #{userId} 
+	]]>
+	</update>
+	
+	<select id="getById" resultType="meetingTemplate" parameterType="java.lang.Long">
+		SELECT <include refid="columns" />
+		<![CDATA[
+			FROM tb_meeting_template 
+			WHERE id = #{id}
+				AND is_delete = 0
+		]]>
+	</select>
+	
+	<select id="getByUserId" resultType="meetingTemplate" parameterType="java.lang.Long">
+		SELECT <include refid="columns" />
+		<![CDATA[
+			FROM tb_meeting_template 
+			WHERE user_id = #{userId}
+				AND is_delete = 0
+		]]>
+	</select>
+</mapper>

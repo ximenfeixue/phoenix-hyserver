@@ -17,10 +17,9 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
 import org.openqa.selenium.By;
 
-public class MeetingQuery implements Serializable {
+public class MeetingQuery extends Live implements Serializable {
     private static final long serialVersionUID = 3148176768559230877L;
-	/** 会议序号 */
-	private Long id;
+
 	/** 会议名称 */
 	private String meetingName;
 	/** 会议地点 */
@@ -136,14 +135,6 @@ public class MeetingQuery implements Serializable {
 	// 签到提醒时间 （0 —— 120）
 	private Integer signReminderTime;
 
-	public Long getId() {
-		return this.id;
-	}
-	
-	public void setId(Long value) {
-		this.id = value;
-	}
-	
 	public String getMeetingName() {
 		return this.meetingName;
 	}

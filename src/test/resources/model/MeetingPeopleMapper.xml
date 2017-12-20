@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+"http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+<mapper namespace="MeetingPeople">
+
+	<resultMap id="meetingPeopleMap" type="com.ginkgocap.ywxt.model.meeting.MeetingPeople">
+        <result property="id" column="id"/>
+        <result property="meetingId" column="meeting_id"/>
+        <result property="peopleId" column="people_id"/>
+        <result property="peopleName" column="people_name"/>
+        <result property="peoplePhoto" column="people_photo"/>
+        <result property="peopleDesc" column="people_desc"/>
+        <result property="isShare" column="is_share"/>
+        <result property="peopleType" column="people_type"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="relation" column="relation"/>
+	</resultMap>
+	
+	<sql id="columns">
+	    <![CDATA[
+		id,meeting_id AS meetingId,people_id AS peopleId,people_name AS peopleName,people_photo AS peoplePhoto,
+		people_desc AS peopleDesc,is_share AS isShare,people_type AS peopleType,create_time AS createTime,update_time AS updateTime,
+		relation
+	    ]]>
+	</sql>
+
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id">
+    <![CDATA[
+        INSERT INTO tb_meeting_people (
+        	id,
+        	meeting_id,
+        	people_id,
+        	people_name,
+        	people_photo,
+        	people_desc,
+        	is_share,
+        	people_type,
+        	create_time,
+        	update_time,
+        	relation
+        ) VALUES (
+        	#{id},
+        	#{meetingId},
+        	#{peopleId},
+        	#{peopleName},
+        	#{peoplePhoto},
+        	#{peopleDesc},
+        	#{isShare},
+        	#{peopleType},
+        	NOW(),
+        	NOW(),
+        	#{relation}
+        )
+    ]]>
+	</insert>
+    
+	<update id="update" >
+    <![CDATA[
+        UPDATE tb_meeting_people SET
+	        meeting_id = #{meetingId},
+	        people_id = #{peopleId},
+	        people_name = #{peopleName},
+	        people_photo = #{peoplePhoto},
+	        people_desc = #{peopleDesc},
+	        is_share = #{isShare},
+	        people_type = #{peopleType},
+	        update_time = NOW(),
+	        relation = #{relation}
+        WHERE 
+	        id = #{id} 
+    ]]>
+	</update>
+
+    <delete id="delete">
+    <![CDATA[
+        DELETE FROM tb_meeting_people 
+        WHERE id = #{id} 
+    ]]>
+    </delete> 
+    
+    <delete id="deleteByMeetingId">
+    <![CDATA[
+        DELETE FROM tb_meeting_people 
+        WHERE meeting_id = #{meetingId}
+    ]]>
+    
+    </delete>
+    
+    <select id="getById" resultType="meetingPeople">
+		SELECT <include refid="columns" />
+	    <![CDATA[
+		    FROM tb_meeting_people 
+	        WHERE id = #{id} 
+	    ]]>
+	</select>
+
+    <select id="getByMeetingId" resultType="meetingPeople" parameterType="java.lang.Long">
+	    SELECT <include refid="columns"/>
+	    <![CDATA[
+	        FROM tb_meeting_people 
+			WHERE meeting_id = #{meetingId}
+	    ]]>
+    </select>
+    
+    <select id="getByMeetingIdList" resultType="meetingPeople" parameterType="java.util.List">
+	    SELECT <include refid="columns"/>
+	    FROM tb_meeting_people 
+		WHERE meeting_id IN
+	    <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+    </select>
+    
+    <select id="getByPeopleId" resultType="meetingPeople" parameterType="java.lang.Long">
+	    SELECT <include refid="columns"/>
+	    <![CDATA[
+	        FROM tb_meeting_people 
+			WHERE people_id = #{peopleId}
+	    ]]>
+    </select>
+    
+    <select id="getByPeopleName" resultType="meetingPeople" parameterType="java.lang.String">
+	    SELECT <include refid="columns"/>
+	    <![CDATA[
+	        FROM tb_meeting_people 
+			WHERE people_name = #{peopleName}
+	    ]]>
+    </select>
+     
+    <select id="getMeetingPeople" resultType="meetingPeopleQuery" parameterType="java.util.Map">
+		<![CDATA[ 
+		SELECT p.id,
+			p.meeting_id AS meetingId,
+			p.people_id AS peopleId,
+			p.people_name AS peopleName,
+	    	p.people_photo AS peoplePhoto,
+	    	p.people_desc AS peopleDesc,
+	    	p.is_share AS isShare,
+	    	m.meeting_name AS meetingName,
+	    	m.meeting_people AS meetingPeople
+		FROM tb_meeting_people p,
+			tb_meeting m,tb_meeting_member mm 
+		WHERE mm.meeting_Id = m.id 
+			AND mm.member_id = #{memberId} 
+			AND p.meeting_id = m.id 
+			AND m.start_time >= #{beginDate} 
+	        AND m.start_time < #{endDate} 
+		ORDER BY m.start_time
+		]]>
+    </select>
+    
+    <select id="getByPeoplePhoto" resultType="meetingPeople" parameterType="java.lang.String">
+	    SELECT <include refid="columns"/>
+	    <![CDATA[
+	        FROM tb_meeting_people 
+			WHERE people_photo = #{peoplePhoto}
+	    ]]>
+    </select>
+    
+    <select id="getByPeopleDesc" resultType="meetingPeople" parameterType="java.lang.String">
+	    SELECT <include refid="columns"/>
+	    <![CDATA[
+	        FROM tb_meeting_people 
+			WHERE people_desc = #{peopleDesc}
+	    ]]>
+    </select>
+    
+    <select id="getByIsShare" resultType="meetingPeople" parameterType="java.lang.Boolean">
+	    SELECT <include refid="columns"/>
+	    <![CDATA[
+	        FROM tb_meeting_people 
+			WHERE is_share = #{isShare}
+	    ]]>
+    </select>
+</mapper>

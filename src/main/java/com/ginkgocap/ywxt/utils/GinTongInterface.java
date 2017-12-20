@@ -120,8 +120,9 @@ public class GinTongInterface {
 			ConnectionsMini connectionsMini = new ConnectionsMini();
 			connectionsMini.setListUserID(userIds);
 			for (int i = userIds.size() - 1; i >= 0; i--) {
-				if (userIds.get(i) == 0)
+				if (userIds.get(i) == 0) {
 					userIds.remove(i);
+				}
 			}
 			json = new Gson().toJson(connectionsMini);
 			url = resource.getString("url");
@@ -158,8 +159,9 @@ public class GinTongInterface {
 			MeetingMemberPush updateMeetingPush = new MeetingMemberPush();
 			updateMeetingPush.setContent(content);
 			updateMeetingPush.setMeetingId(Integer.valueOf(meetingId));
-			if (!Utils.isNullOrEmpty(user))
+			if (!Utils.isNullOrEmpty(user)) {
 				updateMeetingPush.setUser(user);
+			}
 			updateMeetingPush.setHaveCreate(true);
 			updateMeetingPush.setDate(date);
 			json = new Gson().toJson(updateMeetingPush);
@@ -426,6 +428,7 @@ public class GinTongInterface {
 			UserBean userBean = new UserBean();
 			userBean.setId(property.getUserId());
 			String responseJson = HttpClientUtil.getGintongPost(url, interfaceName, "{}", userBean);
+
 			JsonNode jsonNode = null;
 			try {
 				jsonNode = objectMap.readTree(responseJson);

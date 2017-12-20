@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+        "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+<!-- 不使用namespace的话sql搜索定位会比较方便 -->
+<mapper namespace="MeetingDetail">
+    <resultMap id="meetingDetailMap" type="com.ginkgocap.ywxt.model.meeting.MeetingDetail">
+        <result property="id" column="id"/>
+        <result property="meetingId" column="meeting_id"/>
+        <result property="meetingDetailTitle" column="meeting_detail_title"/>
+        <result property="meetingDetail" column="meeting_detail"/>
+        <result property="sequence" column="sequence"/>
+    </resultMap>
+
+    <!-- 用于select查询公用抽取的列 -->
+    <sql id="columns">
+        <![CDATA[
+		id as id,meeting_id as meetingId,meeting_detail_title as meetingDetailTitle,
+		meeting_detail as meetingDetail,sequence AS sequence
+	    ]]>
+    </sql>
+
+    <!-- useGeneratedKeys="true" keyProperty="xxx" for sqlserver and mysql -->
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        <![CDATA[
+        INSERT INTO tb_meeting_detail (
+        	id,
+        	meeting_id,
+        	meeting_detail_title,
+        	meeting_detail,
+        	sequence
+        ) VALUES (
+        	#{id},
+        	#{meetingId},
+        	#{meetingDetailTitle},
+        	#{meetingDetail},
+        	#{sequence}
+        )
+    ]]>
+    </insert>
+
+    <update id="update" >
+        <![CDATA[
+        UPDATE tb_meeting_detail SET
+	        meeting_id = #{meetingId},
+	        meeting_detail_title = #{meetingDetailTitle},
+	        meeting_detail = #{meetingDetail},
+	        sequence = #{sequence}
+        WHERE
+	        id = #{id}
+        ]]>
+    </update>
+
+    <delete id="deleteByMeetingId" parameterType="java.util.Map">
+        <![CDATA[
+        DELETE FROM tb_meeting_detail WHERE
+        meeting_id = #{meetingId}
+        ]]>
+    </delete>
+
+    <delete id="delete">
+        <![CDATA[
+        DELETE FROM tb_meeting_detail WHERE
+        id = #{id}
+        ]]>
+    </delete>
+
+    <delete id="deleteByMeetingIdAndNotDetailIdList">
+        DELETE FROM tb_meeting_detail WHERE meeting_id = #{meetingId} AND id NOT IN
+        <foreach collection="list" index="index" item="item" open="(" separator="," close=")">
+          #{item}
+        </foreach>
+    </delete>
+
+    <select id="getByMeetingId" resultMap="meetingDetailMap" parameterType="java.lang.Long">
+        SELECT <include refid="columns"/>
+        <![CDATA[
+	        FROM tb_meeting_detail where meeting_id = #{meetingId}
+	    ]]>
+    </select>
+
+</mapper>
