@@ -67,7 +67,7 @@ public class MeetingLiveUseRecordDaoImpl extends SqlSessionDaoSupport implements
      * @return
      */
     @Override
-    public List<MeetingLiveUseRecord> getByMeetingId(Long meetingId) {
+    public List<MeetingLiveUseRecord> getByMeetingId(final long meetingId) {
         return getSqlSession().selectList("MeetingLiveUseRecord.getByMeetingId", meetingId);
     }
 
@@ -78,7 +78,7 @@ public class MeetingLiveUseRecordDaoImpl extends SqlSessionDaoSupport implements
      * @return
      */
     @Override
-    public List<MeetingLiveUseRecord> getByChannelId(String channelId) {
+    public List<MeetingLiveUseRecord> getByChannelId(final String channelId) {
         return getSqlSession().selectList("MeetingLiveUseRecord.getByChannelId", channelId);
     }
 

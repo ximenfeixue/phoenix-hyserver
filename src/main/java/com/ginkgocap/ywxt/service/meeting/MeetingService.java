@@ -14,6 +14,7 @@ import java.util.Map;
 import com.ginkgocap.parasol.file.exception.FileIndexServiceException;
 import com.ginkgocap.ywxt.model.meeting.Meeting;
 import com.ginkgocap.ywxt.model.meeting.MeetingLiveCreateRecord;
+import com.ginkgocap.ywxt.model.meeting.MeetingLiveUseRecord;
 import com.ginkgocap.ywxt.model.meeting.MeetingVo;
 import com.ginkgocap.ywxt.user.model.User;
 import com.ginkgocap.ywxt.vo.query.meeting.*;
@@ -452,4 +453,11 @@ public interface MeetingService {
 	 * @return
 	 */
 	Meeting getByLiveChannelId(final String liveChannelId);
+
+	/**
+	 * getMeetingLiveUseRecordByMeetingId
+	 * @param meetingId
+	 * @return
+	 */
+	List<MeetingLiveUseRecord> getMeetingLiveUseRecordByMeetingId(final long meetingId);
 }

@@ -24,7 +24,7 @@ public interface MeetingLiveUseRecordDao {
      * @param meetingId
      * @return
      */
-    List<MeetingLiveUseRecord> getByMeetingId(final Long meetingId);
+    List<MeetingLiveUseRecord> getByMeetingId(final long meetingId);
 
     /**
      * getByChannelId

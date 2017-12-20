@@ -120,6 +120,8 @@ public class MeetingServiceImpl extends BaseServiceImpl<Meeting, Long> implement
 	private MeetingNotifyService meetingNotifyService;
 	@Autowired
 	private MeetingLiveCreateRecordDao meetingLiveCreateRecordDao;
+	@Autowired
+	private MeetingLiveUseRecordDao meetingLiveUseRecordDao;
 
 	@Value("${nginx.root}")
 	private String nginxRoot;
@@ -2621,6 +2623,17 @@ public class MeetingServiceImpl extends BaseServiceImpl<Meeting, Long> implement
 	@Transactional(readOnly = true)
 	public Meeting getByLiveChannelId(String liveChannelId) {
 		return meetingDao.getByLiveChannelId(liveChannelId);
+	}
+
+	/**
+	 * getMeetingLiveUseRecordByMeetingId
+	 *
+	 * @param meetingId
+	 * @return
+	 */
+	@Override
+	public List<MeetingLiveUseRecord> getMeetingLiveUseRecordByMeetingId(final long meetingId) {
+		return meetingLiveUseRecordDao.getByMeetingId(meetingId);
 	}
 
 	@Override
