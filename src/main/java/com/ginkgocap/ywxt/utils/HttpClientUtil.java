@@ -47,7 +47,7 @@ public class HttpClientUtil {
 		StringEntity input = null;
 		try {
 			input = new StringEntity(json, "utf-8");
-		} catch (UnsupportedEncodingException e) {
+		} catch (Exception e) {
 			e.printStackTrace(); // To change body of catch statement use File |
 									// Settings | File Templates.
 		}
@@ -139,7 +139,7 @@ public class HttpClientUtil {
 		try {
 			input = new StringEntity(json, ContentType.create("application/json", "UTF-8"));
 			input.setContentEncoding("UTF-8");
-		} catch (UnsupportedEncodingException e) {
+		} catch (Exception e) {
 			e.printStackTrace(); // To change body of catch statement use File |
 									// Settings | File Templates.
 		}

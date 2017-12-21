@@ -14,7 +14,7 @@ import com.ginkgocap.ywxt.utils.ThreadPoolUtils;
 import com.ginkgocap.ywxt.utils.type.NoticeType;
 import com.ginkgocap.ywxt.vo.query.meeting.MeetingFreeChat;
 import com.ginkgocap.ywxt.vo.query.meeting.MeetingQuery;
-import com.gintong.frame.cache.redis.RedisClient;
+import com.gintong.frame.cache.redis.RedisCacheService;
 import org.apache.commons.collections.CollectionUtils;
 import org.h2.util.StringUtils;
 import org.slf4j.Logger;
@@ -64,22 +64,21 @@ public class DataSyncTask implements Runnable{
     private MeetingMemberService meetingMemberService;
 
     @Autowired
-    private RedisClient redisClient;
+    private RedisCacheService redisCacheService;
 
     private static final String meetingFreeChatKey = "meeting_free_chat_";
 
     @Override
     public void run() {
         List<PayOrder> payOrderList = null;
-        String id = "";
-        while (true) {
-            try {
+        try {
+            while(true) {
                 logger.info("task 循环日志。");
                 DataSync dataSync = dataSyncQueue.take();
                 if (dataSync != null) {
                     boolean result = false;
                     Object data = dataSync.getData();
-                    id = dataSync.getId();
+                    String id = dataSync.getId();
                     if (data != null) {
                         if (data instanceof MeetingFreeChat) {
                             final MeetingFreeChat meetingFreeChat = (MeetingFreeChat) data;
@@ -235,15 +234,16 @@ public class DataSyncTask implements Runnable{
             Long currentTime = System.currentTimeMillis();
             Long timeout = 1 * 60 * 1000l + currentTime;
             Long expireTime = 10 * 60 * 1000l + currentTime;
-            lock = redisClient.setnx(meetingFreeChatKey + id, timeout);
+            lock = redisCacheService.setnxRedisCacheByKey(meetingFreeChatKey + id, timeout);
             // 获取锁的过期时间
-            lockTimeout = (Long) redisClient.getObjectByKey(meetingFreeChatKey + id);
+            lockTimeout = (Long) redisCacheService.getRedisCacheByKey(meetingFreeChatKey + id);
             // 获取之前锁的过期时间 并设置最新锁的过期时间
-            Long oldTimeout = (Long) redisClient.getSet(meetingFreeChatKey + id, timeout);
+            Long oldTimeout = (Long) redisCacheService.getSetRedisCacheByKey(meetingFreeChatKey + id, timeout);
+
             // 若直接加锁成功 或 该锁过期时，第一次重新设置过期时间接替锁的持有者
             if (lock == 1 || (currentTime > lockTimeout && currentTime > oldTimeout)) {
                 // 对 key 设置过期时间
-                redisClient.expireAt(meetingFreeChatKey + id, expireTime);
+                redisCacheService.expireAtRedisCacheByKey(meetingFreeChatKey + id, expireTime);
                 break;
             } else {
                 try {
@@ -262,13 +262,11 @@ public class DataSyncTask implements Runnable{
      */
     public void unLock(String id) {
 
-        if (!StringUtils.isNullOrEmpty(id)) {
-            Long currentTime = System.currentTimeMillis();
-            Long timeout = (Long) redisClient.getObjectByKey(meetingFreeChatKey + id);
-            // 当前锁还未过期 则直接删除 key
-            if (currentTime < timeout)
-                redisClient.del(meetingFreeChatKey + id);
-        }
+        Long currentTime = System.currentTimeMillis();
+        Long timeout = (Long) redisCacheService.getRedisCacheByKey(meetingFreeChatKey + id);
+        // 当前锁还未过期 则直接删除 key
+        if (currentTime < timeout)
+            redisCacheService.deleteRedisCacheByKey(meetingFreeChatKey + id);
     }
 
     public boolean batchSaveDataNeedSync(List<DataSync> dataList) {
