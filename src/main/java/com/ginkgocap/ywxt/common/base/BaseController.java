@@ -252,4 +252,10 @@ public abstract class BaseController {
 			return null;
 		}
 	}
+
+	public static boolean isWeb(HttpServletRequest request)
+	{
+		String s = request.getHeader("s");
+		return "web".equals(s);
+	}
 }
