@@ -5,6 +5,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.*;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.ginkgocap.ywxt.util.JsonUtil;
 import com.gintong.ywxt.im.model.ChatMessage;
 import com.gintong.ywxt.im.model.ImRecord;
@@ -419,7 +420,7 @@ public class GinTongInterface {
 
 	public static Map<Integer,List<Social>> getListIMRecordMap(SocialListReq property) {
 
-		ObjectMapper objectMap = new ObjectMapper();
+		ObjectMapper objectMapper = new ObjectMapper();
 		String url = resource.getString("imUrl");
 		String interfaceName = "/mobile/im/getListIMRecordMap";
 		try {
@@ -428,7 +429,8 @@ public class GinTongInterface {
 			String responseJson = HttpClientUtil.getGintongPost(url, interfaceName, "{}", userBean);
 			JsonNode jsonNode = null;
 			try {
-				jsonNode = objectMap.readTree(responseJson);
+				objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+				jsonNode = objectMapper.readTree(responseJson);
 			} catch (Exception ex) {
 				logger.error("parser json failed. error: " + ex.getMessage());
 				logger.error("responseJson content: " + responseJson);
