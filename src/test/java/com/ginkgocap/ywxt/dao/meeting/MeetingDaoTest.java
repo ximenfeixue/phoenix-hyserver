@@ -26,9 +26,9 @@ public class MeetingDaoTest extends BaseTest{
         Meeting meeting = new Meeting();
         //live.setId(3913L);
         meeting.setLive(1);
-        meeting.setLiveRoomNum("110");
+       // meeting.setLiveRoomNum("110");
         meeting.setLiveStartTime(new Date());
-        meeting.setLiveEndTime(new Date(System.currentTimeMillis() +  ONE_HOUR));
+       // meeting.setLiveEndTime(new Date(System.currentTimeMillis() +  ONE_HOUR));
         meetingDao.save(meeting);
     }
 
@@ -37,9 +37,9 @@ public class MeetingDaoTest extends BaseTest{
         Live live = new Live();
         live.setId(3913L);
         live.setLive(1);
-        live.setLiveRoomNum("110");
+        //live.setLiveRoomNum("110");
         live.setLiveStartTime(new Date());
-        live.setLiveEndTime(new Date(System.currentTimeMillis() +  ONE_HOUR));
+       // live.setLiveEndTime(new Date(System.currentTimeMillis() +  ONE_HOUR));
         meetingDao.updateLive(live);
     }
 
@@ -50,7 +50,7 @@ public class MeetingDaoTest extends BaseTest{
 
     @Test
     public void updateLiveEndTime() throws Exception {
-        meetingDao.updateLiveEndTime(3912L, new Date(System.currentTimeMillis() + ONE_HOUR));
+       // meetingDao.updateLiveEndTime(3912L, new Date(System.currentTimeMillis() + ONE_HOUR));
     }
 
 }
