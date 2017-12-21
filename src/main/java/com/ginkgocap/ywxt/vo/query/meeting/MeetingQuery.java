@@ -138,6 +138,15 @@ public class MeetingQuery implements Serializable {
 
 	private Integer live;
 
+	/**
+	 * 直播房间id
+	 */
+	private String liveChannelId;
+	/**
+	 * 直播聊天室id
+	 */
+	private Long liveRoomId;
+
 	public String getMeetingName() {
 		return this.meetingName;
 	}
@@ -687,5 +696,21 @@ public class MeetingQuery implements Serializable {
 
 	public void setLive(Integer live) {
 		this.live = live;
+	}
+
+	public Long getLiveRoomId() {
+		return liveRoomId;
+	}
+
+	public void setLiveRoomId(Long liveRoomId) {
+		this.liveRoomId = liveRoomId;
+	}
+
+	public String getLiveChannelId() {
+		return liveChannelId;
+	}
+
+	public void setLiveChannelId(String liveChannelId) {
+		this.liveChannelId = liveChannelId;
 	}
 }
