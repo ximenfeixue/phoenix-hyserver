@@ -337,9 +337,7 @@ public class GinTongInterface {
 			UserBean userBean = new UserBean();
 			userBean.setId(ownerId);
 			String responseJson = HttpClientUtil.getGintongPost(url, interfaceName, json, userBean);
-			objectMap.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-			JsonNode jsonNode = objectMap.readTree(responseJson);
-
+			JsonNode jsonNode = JsonReadUtil.getJsonNode(responseJson);
 			logger.info("resp freechat.createMUC =>" + objectMap.writeValueAsString(jsonNode));
 			if ("0000".equals(jsonNode.get("notification").get("notifCode").asText())) {
 				groupId = jsonNode.get("responseData").get("mucDetail").get("imGroupId").asText();
@@ -358,15 +356,13 @@ public class GinTongInterface {
 	public static List<Social> getListIMRecord(SocialListReq property) {
 		List<Social> listSocial = new ArrayList<Social>();
 
-		ObjectMapper objectMap = new ObjectMapper();
 		String url = resource.getString("imUrl");
 		String interfaceName = "/mobile/im/getListIMRecord.action";
 		try {
 			UserBean userBean = new UserBean();
 			userBean.setId(property.getUserId());
 			String responseJson = HttpClientUtil.getGintongPost(url, interfaceName, "{}", userBean);
-			objectMap.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-			JsonNode jsonNode = objectMap.readTree(responseJson);
+			JsonNode jsonNode = JsonReadUtil.getJsonNode(responseJson);
 
 			if ("0000".equals(jsonNode.get("notification").get("notifCode").asText())) {
 				JsonNode listIMRecordNode = jsonNode.get("responseData").get("page").get("listIMRecord");
@@ -573,15 +569,13 @@ public class GinTongInterface {
 	public static List<Social> getListMeetingRecord(Long userId) {
 		List<Social> listSocial = new ArrayList<Social>();
 
-		ObjectMapper objectMap = new ObjectMapper();
 		String url = resource.getString("imUrl");
 		String interfaceName = "/mobile/im/getListMeetingRecord.action";
 		try {
 			UserBean userBean = new UserBean();
 			userBean.setId(userId);
 			String responseJson = HttpClientUtil.getGintongPost(url, interfaceName, "{}", userBean);
-			objectMap.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-			JsonNode jsonNode = objectMap.readTree(responseJson);
+			JsonNode jsonNode = JsonReadUtil.getJsonNode(responseJson);
 
 			if ("0000".equals(jsonNode.get("notification").get("notifCode").asText())) {
 				JsonNode listIMRecordNode = jsonNode.get("responseData").get("page").get("listIMRecord");
@@ -675,8 +669,7 @@ public class GinTongInterface {
 			String jsonbody = objectMap.writeValueAsString(objectNode);
 
 			String responseJson = HttpClientUtil.getGintongPost(url, interfaceName, jsonbody, userBean);
-			objectMap.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-			JsonNode jsonNode = objectMap.readTree(responseJson);
+			JsonNode jsonNode = JsonReadUtil.getJsonNode(responseJson);
 
 			logger.info("resp freechat.invite2MUC =>" + objectMap.writeValueAsString(jsonNode));
 			if ("0000".equals(jsonNode.get("notification").get("notifCode").asText())) {
@@ -702,9 +695,7 @@ public class GinTongInterface {
 			String jsonbody = objectMap.writeValueAsString(objectNode);
 
 			String responseJson = HttpClientUtil.getGintongPost(url, interfaceName, jsonbody, userBean);
-			objectMap.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-			JsonNode jsonNode = objectMap.readTree(responseJson);
-
+			JsonNode jsonNode = JsonReadUtil.getJsonNode(responseJson);
 			logger.info("resp freechat.exitFromMUC =>" + objectMap.writeValueAsString(jsonNode));
 			if ("0000".equals(jsonNode.get("notification").get("notifCode").asText())) {
 				logger.info(targetUserId + "离开畅聊" + groupId + "成功!");
@@ -763,8 +754,7 @@ public class GinTongInterface {
 			String jsonbody = objectMap.writeValueAsString(objectNode);
 
 			String responseJson = HttpClientUtil.getGintongPost(url, interfaceName, jsonbody, userBean);
-			objectMap.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-			JsonNode jsonNode = objectMap.readTree(responseJson);
+			JsonNode jsonNode = JsonReadUtil.getJsonNode(responseJson);
 
 			logger.info("resp freechat.updateMuc =>" + objectMap.writeValueAsString(jsonNode));
 			if ("0000".equals(jsonNode.get("notification").get("notifCode").asText())) {

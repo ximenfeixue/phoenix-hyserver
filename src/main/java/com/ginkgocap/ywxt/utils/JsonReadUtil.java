@@ -42,6 +42,7 @@ public class JsonReadUtil {
 
 		try {
 			ObjectMapper objectMapper = new ObjectMapper();
+			objectMapper.configure(JsonParser.Feature.AUTO_CLOSE_SOURCE, true);
 			objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 			return objectMapper.readTree(content);
 		} catch (Exception ex) {
