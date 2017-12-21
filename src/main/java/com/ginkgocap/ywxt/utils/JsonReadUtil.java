@@ -1,6 +1,7 @@
 package com.ginkgocap.ywxt.utils;
 
 import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -40,8 +41,9 @@ public class JsonReadUtil {
 		}
 
 		try {
-			ObjectMapper objectMap = new ObjectMapper();
-			return objectMap.readTree(content);
+			ObjectMapper objectMapper = new ObjectMapper();
+			objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+			return objectMapper.readTree(content);
 		} catch (Exception ex) {
 			ex.printStackTrace();
 			logger.error("json content : " + content);
