@@ -148,7 +148,7 @@ public class MeetingNotifyService {
             if (notify != null) {
                 messageNotifyService.sendMessageNotify(notify);
             }
-        } catch (Exception ex) {
+        } catch (Throwable ex) {
             logger.error("send messageNotify failed. error: " + ex.getMessage());
         }
     }

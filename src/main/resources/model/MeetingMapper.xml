@@ -58,7 +58,7 @@ PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
 			update_time AS updateTime,group_id AS groupId,industry,is_delete AS isDelete,formated_desc AS formatedDesc,
 			create_user_type AS createUserType, top AS top, disable AS disable, is_pay AS isPay, pay_money AS payMoney,
 			send_flag AS sendFalg, review_flag as reviewFlag, sign_reminder_time AS signReminderTime, is_sign AS isSign,
-			is_live AS live, live_status AS liveStatus, live_channel_id AS liveChannelId, live_room_id AS liveRoomId
+			is_live AS live, live_status AS liveStatus, live_channel_id AS liveChannelId, live_room_id AS liveRoomId,
 			live_start_time AS liveStartTime, live_remain_duration AS liveRemainDuration
 		]]>
 	</sql>
