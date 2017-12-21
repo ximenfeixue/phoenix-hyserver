@@ -71,14 +71,15 @@ public class DataSyncTask implements Runnable{
     @Override
     public void run() {
         List<PayOrder> payOrderList = null;
-        try {
-            while(true) {
+        String id = "";
+        while (true) {
+            try {
                 logger.info("task 循环日志。");
                 DataSync dataSync = dataSyncQueue.take();
                 if (dataSync != null) {
                     boolean result = false;
                     Object data = dataSync.getData();
-                    String id = dataSync.getId();
+                    id = dataSync.getId();
                     if (data != null) {
                         if (data instanceof MeetingFreeChat) {
                             final MeetingFreeChat meetingFreeChat = (MeetingFreeChat) data;
@@ -108,17 +109,20 @@ public class DataSyncTask implements Runnable{
                     if (result) {
                         dataSyncService.deleteDataSync(id);
                     }
-                    // 释放锁
-                    unLock(id);
+
                 } else {
                     logger.info("data is null, so skip to send.");
                 }
+
+            } catch (InterruptedException ex) {
+                logger.error("queues thread interrupted. so exit this thread.");
+            } catch (Exception e) {
+                e.printStackTrace();
+                logger.error("update member status failed" + e.getMessage());
+            } finally {
+                // 释放锁
+                unLock(id);
             }
-        } catch (InterruptedException ex) {
-            logger.error("queues thread interrupted. so exit this thread.");
-        } catch (Exception e) {
-            e.printStackTrace();
-            logger.error("update member status failed" + e.getMessage());
         }
     }
 
@@ -258,11 +262,13 @@ public class DataSyncTask implements Runnable{
      */
     public void unLock(String id) {
 
-        Long currentTime = System.currentTimeMillis();
-        Long timeout = (Long) redisClient.getObjectByKey(meetingFreeChatKey + id);
-        // 当前锁还未过期 则直接删除 key
-        if (currentTime < timeout)
-            redisClient.del(meetingFreeChatKey + id);
+        if (!StringUtils.isNullOrEmpty(id)) {
+            Long currentTime = System.currentTimeMillis();
+            Long timeout = (Long) redisClient.getObjectByKey(meetingFreeChatKey + id);
+            // 当前锁还未过期 则直接删除 key
+            if (currentTime < timeout)
+                redisClient.del(meetingFreeChatKey + id);
+        }
     }
 
     public boolean batchSaveDataNeedSync(List<DataSync> dataList) {

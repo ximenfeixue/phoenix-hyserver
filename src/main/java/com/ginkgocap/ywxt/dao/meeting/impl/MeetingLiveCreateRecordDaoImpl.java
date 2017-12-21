@@ -71,6 +71,12 @@ public class MeetingLiveCreateRecordDaoImpl extends SqlSessionDaoSupport impleme
         if (MeetingLiveDurationTypeEnum.ONE_HOUR.getKey() == meetingLiveCreateRecord.getDurationType()) {
             duration += MeetingLiveDurationTypeEnum.ONE_HOUR.getValue();
         }
+        if (MeetingLiveDurationTypeEnum.TWENTY_MINUTES.getKey() == meetingLiveCreateRecord.getDurationType()) {
+            duration += MeetingLiveDurationTypeEnum.TWENTY_MINUTES.getValue();
+        }
+        if (MeetingLiveDurationTypeEnum.FORTY_MINUTES.getKey() == meetingLiveCreateRecord.getDurationType()) {
+            duration += MeetingLiveDurationTypeEnum.FORTY_MINUTES.getValue();
+        }
         meetingLiveCreateRecord.setRemainDuration(duration);
         int insert = getSqlSession().insert("MeetingLiveCreateRecord.insert", meetingLiveCreateRecord);
         if (insert > 0) {

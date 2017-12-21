@@ -18,6 +18,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.ginkgocap.parasol.file.service.FileIndexService;
+import com.ginkgocap.ywxt.constant.MeetingPayType;
 import com.ginkgocap.ywxt.model.meeting.*;
 import com.ginkgocap.ywxt.payment.model.PayOrder;
 import com.ginkgocap.ywxt.payment.model.request.PayRequest;
@@ -130,6 +131,8 @@ public class MeetingController extends BaseController {
 	private DataSyncTask dataSyncTask;
 	@Autowired
 	private CheckStatusService checkStatusService;
+	@Autowired
+	private MeetingLiveCreateRecordService meetingLiveCreateRecordService;
 
 	private static int  expiredTime = 60 * 60 * 24 * 7;
 	// 不需要审核状态
@@ -3165,9 +3168,9 @@ public class MeetingController extends BaseController {
 		MeetingPayQuery meetingPayQuery = GsonUtils.StringToObject(MeetingPayQuery.class, requestJson);
 		Long meetingId = meetingPayQuery.getMeetingId();
 		Integer type = meetingPayQuery.getType();
+		String openId = meetingPayQuery.getOpenId();
 		Integer web = meetingPayQuery.getWeb();
 		Byte sourceType = meetingPayQuery.getSourceType();
-		String openId = meetingPayQuery.getOpenId();
 		if (null == meetingId || null == type || null == web) {
 			return InterfaceResult.getInterfaceResultInstance(CommonResultCode.PARAMS_EXCEPTION);
 		}
@@ -3198,7 +3201,7 @@ public class MeetingController extends BaseController {
 		Long createId = meeting.getCreateId();
 		payMoney = payMoney.multiply(new BigDecimal(100));
 		// TODO : 上线 需要修改金额
-		PayRequest payRequest = createPayRequest(payMoney.intValue(), web.intValue(), type.intValue(), userId, meetingId, mobile, userName, createId, openId);
+		PayRequest payRequest = createPayRequest(payMoney.intValue(), web.intValue(), type.intValue(), userId, meetingId, mobile, userName, createId, openId, MeetingPayType.MEETING_PAY_TYPE.getValue());
 		PayResponse payResponse = null;
 		try {
 			payResponse = payService.request(payRequest);
@@ -3231,6 +3234,89 @@ public class MeetingController extends BaseController {
 			}
 		}
 		return InterfaceResult.getSuccessInterfaceResultInstance(payResponse);
+	}
+
+	/**
+	 * 活动直播支付
+	 * @param request
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/payLive", method = RequestMethod.POST)
+	public InterfaceResult payLive(HttpServletRequest request) {
+
+		User user = this.getUser(request);
+		long userId = user.getId();
+		String mobile = user.getMobile();
+		String userName = user.getName();
+		boolean isWeb = this.isWeb(request);
+		int web = 1; // 默认代表app支付
+		if (isWeb) {
+			web = 2; // 代表 web端支付
+		}
+		String requestJson = "";
+		try {
+			requestJson = this.getJsonParamStr(request);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		if (StringUtils.isBlank(requestJson)) {
+			return InterfaceResult.getInterfaceResultInstance(CommonResultCode.PARAMS_EXCEPTION);
+		}
+		MeetingPayQuery meetingPayQuery = GsonUtils.StringToObject(MeetingPayQuery.class, requestJson);
+		Long meetingId = meetingPayQuery.getMeetingId();
+		// 支付类型
+		Integer type = meetingPayQuery.getType();
+		String openId = meetingPayQuery.getOpenId();
+		Meeting meeting = meetingService.getById(meetingId);
+		if (null == meeting) {
+			return InterfaceResult.getInterfaceResultInstance(CommonResultCode.PARAMS_EXCEPTION, "当前活动不存在或已删除");
+		}
+		BigDecimal payMoney = meeting.getPayMoney();
+		Long createId = meeting.getCreateId();
+		payMoney = payMoney.multiply(new BigDecimal(100));
+		PayRequest payRequest = createPayRequest(payMoney.intValue(), web, type.intValue(), userId, meetingId, mobile, userName, createId, openId, MeetingPayType.MEETING_PAY_TYPE.getValue());
+		PayResponse payResponse = null;
+		try {
+			payResponse = payService.request(payRequest);
+		} catch (Exception e) {
+			logger.error("invoke payService failed! method : {request}");
+			return InterfaceResult.getInterfaceResultInstance(CommonResultCode.PARAMS_EXCEPTION, "支付模块挂掉了");
+		}
+		return InterfaceResult.getSuccessInterfaceResultInstance(payResponse);
+	}
+
+	/**
+	 * 支付成功后 保存直播记录
+	 * @param request
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/saveLiveRecord", method = RequestMethod.POST)
+	public InterfaceResult saveLiveRecord(HttpServletRequest request) {
+
+		User user = this.getUser(request);
+		String requestJson = "";
+		try {
+			requestJson = this.getJsonParamStr(request);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		if (StringUtils.isBlank(requestJson)) {
+			return InterfaceResult.getInterfaceResultInstance(CommonResultCode.PARAMS_EXCEPTION);
+		}
+		MeetingLiveCreateRecord meetingLiveCreateRecord = GsonUtils.StringToObject(MeetingLiveCreateRecord.class, requestJson);
+		// save record
+		MeetingLiveCreateRecord record = null;
+		try {
+			record = meetingLiveCreateRecordService.saveRecord(meetingLiveCreateRecord);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		if (record == null) {
+			return InterfaceResult.getInterfaceResultInstance(CommonResultCode.PARAMS_EXCEPTION, "保存记录失败");
+		}
+		return InterfaceResult.getSuccessInterfaceResultInstance(true);
 	}
 
 	private void saveMeetingMember(User user, long meetingId) throws Exception {
@@ -3286,16 +3372,23 @@ public class MeetingController extends BaseController {
 	}
 
 	public static PayRequest createPayRequest(int money, int web, int type, long userId, long sourceId,
-											  String mobile, String userName, long createId, String openId) {
+											  String mobile, String userName, long createId, String openId, final int meetingType) {
 
 		PayRequest payRequest = new PayRequest();
+		if (meetingType == MeetingPayType.MEETING_PAY_TYPE.getValue()) {
 		payRequest.setDetail("4"); // 活动："4"
+			payRequest.setOrderType(4); // 活动会议4
+			payRequest.setSourceType(4); // 4
+		}
+		if (meetingType == MeetingPayType.MEETING_LIVE_PAY_TYPE.getValue()) {
+			payRequest.setDetail("5"); // 活动直播："5"
+			payRequest.setOrderType(5); // 活动直播 5
+			payRequest.setSourceType(5); // 活动直播类型 5
+		}
 		payRequest.setExtra(""); // 传""
-		payRequest.setOrderType(4); // 活动会议4
 		payRequest.setPayAmount(money); // 充值金额,精确到分
 		payRequest.setPayType(type); // 1.微信 2.支付宝
 		payRequest.setSourceId(sourceId); // 活动或会议的Id
-		payRequest.setSourceType(4); // 4
 		payRequest.setSubject("Gintong"); //Gintong
 		payRequest.setTradeType(web); // 支付类型：1.app, 2.web
 		payRequest.setUserId(userId); // 发起人 userId

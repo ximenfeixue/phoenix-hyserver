@@ -38,7 +38,7 @@ public class MeetingLiveCreateRecord extends BaseEntity implements Serializable 
     private Integer createType;
 
     /**
-     * 开通/续费直播时长类型，1--30分钟，2--60分钟
+     * 开通/续费直播时长类型，1--20分钟，2--30分钟 3--40分钟 4--60分钟
      */
     private Integer durationType;
 
