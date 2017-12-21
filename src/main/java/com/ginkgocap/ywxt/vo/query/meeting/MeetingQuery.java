@@ -17,9 +17,10 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
 import org.openqa.selenium.By;
 
-public class MeetingQuery extends Live implements Serializable {
+public class MeetingQuery implements Serializable {
     private static final long serialVersionUID = 3148176768559230877L;
 
+    private Long id;
 	/** 会议名称 */
 	private String meetingName;
 	/** 会议地点 */
@@ -134,6 +135,8 @@ public class MeetingQuery extends Live implements Serializable {
 	private Byte reviewFlag;
 	// 签到提醒时间 （0 —— 120）
 	private Integer signReminderTime;
+
+	private Integer live;
 
 	public String getMeetingName() {
 		return this.meetingName;
@@ -668,5 +671,21 @@ public class MeetingQuery extends Live implements Serializable {
 
 	public void setPayStatus(Byte payStatus) {
 		this.payStatus = payStatus;
+	}
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public Integer getLive() {
+		return live;
+	}
+
+	public void setLive(Integer live) {
+		this.live = live;
 	}
 }
