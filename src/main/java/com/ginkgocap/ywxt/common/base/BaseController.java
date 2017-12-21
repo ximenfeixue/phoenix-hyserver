@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import net.sf.json.JSONObject;
@@ -244,6 +245,7 @@ public abstract class BaseController {
 		}
 		try {
 			ObjectMapper objectMapper = new ObjectMapper();
+			objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 			objectMapper.configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true);
 			return objectMapper.readValue(content, aClass);
 		}

@@ -5,6 +5,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.*;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.ginkgocap.ywxt.util.JsonUtil;
 import com.gintong.ywxt.im.model.ChatMessage;
 import com.gintong.ywxt.im.model.ImRecord;
@@ -336,6 +337,7 @@ public class GinTongInterface {
 			UserBean userBean = new UserBean();
 			userBean.setId(ownerId);
 			String responseJson = HttpClientUtil.getGintongPost(url, interfaceName, json, userBean);
+			objectMap.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 			JsonNode jsonNode = objectMap.readTree(responseJson);
 
 			logger.info("resp freechat.createMUC =>" + objectMap.writeValueAsString(jsonNode));
@@ -363,6 +365,7 @@ public class GinTongInterface {
 			UserBean userBean = new UserBean();
 			userBean.setId(property.getUserId());
 			String responseJson = HttpClientUtil.getGintongPost(url, interfaceName, "{}", userBean);
+			objectMap.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 			JsonNode jsonNode = objectMap.readTree(responseJson);
 
 			if ("0000".equals(jsonNode.get("notification").get("notifCode").asText())) {
@@ -577,6 +580,7 @@ public class GinTongInterface {
 			UserBean userBean = new UserBean();
 			userBean.setId(userId);
 			String responseJson = HttpClientUtil.getGintongPost(url, interfaceName, "{}", userBean);
+			objectMap.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 			JsonNode jsonNode = objectMap.readTree(responseJson);
 
 			if ("0000".equals(jsonNode.get("notification").get("notifCode").asText())) {
@@ -671,6 +675,7 @@ public class GinTongInterface {
 			String jsonbody = objectMap.writeValueAsString(objectNode);
 
 			String responseJson = HttpClientUtil.getGintongPost(url, interfaceName, jsonbody, userBean);
+			objectMap.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 			JsonNode jsonNode = objectMap.readTree(responseJson);
 
 			logger.info("resp freechat.invite2MUC =>" + objectMap.writeValueAsString(jsonNode));
@@ -697,6 +702,7 @@ public class GinTongInterface {
 			String jsonbody = objectMap.writeValueAsString(objectNode);
 
 			String responseJson = HttpClientUtil.getGintongPost(url, interfaceName, jsonbody, userBean);
+			objectMap.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 			JsonNode jsonNode = objectMap.readTree(responseJson);
 
 			logger.info("resp freechat.exitFromMUC =>" + objectMap.writeValueAsString(jsonNode));
@@ -757,6 +763,7 @@ public class GinTongInterface {
 			String jsonbody = objectMap.writeValueAsString(objectNode);
 
 			String responseJson = HttpClientUtil.getGintongPost(url, interfaceName, jsonbody, userBean);
+			objectMap.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 			JsonNode jsonNode = objectMap.readTree(responseJson);
 
 			logger.info("resp freechat.updateMuc =>" + objectMap.writeValueAsString(jsonNode));
