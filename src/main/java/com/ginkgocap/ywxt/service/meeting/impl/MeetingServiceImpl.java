@@ -369,16 +369,8 @@ public class MeetingServiceImpl extends BaseServiceImpl<Meeting, Long> implement
 			} else if (meeting.getStartTime().before(new Date()) && MeetingStatusType.DRAFT.code() != meeting.getMeetingStatus()) {
 				meeting.setMeetingStatus(MeetingStatusType.IN_MEETING.code());
 			}
-<<<<<<< HEAD
-			meeting.setLive(null == entity.getLive() ? 0 : entity.getLive());
-			if (1 == meeting.getLive()) {
-				meeting.setLiveStartTime(date);
-				meeting.setLiveEndTime(getLiveEndTime(meeting.getLiveStartTime(), DEFAULT_LIVE_DURATION));
-			}
-			Long meetingId = this.save(meeting);
-=======
 			final Long meetingId = this.save(meeting);
->>>>>>> origin/release
+
 
 			/**
 			 * 添加为了IOS获取到未读消息数

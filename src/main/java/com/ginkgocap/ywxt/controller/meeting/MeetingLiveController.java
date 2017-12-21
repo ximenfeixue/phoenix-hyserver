@@ -1,6 +1,7 @@
 package com.ginkgocap.ywxt.controller.meeting;
 
 import com.ginkgocap.ywxt.common.base.BaseController;
+import com.ginkgocap.ywxt.dto.LiveData;
 import com.ginkgocap.ywxt.model.meeting.Meeting;
 import com.ginkgocap.ywxt.model.meeting.MeetingLiveUseRecord;
 import com.ginkgocap.ywxt.service.meeting.MeetingService;
@@ -69,12 +70,16 @@ public class MeetingLiveController extends BaseController {
         return InterfaceResult.getInterfaceResultInstance(CommonResultCode.SYSTEM_EXCEPTION);
     }
 
-
     @ResponseBody
-    @RequestMapping(value = "/keepConnect", method = RequestMethod.GET)
-    public InterfaceResult keepConnect(@PathVariable Long meetingId) {
+    @RequestMapping(value = "/keepConnect", method = RequestMethod.POST)
+    public InterfaceResult keepConnect(@RequestBody LiveData liveData) {
+        try {
+            final Long meetingId = liveData.getMeetingId();
+            // TODO: 2017/12/21  
 
-
+        } catch (Exception ex) {
+            getLogger().error("keepConnect Exception : {}", ex.getMessage());
+        }
         return InterfaceResult.getInterfaceResultInstance(CommonResultCode.SYSTEM_EXCEPTION);
     }
 
