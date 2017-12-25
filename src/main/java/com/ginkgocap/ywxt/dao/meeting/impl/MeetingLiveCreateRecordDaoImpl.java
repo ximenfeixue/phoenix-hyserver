@@ -78,6 +78,7 @@ public class MeetingLiveCreateRecordDaoImpl extends SqlSessionDaoSupport impleme
             duration += MeetingLiveDurationTypeEnum.FORTY_MINUTES.getValue();
         }
         meetingLiveCreateRecord.setRemainDuration(duration);
+        meetingLiveCreateRecord.setGmtCreate(new Date());
         int insert = getSqlSession().insert("MeetingLiveCreateRecord.insert", meetingLiveCreateRecord);
         if (insert > 0) {
             if (MeetingLiveCreateTypeEnum.CREATE_LIVE.getKey() == meetingLiveCreateRecord.getCreateType()) {

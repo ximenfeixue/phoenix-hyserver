@@ -3302,12 +3302,34 @@ public class MeetingController extends BaseController {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		if (StringUtils.isBlank(requestJson)) {
+
+		if (StringUtils.isBlank(requestJson))
 			return InterfaceResult.getInterfaceResultInstance(CommonResultCode.PARAMS_EXCEPTION);
-		}
+
 		MeetingLiveCreateRecord meetingLiveCreateRecord = GsonUtils.StringToObject(MeetingLiveCreateRecord.class, requestJson);
+
+		if (meetingLiveCreateRecord == null)
+			return InterfaceResult.getInterfaceResultInstance(CommonResultCode.PARAMS_EXCEPTION);
+
 		// save record
 		MeetingLiveCreateRecord record = null;
+		// 获取订单号
+		Long payOrderId = meetingLiveCreateRecord.getPayOrderId();
+		if (payOrderId == null)
+			return InterfaceResult.getInterfaceResultInstance(CommonResultCode.PARAMS_EXCEPTION);
+
+		PayOrder payOrder = null;
+		try {
+			payOrder = payOrderService.getPayOrder(payOrderId.toString());
+		} catch (Exception e) {
+			logger.error("invoke payOrderService failure. method : getPayOrder.", e.getMessage());
+		}
+		if (payOrder == null) {
+			return InterfaceResult.getInterfaceResultInstance(CommonResultCode.PARAMS_EXCEPTION, "当前订单不存在");
+		}
+		int payAmount = payOrder.getPayAmount();
+		// 设置 支付金额
+		meetingLiveCreateRecord.setPayMoney(BigDecimal.valueOf(payAmount * 100));
 		try {
 			record = meetingLiveCreateRecordService.saveRecord(meetingLiveCreateRecord);
 		} catch (Exception e) {

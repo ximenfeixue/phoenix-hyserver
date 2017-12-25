@@ -13,6 +13,7 @@ PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
 		<result property="durationType" column="duration_type" />
 		<result property="remainDuration" column="remain_duration" />
 		<result property="payOrderId" column="pay_order_id" />
+		<result property="payMoney" column="pay_money"/>
 		<result property="gmtCreate" column="gmt_create" />
 		<result property="userCreate" column="user_create" />
 		<result property="remark" column="remark" />
@@ -23,7 +24,7 @@ PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
 		<![CDATA[
 			id AS id, meeting_id AS meetingId, channel_id AS channelId, room_id AS roomId,
 			create_type AS createType, duration_type AS durationType, remain_duration AS remainDuration,
-			pay_order_id AS payOrderId, gmt_create AS gmtCreate, user_create AS userCreate, remark AS remark
+			pay_order_id AS payOrderId, pay_money AS payMoney, gmt_create AS gmtCreate, user_create AS userCreate, remark AS remark
 		]]>
 	</sql>
 
@@ -38,6 +39,7 @@ PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
         	duration_type,
         	remain_duration,
         	pay_order_id,
+        	pay_money,
 			gmt_create,
 		    user_create,
 		    remark
@@ -50,6 +52,7 @@ PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
         	#{durationType},
         	#{remainDuration},
         	#{payOrderId},
+        	#{payMoney},
         	#{gmtCreate},
         	#{userCreate},
         	#{remark}
@@ -68,6 +71,7 @@ PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
 	        duration_type = #{durationType},
 	        remain_duration = #{remainDuration},
         	pay_order_id = #{payOrderId},
+        	pay_money = #{payMoney},
         	remark = #{remark}
         WHERE id = #{id}
     ]]>
@@ -99,7 +103,4 @@ PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
 			WHERE id = #{id}
 	    ]]>
 	</select>
-
-
-
 </mapper>

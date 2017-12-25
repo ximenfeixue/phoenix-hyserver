@@ -5,6 +5,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
 
 /**
@@ -51,6 +52,11 @@ public class MeetingLiveCreateRecord extends BaseEntity implements Serializable 
      * 支付订单
      */
     private Long payOrderId;
+
+    /**
+     * 支付实际金额
+     */
+    private BigDecimal payMoney;
 
     /**
      * 创建时间
@@ -161,5 +167,13 @@ public class MeetingLiveCreateRecord extends BaseEntity implements Serializable 
     @Override
     public String toString() {
         return ToStringBuilder.reflectionToString(this, ToStringStyle.JSON_STYLE);
+    }
+
+    public BigDecimal getPayMoney() {
+        return payMoney;
+    }
+
+    public void setPayMoney(BigDecimal payMoney) {
+        this.payMoney = payMoney;
     }
 }

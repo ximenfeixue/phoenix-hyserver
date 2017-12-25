@@ -85,12 +85,18 @@ public class DataSyncTask implements Runnable{
                             final MeetingFreeChat meetingFreeChat = (MeetingFreeChat) data;
                             if (meetingFreeChat == null)
                                 continue;
-                            // 加锁
-                            boolean success = getLock(id);
-                            // 成功获得锁
-                            if (success) {
-                                // 设置活动的 畅聊id， 返回是否可删除该数据的标志
-                                result = saveMeetingGroupId(meetingFreeChat);
+                            try {
+                                // 加锁
+                                boolean success = getLock(id);
+                                // 成功获得锁
+                                if (success) {
+                                    // 设置活动的 畅聊id， 返回是否可删除该数据的标志
+                                    result = saveMeetingGroupId(meetingFreeChat);
+                                }
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            } finally {
+                                unLock(id);
                             }
                         }
                         if (data instanceof MeetingNotice) {
@@ -117,9 +123,6 @@ public class DataSyncTask implements Runnable{
             } catch (Exception e) {
                 e.printStackTrace();
                 logger.error("update member status failed" + e.getMessage());
-            } finally {
-                // 释放锁
-                unLock(id);
             }
         }
     }
