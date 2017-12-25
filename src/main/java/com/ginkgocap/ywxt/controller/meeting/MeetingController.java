@@ -653,7 +653,6 @@ public class MeetingController extends BaseController {
 						if (!status)
 							meetingObj.setIsPay((byte)0);
 					}
-
 				}
 			} catch (Exception e) {
 				logger.error("查询会议详情失败", e);
