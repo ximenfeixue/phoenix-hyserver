@@ -73,7 +73,7 @@ public class DataSyncTask implements Runnable{
         List<PayOrder> payOrderList = null;
         try {
             while(true) {
-                logger.info("task 循环日志。"); 
+                logger.info("task 循环日志。");
                 DataSync dataSync = dataSyncQueue.take();
                 if (dataSync != null) {
                     boolean result = false;
