@@ -96,6 +96,7 @@ public class DataSyncTask implements Runnable{
                             } catch (Exception e) {
                                 e.printStackTrace();
                             } finally {
+                                logger.info("id : " + id);
                                 unLock(id);
                             }
                         }
@@ -109,7 +110,7 @@ public class DataSyncTask implements Runnable{
                                 logger.error("invoke payOrderService failed ! method : {getPayOrderByUserIdAndSourceId}. userId : " + createId);
                             }
                             // 处理订单表数据, 并对活动备份通知数据处理，加入活动成员等处理
-                            handlePayOrder(payOrderList, meetingNotice);
+                            result = handlePayOrder(payOrderList, meetingNotice);
                         }
                     }
                     if (result) {
@@ -234,14 +235,23 @@ public class DataSyncTask implements Runnable{
         Long lock = 0l;
         while (lock != 1) {
             Long currentTime = System.currentTimeMillis();
-            Long timeout = 1 * 60 * 1000l + currentTime;
-            Long expireTime = 10 * 60 * 1000l + currentTime;
-            lock = redisCacheService.setnxRedisCacheByKey(meetingFreeChatKey + id, timeout);
-            // 获取锁的过期时间
-            lockTimeout = (Long) redisCacheService.getRedisCacheByKey(meetingFreeChatKey + id);
-            // 获取之前锁的过期时间 并设置最新锁的过期时间
-            Long oldTimeout = (Long) redisCacheService.getSetRedisCacheByKey(meetingFreeChatKey + id, timeout);
 
+            Long expireTime = 10 * 60 * 1000l + currentTime;
+            lock = redisCacheService.setnxRedisCacheByKey(meetingFreeChatKey + id, getTimeout());
+            // 获取锁的过期时间
+            String timeOutStr = redisCacheService.getStringRedisCacheByKey(meetingFreeChatKey + id);
+            if (!StringUtils.isNullOrEmpty(timeOutStr))
+                lockTimeout = Long.valueOf(timeOutStr);
+            // 获取之前锁的过期时间 并设置最新锁的过期时间
+            Long oldTimeout = 0l;
+            try {
+                String o = redisCacheService.getSetRedisCacheByKey(meetingFreeChatKey + id, getTimeout());
+                if (!StringUtils.isNullOrEmpty(o)) {
+                    oldTimeout = Long.valueOf(o);
+                }
+            } catch (Throwable e) {
+                e.printStackTrace();
+            }
             // 若直接加锁成功 或 该锁过期时，第一次重新设置过期时间接替锁的持有者
             if (lock == 1 || (currentTime > lockTimeout && currentTime > oldTimeout)) {
                 // 对 key 设置过期时间
@@ -258,6 +268,11 @@ public class DataSyncTask implements Runnable{
         return true;
     }
 
+    private String getTimeout() {
+        Long currentTime = System.currentTimeMillis();
+        Long timeout =  1 * 60 * 1000l + currentTime;
+        return String.valueOf(timeout);
+    }
     /**
      * 释放锁
      * @param id
@@ -268,8 +283,8 @@ public class DataSyncTask implements Runnable{
             Long currentTime = System.currentTimeMillis();
             Long timeout = (Long) redisCacheService.getRedisCacheByKey(meetingFreeChatKey + id);
             // 当前锁还未过期 则直接删除 key
-            if (currentTime < timeout)
-                redisCacheService.deleteRedisCacheByKey(meetingFreeChatKey + id);
+            /*if (currentTime < timeout)
+                redisCacheService.deleteRedisCacheByKey(meetingFreeChatKey + id);*/
         }
     }
 
