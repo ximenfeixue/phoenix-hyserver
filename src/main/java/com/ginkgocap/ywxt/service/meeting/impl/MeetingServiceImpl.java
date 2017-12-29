@@ -471,7 +471,7 @@ public class MeetingServiceImpl extends BaseServiceImpl<Meeting, Long> implement
 			ThreadPoolUtils.getExecutorService().execute(new Runnable() {
 				@Override
 				public void run() {
-					String groupId = "";//createFreeChatGroup(meetingid, meetingQuery, userIds, ownerId);
+					String groupId = createFreeChatGroup(meetingid, meetingQuery, userIds, ownerId);
 					if (StringUtils.isNullOrEmpty(groupId)) {
 						// 备份到 mongo 中
 						MeetingFreeChat meetingFreeChat = new MeetingFreeChat();
