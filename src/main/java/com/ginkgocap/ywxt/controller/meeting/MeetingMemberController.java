@@ -904,8 +904,9 @@ public class MeetingMemberController extends BaseController {
 		meetingMember.setAttendMeetType(1);
 		meetingMember.setAttendMeetTime(new Date());
 		/** 活动不需要审核不需要签到 直接设置成员为已签到状态 **/
-		if (meeting.getReviewFlag() == 0 && meeting.getIsSign() == 0)
+		if (meeting.getReviewFlag() == 0 && meeting.getIsSign() == 0) {
 			meetingMember.setIsSign(1);
+		}
 		// 报名
 		meetingMemberService.signUp(meeting, meetingMember, user);
 
