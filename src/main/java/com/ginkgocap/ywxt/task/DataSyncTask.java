@@ -71,14 +71,15 @@ public class DataSyncTask implements Runnable{
     @Override
     public void run() {
         List<PayOrder> payOrderList = null;
-        try {
-            while(true) {
+        String id = "";
+        while(true) {
+            try {
                 logger.info("task 循环日志。");
                 DataSync dataSync = dataSyncQueue.take();
                 if (dataSync != null) {
                     boolean result = false;
                     Object data = dataSync.getData();
-                    String id = dataSync.getId();
+                    id = dataSync.getId();
                     if (data != null) {
                         if (data instanceof MeetingFreeChat) {
                             final MeetingFreeChat meetingFreeChat = (MeetingFreeChat) data;
@@ -87,6 +88,7 @@ public class DataSyncTask implements Runnable{
                             try {
                                 // 加锁
                                 boolean success = getLock(id);
+                                logger.info("--------getLock : " + success);
                                 // 成功获得锁
                                 if (success) {
                                     // 设置活动的 畅聊id， 返回是否可删除该数据的标志
@@ -95,11 +97,12 @@ public class DataSyncTask implements Runnable{
                             } catch (Exception e) {
                                 e.printStackTrace();
                             } finally {
-                                // 释放锁
+                                logger.info("MeetingFreeChat------id : " + id);
                                 unLock(id);
                             }
                         }
                         if (data instanceof MeetingNotice) {
+                            logger.info("MeetingNotice---id : " + id);
                             MeetingNotice meetingNotice = (MeetingNotice) data;
                             Long meetingId = meetingNotice.getMeetingId();
                             Long createId = meetingNotice.getCreateId();
@@ -109,7 +112,8 @@ public class DataSyncTask implements Runnable{
                                 logger.error("invoke payOrderService failed ! method : {getPayOrderByUserIdAndSourceId}. userId : " + createId);
                             }
                             // 处理订单表数据, 并对活动备份通知数据处理，加入活动成员等处理
-                            handlePayOrder(payOrderList, meetingNotice);
+                            result = handlePayOrder(payOrderList, meetingNotice);
+                            logger.info("MeetingNotice---result : " + result);
                         }
                     }
                     if (result) {
@@ -118,12 +122,12 @@ public class DataSyncTask implements Runnable{
                 } else {
                     logger.info("data is null, so skip to send.");
                 }
+            } catch (InterruptedException ex) {
+                logger.error("queues thread interrupted. so exit this thread.");
+            } catch (Exception e) {
+                e.printStackTrace();
+                logger.error("update member status failed" + e.getMessage());
             }
-        } catch (InterruptedException ex) {
-            logger.error("queues thread interrupted. so exit this thread.");
-        } catch (Exception e) {
-            e.printStackTrace();
-            logger.error("update member status failed" + e.getMessage());
         }
     }
 
@@ -233,6 +237,7 @@ public class DataSyncTask implements Runnable{
         Long lockTimeout = 0l;
         Long lock = 0l;
         while (lock != 1) {
+            logger.info("-------------id : " + id);
             Long currentTime = System.currentTimeMillis();
 
             Long expireTime = 10 * 60 * 1000l + currentTime;
@@ -244,7 +249,7 @@ public class DataSyncTask implements Runnable{
             // 获取之前锁的过期时间 并设置最新锁的过期时间
             Long oldTimeout = 0l;
             try {
-                String o = redisCacheService.getSetRedisCacheByKey(meetingFreeChatKey + id, getTimeout());
+                String o = redisCacheService.getSetRedisCacheByKey(meetingFreeChatKey + id, timeOutStr + 5 * 1000);
                 if (!StringUtils.isNullOrEmpty(o)) {
                     oldTimeout = Long.valueOf(o);
                 }
@@ -268,23 +273,23 @@ public class DataSyncTask implements Runnable{
     }
 
     private String getTimeout() {
-
         Long currentTime = System.currentTimeMillis();
-        Long timeout = 1 * 60 * 1000l + currentTime;
+        Long timeout =  1 * 60 * 1000l + currentTime;
         return String.valueOf(timeout);
     }
-
     /**
      * 释放锁
      * @param id
      */
     public void unLock(String id) {
 
-        Long currentTime = System.currentTimeMillis();
-        Long timeout = (Long) redisCacheService.getRedisCacheByKey(meetingFreeChatKey + id);
-        // 当前锁还未过期 则直接删除 key
-        if (currentTime < timeout)
-            redisCacheService.deleteRedisCacheByKey(meetingFreeChatKey + id);
+        if (!StringUtils.isNullOrEmpty(id)) {
+            Long currentTime = System.currentTimeMillis();
+            String timeout = redisCacheService.getStringRedisCacheByKey(meetingFreeChatKey + id);
+            // 当前锁还未过期 则直接删除 key
+            if (!StringUtils.isNullOrEmpty(timeout) && currentTime < Long.valueOf(timeout))
+                redisCacheService.deleteRedisCacheByKey(meetingFreeChatKey + id);
+        }
     }
 
     public boolean batchSaveDataNeedSync(List<DataSync> dataList) {
