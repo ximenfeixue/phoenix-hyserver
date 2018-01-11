@@ -248,6 +248,12 @@ public class MeetingController extends BaseController {
 				return InterfaceResult.getInterfaceResultInstance(CommonResultCode.PARAMS_EXCEPTION);
 			}
 		}
+		// 由于畅聊是异步创建，为保证第一次获取详情时成功（groupId 不为 null），延迟返回数据 0.1秒
+		try {
+			Thread.sleep(100);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 		return InterfaceResult.getSuccessInterfaceResultInstance(responseDataMap);
 	}
 
